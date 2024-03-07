@@ -1,0 +1,20 @@
+---
+title: "Home"
+output:
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
+```
+
+These are the result from a project assessing the nutrient flows in the French sanitation system. Multiple sources are used: wastewater treatment plant data from water agencies, industry discharge, food intakes surveys...
+
+In *Data preparation*, we clean and normalize the data.
+
+In *First Synthesis*, we show some first results combining the multiple sources together.
+
+In *Results*, we show our main results: a nitrogen and phosphorus nutrient flow analysis, and the main figures used in our articles.
