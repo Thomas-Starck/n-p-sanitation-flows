@@ -8,3 +8,5 @@
 /.quarto/
 
 renv/library/
+
+_site
