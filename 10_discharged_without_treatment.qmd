@@ -1,0 +1,800 @@
+---
+title: "Discharged without treatment"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning=F, message=F, results=F, fig.align = "center",  dev='svg')
+
+library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
+
+#core tidyverse packages loaded:
+# ggplot2, for data visualisation. https://ggplot2.tidyverse.org/
+# dplyr, for data manipulation. https://dplyr.tidyverse.org/
+# tidyr, for data tidying. https://tidyr.tidyverse.org/
+# readr, for data import. https://readr.tidyverse.org/
+# purrr, for functional programming. https://purrr.tidyverse.org/
+# tibble, for tibbles, a modern re-imagining of data frames. https://tibble.tidyverse.org/
+# stringr, for strings. https://stringr.tidyverse.org/
+# forcats, for factors. https://forcats.tidyverse.org/
+# lubridate, for date/times. https://lubridate.tidyverse.org/
+
+#also loads the following packages (less frequently used):
+# Working with specific types of vectors:
+#     hms, for times. https://hms.tidyverse.org/
+# Importing other types of data:
+#     feather, for sharing with Python and other languages. https://github.com/wesm/feather
+#     haven, for SPSS, SAS and Stata files. https://haven.tidyverse.org/
+#     httr, for web apis. https://httr.r-lib.org/
+#     jsonlite for JSON. https://arxiv.org/abs/1403.2805
+#     readxl, for .xls and .xlsx files. https://readxl.tidyverse.org/
+#     rvest, for web scraping. https://rvest.tidyverse.org/
+#     xml2, for XML. https://xml2.r-lib.org/
+# Modelling
+#     modelr, for modelling within a pipeline. https://modelr.tidyverse.org/
+#     broom, for turning models into tidy data. https://broom.tidymodels.org/
+
+#load additional relevant packages
+library(readxl)
+
+#setting graphs theme
+theme_set(
+  theme_minimal() +
+    theme(
+      text = element_text(family = "Times New Roman"),
+      plot.title = element_text(face="bold")
+      )
+  )
+
+#setting viridis theme for colors
+scale_colour_continuous <- scale_colour_viridis_c
+scale_colour_discrete   <- scale_colour_viridis_d
+scale_colour_binned     <- scale_colour_viridis_b
+#setting viridis theme for fill
+scale_fill_continuous <- scale_fill_viridis_c
+scale_fill_discrete   <- scale_fill_viridis_d
+scale_fill_binned     <- scale_fill_viridis_b
+```
+
+For **Artois-Picardie, Rhin-Meuse, Seine-Normandie and Loire-Bretagne**, we have some estimations made in the expert assessments *Etat des lieux* reports.
+
+For **Artois-Picardie and Rhin-Meuse**, some data was also provided about direct discharge flows, for the largest WWTPs. However this only concerns water volumes and not pollutant quantities. As discharges tend to have lower concentrations (because of dilution during storms), these should be seen as upper bounds.
+
+For **Loire-Bretagne and Adour-Garonne**, we have data about direct discharge for the largest WWTPs. Contrary to Artois_picardie and Rhin-Meuse, these relate to pollutant quantities, and not water volumes. The analyses are made on Loire-Bretagne's and Adour-Garonne's respective data preparation pages, and are not reproduced here. We only report the results.
+
+**Rhône-Méditerranée** is the only basin for which we do not have any data related to direct discharges. For this basin we use the estimations made for Adour-Garonne, which is the other basin from Southern France.
+
+# Source for each basin
+
+::: panel-tabset
+
+## Artois-Picardie 
+
+From the data we have, discharges A1 and A2 points represent 15-20% of the flow (in volume) entering the WWTP. Concentrations of discharges tend to be lower than for usual flows ; on the other hand, this is only monitored discharge, and not sewers leaks
+
+In the *Etat des lieux* reports, direct discharges are generally between around \~10-25% of pollution entering WWTP.
+
+We keep **20%** as a final value.
+
+::: panel-tabset
+
+### Water flows in A1 and A2 
+
+This does not take into account the different concentrations of stormwater, nor the network leaks. The total capacity in Artois-Picardie is 6.4 million population equivalent. Here we have data concerning A1 and A2 points for WWTPs representing more than 5 million population equivalent, so \~80% of the basin capacity.
+
+Discharges A1 and A2 points represent 15-20% of the flow (in volume) entering the WWTP. Concentrations of discharges tend to be lower than for usual flows ; on the other hand, this is only monitored discharge, and not sewers leaks. We keep **15-20%**.
+
+```{r}
+path_source <- "source_data/10_discharge_without_treatment/artois_picardie/"
+file_2019 <- read_excel(paste0(path_source, "2019 - ratio A1 et A1, A2, A3.xlsx"))
+file_2020 <- read_excel(paste0(path_source, "2020 - ratio A1 et A1, A2, A3.xlsx"))
+file_2021 <- read_excel(paste0(path_source, "2021 - ratio A1 et A1, A2, A3.xlsx"))
+flows <- rbind(file_2019, file_2020, file_2021)
+
+flows <- flows %>% select(
+  Year = Année,
+  capacity = `Capacité STEU`,
+  A1 = `Volume annuel A1`,
+  A2 = `Volume annuel A2`,
+  A3 = `Volume annuel A3`
+) %>%
+  mutate(
+    flow = (A1 + A2 + A3),
+    perc_discharged_A1 = round(A1/flow*100),
+    perc_discharged_A2 = round(A1/flow*100)
+    )
+
+Source <- "Source: data from Artois-Picardie Agency\ncomputation by Thomas Starck"
+```
+
+::: panel-tabset
+
+#### A1 point 
+
+::: panel-tabset
+
+##### Reporting
+
+```{r}
+#reporting of A1 point
+temp <- flows %>%
+  group_by(Year) %>%
+  mutate(A1_reported = ifelse(is.na(A1)==T, "no", "yes")) %>%
+  group_by(Year, A1_reported) %>%
+  summarise(
+    capacity = round(sum(capacity, na.rm=T)/10^6, 2),
+    flow = round(sum(flow, na.rm=T)/10^6, 0)
+    )
+ggplot(temp) +
+  geom_area(
+    aes(Year, capacity, fill=A1_reported, group=A1_reported),
+    alpha=.8
+    ) +
+  labs(
+    y="million PE", x="",
+    title = "reporting of the A1 point in the data",
+    subtitle = "in terms of Population Equivalent (PE)",
+    caption=Source
+    ) +
+  scale_y_continuous(breaks = seq(0, 7, by = 1))
+```
+
+##### Discharged without treatment
+
+```{r}
+temp <- flows %>%
+  filter(is.na(A1)==F)
+temp2 <- temp %>%
+  group_by(Year) %>%
+  summarise(
+    A1 = round(sum(A1, na.rm=T)/10^6), 
+    A3 = round(sum(A3, na.rm=T)/10^6),
+    perc_discharged_A1 = round(A1/A3*100),
+    )
+
+ggplot(temp) +
+  #individual points
+  geom_jitter(
+    aes(Year, perc_discharged_A1, size = A3),
+    alpha=.5, width = .2
+    ) +
+  #mean value, in red
+  geom_point(
+    data = temp2, 
+    aes(Year, perc_discharged_A1),
+    fill="red", color="black", shape=23, size=4,
+    ) +
+  scale_size(range = c(0, 15)) +
+  #men text, in red
+  geom_text(
+    data = temp2, 
+    aes(Year, 65, label=paste0(perc_discharged_A1, "%")),
+    hjust=0, vjust=0, color="red"
+    ) +
+  theme(legend.position="none") +
+  labs(
+    x="", y="%",
+    title = "flow discharged without treatment as % of A3 flow",
+    subtitle = "in A1 point. Red: value for all basin",
+    size="incoming flow",
+    caption=Source
+  )
+```
+
+:::
+
+#### A2 point 
+
+::: panel-tabset
+
+##### Reporting
+
+```{r}
+#reporting of A2 point
+temp <- flows %>%
+  group_by(Year) %>%
+  mutate(A2_reported = ifelse(is.na(A2)==T, "no", "yes")) %>%
+  group_by(Year, A2_reported) %>%
+  summarise(
+    capacity = round(sum(capacity, na.rm=T)/10^6, 2),
+    flow = round(sum(flow, na.rm=T)/10^6, 0)
+    )
+ggplot(temp) +
+  geom_area(
+    aes(Year, capacity, fill=A2_reported, group=A2_reported),
+    alpha=.8
+    ) +
+  labs(
+    y="million PE", x="",
+    title = "reporting of the A2 point in the data",
+    subtitle = "in terms of Population Equivalent (PE)",
+    caption=Source
+    ) +
+  scale_y_continuous(breaks = seq(0, 7, by = 1))
+
+```
+
+##### Discharged without treatment
+
+```{r}
+temp <- flows %>%
+  filter(is.na(A2)==F)
+temp2 <- temp %>%
+  group_by(Year) %>%
+  summarise(
+    A2 = round(sum(A2, na.rm=T)/10^6), 
+    A3 = round(sum(A3, na.rm=T)/10^6),
+    perc_discharged_A2 = round(A2/A3*100),
+    )
+
+ggplot(temp) +
+  #individual points
+  geom_jitter(
+    aes(Year, perc_discharged_A2, size = A3),
+    alpha=.5, width = .2
+    ) +
+  #mean value, in red
+  geom_point(
+    data = temp2, 
+    aes(Year, perc_discharged_A2),
+    fill="red", color="black", shape=23, size=4,
+    ) +
+  scale_size(range = c(0, 15)) +
+  #men text, in red
+  geom_text(
+    data = temp2, 
+    aes(Year, 65, label=paste0(perc_discharged_A2, "%")),
+    hjust=0, vjust=0, color="red"
+    ) +
+  theme(legend.position="none") +
+  labs(
+    x="", y="%",
+    title = "% flow discharged without treatment",
+    subtitle = "in A2 point. Red: value for all basin",
+    size="incoming flow",
+    caption=Source
+  )
+```
+
+:::
+
+:::
+
+### Etat des lieux 
+
+In the 2019 and 2013 *Etat des lieux* reports, direct discharges are generally between around \~10-25% of pollution entering WWTP. We keep **20%**.
+
+```{r}
+path_source <- "source_data/10_discharge_without_treatment/artois_picardie/" 
+```
+
+::: panel-tabset
+
+#### 2019 
+
+[Document](https://www.eau-artois-picardie.fr/sites/default/files/edl_district_hydro_bd.pdf) found on this [website page](https://www.eau-artois-picardie.fr/letat-des-lieux-2019-du-bassin-artois-picardie).
+
+The assessment is page 70
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2019.png"))
+```
+
+::: panel-tabset
+
+##### N
+
+Pollution discharged directly by sewers networks represent (with 0.8 uncertainty in the global flows)
+
+3.6/(21x4/4.7) = **20%** of pollution produced by population (up to (3.6+0.8)/(21x4/4.7)=**25%** if we count residual pollution)
+
+and
+
+3.6/2.6 = **140%** of outgoing flow in A4 (up to (3.6+0.8)/2.6=**220%** if we count residual pollution)
+
+##### P
+
+Pollution discharged directly by sewers networks represent (with 0.1 uncertainty in the global flows)
+
+0.5/(2.8x4/4.7) = **20%** of pollution produced by population (up to (0.5+0.11)/(2.8x4/4.7)=**26%** if we count residual pollution)
+
+and
+
+0.5/0.35 = **140%** of outgoing flow in A4 (up to (0.5+0.11)/0.35=**175%** if we count residual pollution)
+
+##### MES
+
+Pollution discharged directly by sewers networks represent (with 4.6 uncertainty in the global flows)
+
+15/(120x4/4.7) = **15%** of pollution produced by population (up to (15+4.6)/(120x4/4.7)=**19%** if we count residual pollution)
+
+and
+
+15/2 = **750%** of outgoing flow in A4 (up to (15+4.6)/2=**1000%** if we count residual pollution)
+
+##### MO
+
+Pollution discharged directly by sewers networks represent (with 5.5 uncertainty in the global flows)
+
+23/(94x4/4.7) = **29%** of pollution produced by population (up to (23+5.5)/(94x4/4.7)=**36%** if we count residual pollution)
+
+and
+
+23/4.3 = **540%** of outgoing flow in A4 (up to (23+5.5)/4.3=**670%** if we count residual pollution)
+
+:::
+
+#### 2013 
+
+[Document](https://www.eau-artois-picardie.fr/sites/default/files/etat_des_lieux_2013_escaut_sambre_2013.pdf) on [this website page](https://www.eau-artois-picardie.fr/etat-des-lieux)
+
+Based on an assessment on 19 urban areas, the agency found that 10% of the pollution produced byt the population is directly discharged by storm overflows.
+
+::: panel-tabset
+
+##### MES
+
+10/91 = 11%, up to 22/91=25%
+
+p 65
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2013_MES.png"))
+```
+
+##### DBO5
+
+Pollution discharged directly by sewers networks represent
+
+8.1/85.1 = **9%** of pollution produced by population (up to (8.1+13.8)/85.1 = **25%** if we count residual pollution)
+
+and
+
+8.1/3 = **270%** of outgoing flow in A4 (up to (8.1+13.8)/3 = **730%**)
+
+p 98
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2013_DBO.png"))
+```
+
+##### N
+
+Pollution discharged directly by sewers networks represent
+
+2/(19-) = **12%** of pollution produced by population (up to (2+1.5)/(19-2) = **21%** if we count residual pollution)
+
+and
+
+2/2.8 = **70%** of outgoing flow in A4 (up to (2+1.5)/2.8 = **125%**)
+
+p 99
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2013_N.png"))
+```
+
+##### P
+
+Pollution discharged directly by sewers networks represent
+
+0.2/(2.5-0.2) = **9%** of pollution produced by population (up to (0.2+0.3)/(2.5-0.2-0.3) = **20%** if we count residual pollution)
+
+and
+
+0.2/0.5 = **40%** of outgoing flow in A4 (up to (0.2+0.3)/0.5 = **100%**)
+
+p 100
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2013_P.png"))
+```
+
+:::
+
+:::
+
+:::
+
+## Rhin - Meuse 
+
+::: panel-tabset
+
+From the data we have, A1 + A2 direct discharge flows represent \~15% of total incoming flow, so **\~18%** the flow finally entering the WWTP.
+
+In the *Etat des lieux*, the storm water represent **\~24%** of the pollution entering in the WWTP.
+
+We keep **20%** as an intermediate value.
+
+### Flow discharged without treatment
+
+These data show that A1 + A2 direct discharge flows represent \~15% of total incoming flow, so **\~18%** the flow finally entering the WWTP.
+
+```{r results=T, out.width="500px"}
+path_source <- "source_data/10_discharge_without_treatment/rhin_meuse/"
+knitr::include_graphics(paste0(path_source, "discharged_without_treatment_rhin_meuse.jpg"))
+```
+
+### Etat des lieux
+
+water storm / (industry to sewers + connected housings) = 0.99 / (3.44 + 0.69) = 24%
+
+```{r results=T, out.width="100%"}
+path_source <- "source_data/10_discharge_without_treatment/rhin_meuse/"
+knitr::include_graphics(paste0(path_source,"etat_des_lieux.png"))
+```
+
+:::
+
+## Seine-Normandie 
+
+For Seine-Normandie *Etat des lieux*, there is genarally a discrepancy concerning estimated pollution from direct discharge depending on the type of pollution considered. All expressed as % of pollution entering the WWTP:
+
+-   DBO5, DCO and MES are generally around 7-15%
+-   P is around 20-25% in 2013 and 2004
+-   N is around 1-4% in 2013 and 2004
+
+We are interested in N and P, which are the more extreme values. We consider that the 1% is an implausible outlier. We chose an intermediate value corresponding to DBO5, DCO and MES: **10%**. That means that N direct discharge could be overestimated by a factor 2.5 and P underestimated by 2-2.5.
+
+```{r}
+path_source <- "source_data/10_discharge_without_treatment/seine_normandie/" 
+```
+
+::: panel-tabset
+
+### 2019 
+
+[Document](https://www.eau-seine-normandie.fr/sites/public_file/inline-files/AESN_etat_lieux_janvier20.pdf), p 93, from this [website page](https://www.eau-seine-normandie.fr/domaines-d-action/sdage/etat-des-lieux).
+
+If we say that about half of the rainwater entering sewers is discharged without treatment, we can estimate the pollution discharged without treatment as % of the A3 point (entrance of station) by :
+
+(109-38/2)/(760-38/2) = **12%** of incoming pollution in A3
+
+100/63 = **175%** of outgoing pollution in A4
+
+Pollution from rainwater coming in WWTP entrance represent (38/2)/760 = **2.5%** of A3 point.
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2019_DCO.png"))
+```
+
+### 2013 
+
+On this [document](https://www.observatoire-poissons-seine-normandie.fr/wp-content/uploads/2018/03/etat-des-lieux-complet.pdf).
+
+::: panel-tabset
+
+#### DBO5
+
+p 107
+
+Discharged without treatment as % of A3 point (entrance of station), after removing rainwater :
+
+(45-2.5)/(314-9.8) = **14%** of incoming pollution in A3
+
+45/14 = **320%** of outgoing pollution in A4
+
+Pollution from rainwater coming in WWTP entrance represent 9.8/314 = **3%** of A3 point.
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2013_DBO.png"))
+```
+
+#### DCO
+
+p 108
+
+Discharged without treatment as % of A3 point (entrance of station), after removing rainwater :
+
+(108-10)/(764-38) = **13%** of incoming pollution in A3
+
+108/67 = **160%** of outgoing pollution in A4
+
+Pollution from rainwater coming in WWTP entrance represent 38/764 = **5%** of A3 point.
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2013_DCO.png"))
+```
+
+#### MES
+
+p 153
+
+Discharged without treatment as % of A3 point (entrance of station), after removing rainwater :
+
+(85-60)/(394-40) = **7%** of incoming pollution in A3
+
+76/23 = **330%** of outgoing pollution in A4
+
+Pollution from rainwater coming in WWTP entrance represent 78/406 = **20%** of A3 point.
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2013_MES.png"))
+```
+
+#### P
+
+p 135
+
+Discharged without treatment as % of A3 point (entrance of station), after removing rainwater :
+
+(2.6-0.2)/(10-0.8) = **26%** of incoming pollution in A3
+
+2.6/1.7 = **150%** of outgoing pollution in A4
+
+Pollution from rainwater coming in WWTP entrance represent 0.8/10 = **8%** of A3 point.
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2013_P.png"))
+```
+
+#### N
+
+p 114
+
+Discharged without treatment as % of A3 point (entrance of station), after removing rainwater :
+
+(1.5-1)/(79-4) = **1%** of incoming pollution in A3
+
+1.5/(8.9+9.2+1.7) = **8%** of outgoing flow in A4
+
+Pollution from rainwater coming in WWTP entrance represent 4/79 = **5%** of A3 point.
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2013_N.png"))
+```
+
+:::
+
+### 2004 
+
+Document found on this [website page](https://seine-normandie.eaufrance.fr/planification-et-programmation/le-sdage-pdm/letat-des-lieux-2004/).
+
+::: panel-tabset
+
+#### DCO
+
+p 39
+
+Discharged without treatment as % of A3 point (entrance of station), after removing rainwater :
+
+(183-30)/(603-30) = **27%** of incoming pollution in A3
+
+(183-30)/157 = **100%** of outgoing pollution in A4
+
+Pollution from rainwater coming in WWTP entrance represent 20/603 = **3%** of A3 point.
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2004_DCO.png"))
+```
+
+#### MES
+
+p 42
+
+Discharged without treatment as % of A3 point (entrance of station), after removing rainwater :
+
+(85-60)/(394-40) = **7%** of incoming pollution in A3
+
+(85-60)/53 = **50%** of outgoing pollution in A4
+
+Pollution from rainwater coming in WWTP entrance represent 40/394 = **10%** of A3 point.
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2004_MES.png"))
+```
+
+#### P
+
+p 49
+
+Discharged without treatment as % of A3 point (entrance of station), after removing rainwater :
+
+(3.2-0.5)/(13.1-0.4) = **21%** of incoming pollution in A3
+
+(3.2-0.5)/7.7 = **35%** of outgoing pollution in A4
+
+Pollution from rainwater coming in WWTP entrance represent 0.4/13.1 = **3%** of A3 point.
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2004_P.png"))
+```
+
+#### N
+
+p 44
+
+Discharged without treatment as % of A3 point (entrance of station), after removing rainwater :
+
+(5.7-2.9)/(70-1.8) = **4%** of incoming pollution in A3
+
+(5.7-2.9)/(36.9+5.3) = **6.5%** of outgoing pollution in A4
+
+Pollution from rainwater coming in WWTP entrance represent 1.8/70 = **2.5%** of A3 point.
+
+```{r results=T, out.width="100%"}
+knitr::include_graphics(paste0(path_source, "2004_N.png"))
+```
+
+:::
+
+:::
+
+## Loire-Bretagne 
+
+The data analysed on Loire-Bretagne webpage (in *Etat des lieux* -\> *A1, A2 and A5*) results in a **15%** rate for direct discharge pollution as a share of pollution entering WWTP (only monitored discharges, does not consider sewers leaks).
+
+The *Etat des lieux* expert assessment gives figures of *10-15%*, which is coherent.
+
+We keep **15%**.
+
+::: panel-tabset
+
+### Data from WWTP
+
+See on Loire-Bretagne data preparation page, in *Etat des lieux* -\> *A1, A2 and A5*.
+
+As % of pollution entering the station (A3 point), direct discharge in A1, A2 and A5 represent in total **15%** (respectively 9%, 4% and 2%).
+
+### Etat des lieux report 
+
+```{r}
+path_source <- "source_data/10_discharge_without_treatment/loire_bretagne/" 
+```
+
+::: panel-tabset
+
+#### 2019 
+
+[Document](https://sdage-sage.eau-loire-bretagne.fr/files/live/mounts/midas/Donnees-et-documents/EDL2019-Erratum.pdf) found on this [website page](https://sdage-sage.eau-loire-bretagne.fr/home/le-sdage-2022-2027/les-documents-du-sdage-2022---2027/etat-des-lieux-2019.html)
+
+p 160, yields on page 162
+
+In general, direct discharge of pollution represent 10-15% of pollution entering the station (see details below), coherent with our precedent estimation.
+
+```{r results=T, out.width="600px"}
+knitr::include_graphics(paste0(path_source, "2019.png"))
+```
+
+```{r results=T, out.width="500px"}
+knitr::include_graphics(paste0(path_source, "2019_yield.png"))
+```
+
+::: panel-tabset
+
+##### N
+
+Pollution discharged without treatment represents
+
+(1.4+12.3)/23.5 = **60%** of A4 point (up to (1.4+12.3+5)/23.5 = **71%** with rainwater pollution)
+
+and
+
+60% x (1-0.83) = **10%** of A3 point (up to with rainwater 71% x (1-0.83) = **12%** pollution)
+
+Rain water represents 5 / 23.5/(1-0.83) = **3.5%** of pollution in A3 point (station entrance)
+
+##### P
+
+Pollution discharged without treatment represents
+
+(0.2+1.5)/3 = **55%** of A4 point (up to (0.2+1.5+1.2)/3 = **100%** with rainwater pollution)
+
+and
+
+55% x (1-0.83) = **9%** of A3 point (up to 100% x (1-0.83) = **17%** with rainwater pollution)
+
+Rain water represents1.2 / 3/(1-0.83) = **7%** of pollution in A3 point (station entrance)
+
+##### DBO5
+
+Pollution discharged without treatment represents
+
+(5.5+49)/12.2 = **450%** of A4 point (up to (5.5+49+33)/12.2 = **700%** with rainwater pollution)
+
+and
+
+450% x (1-0.98) = **9%** of A3 point (up to 700% x (1-0.98) = **14%** with rainwater pollution)
+
+Rain water represents 33 / 12.2/(1-0.98) = **6%** of pollution in A3 point (station entrance)
+
+##### DCO
+
+Pollution discharged without treatment represents
+
+(123+13.5)/89 = **150%** of A4 point (up to (123+13.5+200)/89 = **380%** with rainwater pollution)
+
+and
+
+150% x (1-0.94) = **9%** of A3 point (up to 380% x (1-0.94) = **23%** with rainwater pollution)
+
+Rain water represents 200 / 89/(1-0.94) = **13%%** of pollution in A3 point (station entrance)
+
+:::
+
+#### 2013 
+
+On this [document](https://sdage-sage.eau-loire-bretagne.fr/files/live/sites/sdage-sage/files/Planification-gestion%20des%20eaux/Elaborer%20l%27%C3%A9tat%20des%20lieux/Document/PUBLI_EtatdesLieux_2013_280314.pdf), p150
+
+```{r results=T, out.width="600px"}
+knitr::include_graphics(paste0(path_source, "2013.png"))
+```
+
+::: panel-tabset
+
+##### P
+
+Direct discharge without treatment represents
+
+12/59 = **17%** of A4 point
+
+and
+
+12 / 59/(1-0.8) = **4%** of A3 point (see 2013 yield in 2019 report)
+
+##### DCO
+
+Direct discharge without treatment represents
+
+17/29 = **60%** of A4 point
+
+and
+
+17 / 29/(1-0.92) = **5%** of A3 point (see 2013 yield in 2019 report)
+
+:::
+
+:::
+
+:::
+
+## Adour-Garonne
+
+The data analysed on Adour-Garonne webpage (in *Etat des lieux* -\> *A1, A2 and A5*) results in \~**7%** rate for direct discharge pollution as a share of pollution entering WWTP.
+
+## Rhône-Méditerranée
+
+We do not have data for Rhône-Méditerranée. We use the same rate as Adour-Garonne, the other French Southern basin (with the closest climate), \~**7%**
+
+:::
+
+# Synthesis
+
+Caution, theses should be seen as orders of magnitude. The definition of losses may differ between basins (sometimes the A5 point is considered and sometimes not, sometimes unmonitored sewer losses are estimated and sometimes not...). At the national scale, the weigthed average is 10%.
+
+```{r}
+path_source <-"source_data/10_discharge_without_treatment/"
+
+discharge <- 
+  read.csv(
+    paste0(path_source, "discharge_without_treatment_estimations.csv"),
+    ) %>%
+  mutate(value = paste(percent_loss*100, "%"))
+discharge$basin <- reorder(discharge$basin, discharge$percent_loss)
+
+ggplot(discharge) +
+  geom_col(
+    aes(
+      basin, 
+      percent_loss*100, 
+      fill=basin
+      )
+    ) +
+  geom_text(
+    aes(basin, percent_loss*100, label = paste(percent_loss*100, "%")),
+    fontface="italic", family = "Times New Roman", hjust=0
+  ) +
+  theme(
+    strip.text.y.right = element_text(angle = 0),
+    legend.position = "none") +
+  coord_flip() +
+  ylim(0, 100) +
+  labs(
+    y="%", x="",
+    title = "Pollution discharged without treatment as % WWTP entrance",
+    caption="based on combination of expert judgements"
+    )
+```
+
+```{r remove_all_objects_in_environment}
+rm(list = ls())
+```

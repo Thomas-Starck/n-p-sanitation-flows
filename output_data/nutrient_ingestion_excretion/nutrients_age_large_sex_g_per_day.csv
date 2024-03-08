@@ -1,0 +1,10 @@
+sex,age_class_large,energy,carbohydrates,lipids,proteins,nitrogen,phosphorus,potassium
+both,child (<10 yr),1560,194,58.1,57.1,9.13,0.983,2.18
+both,adolescent (11-18 yr),1970,247,70.4,76.1,12.2,1.21,2.67
+both,adult (>18 yr),2060,231,76,81.1,13,1.22,3.12
+F,child (<10 yr),1500,184,56.5,55.7,8.91,0.955,2.11
+F,adolescent (11-18 yr),1790,226,63.9,68,10.9,1.09,2.46
+F,adult (>18 yr),1810,203,68.6,71.9,11.5,1.1,2.85
+M,child (<10 yr),1620,204,59.6,58.4,9.34,1.01,2.25
+M,adolescent (11-18 yr),2140,267,76.4,83.6,13.4,1.32,2.86
+M,adult (>18 yr),2410,270,86.3,93.9,15,1.39,3.49
