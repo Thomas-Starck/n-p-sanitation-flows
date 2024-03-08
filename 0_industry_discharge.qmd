@@ -70,11 +70,9 @@ source("functions.R")
 The georisque database is public and reports industrial discharge, when they are made compulsory by the reglementary thresholds. The GEREP database is not open access but was provided by the French administration ; it contains more industry discharges than simply the mandatory reported ones.
 
 ::: panel-tabset
-
 ## Load géorisque data
 
 ::: panel-tabset
-
 ### Source and description
 
 The data were downloaded on the [georisque](https://www.georisques.gouv.fr/installations-industrielles-rejetant-des-polluants) website, reporting industrial pollution discharges. Read the description of the data on [this page](https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes).
@@ -226,7 +224,6 @@ file_discharge <- file_discharge %>%
     
   )
 ```
-
 :::
 
 ## Load GEREP data
@@ -414,15 +411,13 @@ About [INERIS](https://www.ineris.fr/fr), responsible for IREP (installation reg
 About [Aida](https://aida.ineris.fr/recherche?search=IREP), INERIS website on risk prevention and environmental protection regulations, and the related [decree](https://aida.ineris.fr/reglementation/arrete-261212-modifiant-larrete-31-janvier-2008-relatif-registre-a-declaration).
 
 About the European registry [E-PRTR](https://ec.europa.eu/environment/industry/stationary/eper/legislation.htm).
-
 :::
 
-# géorisque data 
+# géorisque data
 
 On [this page](https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes/synthese/donnees#/recherche=secteur) we can see that what is called water indirect ("eau indirect") in the data base corresponds to pollutants sent to wastewater treatment plants ("eau vers station d'épuration"). However it is unclear whether the reported pollutant flows correspond to the quantity discharged to the sewage network or the quantity discharge to the environment after WWTP end of pipe pollution treatment.
 
 ::: panel-tabset
-
 ## Outliers identification {.tabset .tabset-fade}
 
 Spikes in the right chart indicate some potential incoherent reported pollution quantities, that we investigate.
@@ -482,7 +477,6 @@ f_graph <- function(nutrient){
 ```
 
 ::: panel-tabset
-
 ### NGL
 
 Outliers : in 2017 for indirect water discharge ; in 2010 for direct water discharge (and in 2007 ?).
@@ -595,7 +589,6 @@ georisque$MES[georisque$Id == "0006700018" & georisque$Year ==2019] <- NA
 georisque$MES[georisque$Id == "0006402259" & georisque$Year %in% c(2018, 2019, 2020)] <- 
   georisque$MES[georisque$Id == "0006402259" & georisque$Year %in% c(2018, 2019, 2020)]/10
 ```
-
 :::
 
 ## Corrected Flows {.tabset .tabset-fade}
@@ -603,7 +596,6 @@ georisque$MES[georisque$Id == "0006402259" & georisque$Year %in% c(2018, 2019, 2
 Here are the pollutant flows after outliers correction. For the 5 nutrients, the data seem reliable starting 2008.
 
 ::: panel-tabset
-
 ### NGL
 
 ```{r}
@@ -633,7 +625,6 @@ f_graph("DCO")
 ```{r}
 f_graph("MES")
 ```
-
 :::
 
 ## Understand network discharge {.tabset .tabset-fade}
@@ -641,7 +632,6 @@ f_graph("MES")
 For 2019 and 2020 discharge flows (in m3/year) in the sanitation network and in the environment are reported in the emission.csv file. We combine these data with the one presented in the previous Emission flows part, to check for coherence. Normally the nutrient flows discharged in the network should correspond to the "water (indirect)" flows of the Emission flows part.
 
 ::: panel-tabset
-
 ```{r}
 merge <- inner_join(
   file_discharge %>% 
@@ -750,7 +740,6 @@ f_graph_comparison("DBO5")
 ```{r}
 f_graph_comparison("MES")
 ```
-
 :::
 
 ## Final data {.tabset .tabset-fade}
@@ -837,7 +826,6 @@ f_graph_final <- function(dataset, nutrient_flow, nutrient_nb_facilities){
 ```
 
 ::: panel-tabset
-
 ### Pt
 
 Order of magnitude for the 2010s : 0.7 ktP/year.
@@ -877,15 +865,12 @@ Order of magnitude for the 2010s : 10-15 ktMES/year.
 ```{r}
 f_graph_final(national_network_discharge, "MES", "MES_nb_facilities")
 ```
-
+:::
 :::
 
-:::
-
-# GEREP data 
+# GEREP data
 
 ::: panel-tabset
-
 ## Before Correction {.tabset .tabset-fade}
 
 <details>
@@ -1033,13 +1018,11 @@ GEREP$discharged[
 ```
 
 ::: panel-tabset
-
 ### National (georisque comparison) {.tabset .tabset-fade}
 
 The GEREP database reports higher amounts of discharged pollution in sewage networks. The explanation seems to be that the GEREP database reports more facilities than the gérosique database.
 
 ::: panel-tabset
-
 ```{r}
 Source_GEREP_georisque <- "Source: géorisque and GEREP database\ncomputation by Thomas Starck"
 
@@ -1156,17 +1139,14 @@ f_graph_data_comparison(GEREP_national, national_network_discharge, "DCO", "DCO_
 ```{r}
 f_graph_data_comparison(GEREP_national, national_network_discharge, "MES", "MES_in", "MES_out", "MES_nb_facilities", "MES")
 ```
-
 :::
 
-### Basins 
+### Basins
 
 ::: panel-tabset
-
 #### Pt {.tabset .tabset-fade}
 
 ::: panel-tabset
-
 ##### Adour-Garonne
 
 ```{r}
@@ -1202,13 +1182,11 @@ f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "Pt_in", "Pt_out", "Pt_nb_f
 ```{r}
 f_graph_basin(GEREP_basins, "Seine-Normandie", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
 ```
-
 :::
 
 #### NGL {.tabset .tabset-fade}
 
 ::: panel-tabset
-
 ##### Adour-Garonne
 
 ```{r}
@@ -1244,13 +1222,11 @@ f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "NGL_in", "NGL_out", "NGL_n
 ```{r}
 f_graph_basin(GEREP_basins, "Seine-Normandie", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
 ```
-
 :::
 
 #### DBO5 {.tabset .tabset-fade}
 
 ::: panel-tabset
-
 ##### Adour-Garonne
 
 ```{r}
@@ -1286,13 +1262,11 @@ f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "DBO5_in", "DBO5_out", "DBO
 ```{r}
 f_graph_basin(GEREP_basins, "Seine-Normandie", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
 ```
-
 :::
 
 #### DCO {.tabset .tabset-fade}
 
 ::: panel-tabset
-
 ##### Adour-Garonne
 
 ```{r}
@@ -1328,13 +1302,11 @@ f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "DCO_in", "DCO_out", "DCO_n
 ```{r}
 f_graph_basin(GEREP_basins, "Seine-Normandie", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
 ```
-
 :::
 
 #### MES {.tabset .tabset-fade}
 
 ::: panel-tabset
-
 ##### Adour-Garonne
 
 ```{r}
@@ -1370,11 +1342,8 @@ f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "MES_in", "MES_out", "MES_n
 ```{r}
 f_graph_basin(GEREP_basins, "Seine-Normandie", "MES_in", "MES_out", "MES_nb_facilities", "MES")
 ```
-
 :::
-
 :::
-
 :::
 
 ## After Correction {.tabset .tabset-fade}
@@ -1382,7 +1351,6 @@ f_graph_basin(GEREP_basins, "Seine-Normandie", "MES_in", "MES_out", "MES_nb_faci
 We recompute the aggregated flows after the correction.
 
 ::: panel-tabset
-
 ```{r}
 #We compute the flows at the national scale
 
@@ -1613,7 +1581,6 @@ f_graph_basin <- function(dataset, basin_select, nutri_in, nutri_out, nutri_nb_f
 ```
 
 ::: panel-tabset
-
 #### Pt
 
 ```{r}
@@ -1643,17 +1610,14 @@ f_graph_data_comparison(GEREP_national, national_network_discharge, "DCO", "DCO_
 ```{r}
 f_graph_data_comparison(GEREP_national, national_network_discharge, "MES", "MES_in", "MES_out", "MES_nb_facilities", "MES")
 ```
-
 :::
 
-### Basins 
+### Basins
 
 ::: panel-tabset
-
 #### Pt {.tabset .tabset-fade}
 
 ::: panel-tabset
-
 ##### Adour-Garonne
 
 ```{r}
@@ -1689,13 +1653,11 @@ f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "Pt_in", "Pt_out", "Pt_nb_f
 ```{r}
 f_graph_basin(GEREP_basins, "Seine-Normandie", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
 ```
-
 :::
 
 #### NGL {.tabset .tabset-fade}
 
 ::: panel-tabset
-
 ##### Adour-Garonne
 
 ```{r}
@@ -1731,13 +1693,11 @@ f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "NGL_in", "NGL_out", "NGL_n
 ```{r}
 f_graph_basin(GEREP_basins, "Seine-Normandie", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
 ```
-
 :::
 
 #### DBO5 {.tabset .tabset-fade}
 
 ::: panel-tabset
-
 ##### Adour-Garonne
 
 ```{r}
@@ -1773,13 +1733,11 @@ f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "DBO5_in", "DBO5_out", "DBO
 ```{r}
 f_graph_basin(GEREP_basins, "Seine-Normandie", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
 ```
-
 :::
 
 #### DCO {.tabset .tabset-fade}
 
 ::: panel-tabset
-
 ##### Adour-Garonne
 
 ```{r}
@@ -1815,13 +1773,11 @@ f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "DCO_in", "DCO_out", "DCO_n
 ```{r}
 f_graph_basin(GEREP_basins, "Seine-Normandie", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
 ```
-
 :::
 
 #### MES {.tabset .tabset-fade}
 
 ::: panel-tabset
-
 ##### Adour-Garonne
 
 ```{r}
@@ -1857,13 +1813,9 @@ f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "MES_in", "MES_out", "MES_n
 ```{r}
 f_graph_basin(GEREP_basins, "Seine-Normandie", "MES_in", "MES_out", "MES_nb_facilities", "MES")
 ```
-
 :::
-
 :::
-
 :::
-
 :::
 
 # Corrections and save
