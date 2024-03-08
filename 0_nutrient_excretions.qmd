@@ -2,7 +2,7 @@
 title: "Nutrient Excretions"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=T, warning=F, message=F, results=F}
 knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
 
 library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
@@ -45,10 +45,7 @@ path_source <- "source_data/0_nutrient_excretion/0_INCA3/"
 #setting graphs theme
 theme_set(
   theme_minimal() +
-    theme(
-      text = element_text(family = "Times New Roman"),
-      plot.title = element_text(face="bold")
-      )
+    theme(plot.title = element_text(face="bold"))
   )
 
 #setting viridis theme for colors
@@ -69,7 +66,6 @@ source("functions.R")
 # Nutrient ingestion survey
 
 ::: panel-tabset
-
 ## Source
 
 ```{r}
@@ -288,7 +284,6 @@ Here are presented macronutrients intakes by age and sex. For the relative macro
 ::: panel-tabset
 ## Micronutrient
 
-::: panel-tabset
 ```{r}
 f_graph <- function(dataset, nutrient_select, nutrient_label){
   g <- ggplot(dataset) + 
@@ -316,6 +311,7 @@ f_graph <- function(dataset, nutrient_select, nutrient_label){
 }
 ```
 
+::: panel-tabset
 ### Nitrogen
 
 ```{r}

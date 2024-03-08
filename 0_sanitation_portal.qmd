@@ -2,7 +2,7 @@
 title: "Sanitation Portal"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=T, warning=F, message=F, results=F}
 knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
 
 library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
@@ -37,16 +37,15 @@ library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org
 
 
 #loading relevant packages
-library(cowplot) #for plot_grid() and get_legend
+library(cowplot) #for plot_grid()
+library(patchwork) #for multiple ggplot graphs
 library(sf) #for spherical geometry operations
 #at first with sf there was an issues with GDAL and PROJ librairies that were not found. I found the answer here https://github.com/r-spatial/sf/issues/2302 and here https://github.com/r-spatial/sf/issues/2298. I uninstalled the sf package and manually installed it with install.packages('sf', repos = c('https://r-spatial.r-universe.dev')). This changed the version 
 
 #setting graphs theme
 theme_set(
   theme_minimal() +
-  theme(text = element_text(family = "Times New Roman"),
-        plot.title = element_text(face="bold")
-        )
+  theme(plot.title = element_text(face="bold"))
   )
 
 #setting viridis theme for colors
@@ -69,7 +68,6 @@ source("functions.R")
 # Source and data description
 
 ::: panel-tabset
-
 ## Source
 
 We load the files for each year, downloaded from [this page](https://www.assainissement.developpement-durable.gouv.fr/PortailAC/) from the sanitation portal website (on the left "téléchargement des données").
@@ -366,16 +364,11 @@ g2 <- ggplot(temp) +
   labs(
     title = "",
     subtitle = "capacity (million population equivalent)",
-    caption=Source, x="", y="",
+    caption=Source, x="", fill="", y="",
     ) +
   theme(legend.position = "none")
-p <- get_legend(g1)
-plot_grid(
-  plot_grid(
-    g1 + theme(legend.position = "none"), g2 
-  ),
-  p, rel_heights = c(0.85, 0.15), ncol=1
-)
+
+g1 + g2 + plot_layout(guides = "collect") & theme(legend.position = 'bottom')
 ```
 
 ```{r}
@@ -395,7 +388,6 @@ BDERU <- BDERU %>%
 
 We use the creation dates of each station create a database for the period 1960-2020. Note that we use the year 2014 to determine the characteristics of the WWTP, so the further we go back in time, the less reliable is the database. Indeed for instance when a WWTP change capacities, it usually changes SANDRE codes. However it allows to see the temporal evolution of the number of stations.
 
-::: panel-tabset
 ```{r}
 f_file_WWTP_all_years <- function(year_min, year_max, dataset){
   data <- dataset %>% 
@@ -431,6 +423,7 @@ BDERU <- bind_rows(
 )
 ```
 
+::: panel-tabset
 ### Extrapolation : number of facilites
 
 There seem to have some incoherence with a large spike in the reporting rate in 2006 for some basins.
@@ -633,7 +626,6 @@ To help visualize this skewed distribution, we also present the same graph in a 
 
 Finally a focus is made on Zipf's law, which is well known for the size distribution of cities and might be applied to waste water treatment plants capacities.
 
-::: panel-tabset
 ```{r}
 temp <- BDERU %>% filter(Year==Year_analysis) %>% 
   select(code_WWTP, name_WWTP, capacity) %>%
@@ -655,6 +647,7 @@ coef <- max(temp$rank_STEU)/100
 coef2 <- max(temp$cumulative_capacity)/100
 ```
 
+::: panel-tabset
 ### Nb of WWTP vs Capacity (linear scale)
 
 ```{r}
@@ -1482,21 +1475,13 @@ g2 <- ggplot(temp4) +
     x="", y = "",
     caption = Source,
     subtitle = "by basin", 
-    title= "", fill=""
+    title= "", fill="sludge destination"
   ) +
   facet_wrap(vars(basin), scales = "free_y")
 
-p <- get_legend(g2)
-
-
 #synthesis graph
-plot_grid(
-  plot_grid(
-    g1, g2 + theme(legend.position = "none"),
-    rel_widths = c(1/4, 3/4)
-  ),
-  p, rel_heights = c(0.85, 0.15), ncol=1
-)
+g1 + g2 +
+  plot_layout(guides = "collect", widths = c(1/4, 3/4)) & theme(legend.position = 'bottom')
 
 rm(temp, temp2, temp3, temp4, g1, g2, g)
 ```
@@ -1834,15 +1819,7 @@ p2 <- draw_map_sensitive(
     caption = Source
   )
 
-p3 <- get_legend(p1) 
-
-p1 <- p1 + theme(legend.position = "none") 
-
-plot_grid(
-  plot_grid(p1,p2),
-  p3,
-  nrow = 1, rel_widths = c(0.9, 0.1)
-)
+p1 + p2
 ```
 
 # Export data

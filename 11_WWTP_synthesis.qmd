@@ -1,10 +1,5 @@
 ---
 title: "Synthesis"
-output:
-  html_document:
-    code_folding: hide
-    toc: true
-    toc_float: true
 ---
 
 In a further version of the project, we will merge the data from the 6 different basins with the data from the sanitation portal. 

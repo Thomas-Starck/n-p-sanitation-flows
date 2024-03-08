@@ -1,15 +1,10 @@
 ---
 title: "Artois-Picardie"
-output:
-  html_document:
-    code_folding: hide
-    toc: true
-    toc_float: true
 ---
 
 CAREFUL: for now, for Artois-Picardie basin, we do not have NGL outflow after 2008. We extrapolate at the basin scale from NO out and a constant ratio. We will update with better data in the future.
 
-```{r setup, include=FALSE}
+```{r setup, include=T, warning=F, message=F, results=F}
 knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
 
 library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
@@ -49,10 +44,7 @@ library(cowplot) #for plot_grid()
 #setting graphs theme
 theme_set(
   theme_minimal() +
-    theme(
-      text = element_text(family = "Times New Roman"),
-      plot.title = element_text(face="bold")
-      )
+    theme(plot.title = element_text(face="bold"))
   )
 
 #setting viridis theme for colors
@@ -74,8 +66,9 @@ Year_analysis <- 2018
 source("functions.R")
 ```
 
-# Data quality and description  {.tabset .tabset-fade .tabset-pills}
+# Data quality and description  
 
+::: panel-tabset
 ## Source and Description  
 
 Data source can be downloaded on Artois-Picardie Water Agency website, [here](https://www.artois-picardie.eaufrance.fr/cartes-et-donnees/les-donnees-sur-l-eau-du-bassin-artois-picardie/) (in *Données sur les usages de l'eau* -> *Assainissement*). This gives the data for 1992-2018
@@ -627,7 +620,7 @@ basin_PE_N_P_artois_picardie <- f_year_categories(basin_PE_N_P_artois_picardie)
 ```
 
 
-## Understand the data {.tabset .tabset-fade}
+## Understand the data 
 
 There is a reporting discontinuity in 2008. Before this date, DCO and DBO5 are not reported. On the contrary, starting 2008, NO is no more reported. 
 
@@ -686,6 +679,7 @@ f_graph_nutrient <- function(dataset, nutrient_in, nutrient_out, nutrient_remove
 }
 ```
 
+::: panel-tabset
 ### Pt
 
 ```{r Pt_basin_understand}
@@ -735,10 +729,11 @@ N_P_artois_picardie$DBO5_in[N_P_artois_picardie$Year<2008] <- NA
 f_graph_nutrient(basin_N_P_artois_picardie, "MES_in_reported", "MES_out", "MES_removed","MES_in", "MES")
 ```
 
-### NO, NTK and NGL {.tabset .tabset-fade}
+### NO, NTK and NGL 
 
 As we said, before 2008, incoming flows are unreliable and overestimated. But for NO, contrary to the other flows, we cannot compute NO in = NO out + NO removed, because NO is "created" during the treatment through nitrification. 
 
+::: panel-tabset
 #### inflow
 
 For NGL, which is equal to NO + NTK, we can see that incoming NO is negligible compared to NTK, so we approximate incoming NGL by incoming NTK.
@@ -790,6 +785,8 @@ ggplot(basin_N_P_artois_picardie) +
     title= "N outflow in Artois-Picardie basin WWTPs"
   )
 ```
+
+:::
 
 ### NGL out after 2007
 
@@ -913,10 +910,14 @@ basin_PE_N_P_artois_picardie <- basin_PE_N_P_artois_picardie %>%
     )
 ```
 
+:::
 
-# Data cleaning  {.tabset .tabset-fade .tabset-pills}
+:::
 
-## Outliers: first visualization  {.tabset .tabset-fade}
+# Data cleaning  
+
+::: panel-tabset
+## Outliers: first visualization  
 
 ```{r f_graph_nutrients}
 f_graph_nutrient <- function(dataset, nutrient_in, nutrient_out, label, legend_x, legend_y){
@@ -954,6 +955,7 @@ f_graph_nutrient <- function(dataset, nutrient_in, nutrient_out, label, legend_x
 
 We plot the flows at the basin scale to try to see important outliers. For now we do not spot any obvious outlier, so there is no need for correction.
 
+::: panel-tabset
 ### NGL
 
 ```{r NGL_basin_visual_check}
@@ -991,9 +993,13 @@ f_graph_nutrient(basin_N_P_artois_picardie, "DCO_in", "DCO_out", "DCO", 0.4, 0.5
 f_graph_nutrient(basin_N_P_artois_picardie, "MES_in", "MES_out", "MES", 0.4, 0.5)
 ```
 
+:::
 
-# Capacities distribution  {.tabset .tabset-fade .tabset-pills}
+:::
 
+# Capacities distribution  
+
+::: panel-tabset
 ## Reporting Evolution
 
 ```{r}
@@ -1052,7 +1058,7 @@ ggplot(temp) +
   )
 ```
 
-## Large categories  {.tabset .tabset-fade}
+## Large categories  
 
 About half of the total capacity is from WWTP larger than 100 000 population equivalent. About 80-90% is due to WWTP larger than 10 000 population equivalent.
 
@@ -1068,6 +1074,7 @@ temp <- N_P_artois_picardie %>%
   gather(key=capacity_or_n, value = value, `capacity (million PE)`, `number of stations`)
 ```
 
+::: panel-tabset
 ### Absolute
 
 ```{r}
@@ -1096,6 +1103,7 @@ ggplot(temp) +
   )
 ```
 
+:::
 
 ## Histogram
 
@@ -1131,7 +1139,7 @@ ggplot(temp) +
     )
 ```
 
-## Cumulative distribution  {.tabset .tabset-fade}
+## Cumulative distribution  
 
 About 1% of the WWTP represent 25% of the total capacity ; 4% represent 50% of the capacity ; 10% represent 75%
 
@@ -1159,6 +1167,7 @@ coef <- max(temp$rank_STEU)/100
 coef2 <- max(temp$cumulative_capacity)/100
 ```
 
+::: panel-tabset
 ### Nb of WWTPs vs Capacity (linear scale)
 
 ```{r}
@@ -1259,11 +1268,14 @@ ggplot(temp) +
 
 
 
+:::
 
+:::
 
-# Pollution flows {.tabset .tabset-fade .tabset-pills}
+# Pollution flows 
 
-## Data Quality : reporting rates {.tabset .tabset-fade}
+::: panel-tabset
+## Data Quality : reporting rates 
 
 Navigate through tabs below to see details for each pollutant. For each pollutant, we present reporting for incoming (left) and outgoing (right) pollution, in terms of number of WWTP reporting the data (bottom) or in terms of installed capacity (top).
 
@@ -1324,6 +1336,7 @@ f_graph_reporting_nutrients <- function(pollution_in, pollution_out){
 }
 ```
 
+::: panel-tabset
 ### Pt
 
 ```{r}
@@ -1362,14 +1375,17 @@ f_graph_reporting_nutrients("MES_in", "MES_out")
 ```
 
 
+:::
+
 ## Basin scale
 
 The same as in *Data cleaning -> Outliers: first visualization* because we did not have to correct major outliers in the Artois-Picardie basin.
 
-## Real flow extrapolation  {.tabset .tabset-fade}
+## Real flow extrapolation  
 
 We extrapolate the flows at the basin scale for the plants not reporting them. For that, we use a coefficient proportionate to the unreported capacity of the given nutrient flow (see *data quality* tab).
 
+::: panel-tabset
 ### Coefficient calculation
 
 We compute in terms of installed capacity the reported and unreported flows for NGL, Pt, DBO5, DCO and MES. We do this for each year and for each capacity category.
@@ -1564,8 +1580,9 @@ f_graph_adjusted <- function(basin_file, basin_PE_file, nutrient_adjusted, nutri
 }
 ```
 
-### Pt {.tabset .tabset-fade}
+### Pt 
 
+::: panel-tabset
 #### in
 
 ```{r Pt_in_adjusted}
@@ -1586,8 +1603,11 @@ f_graph_adjusted(
   )
 ```
 
-### NGL {.tabset .tabset-fade}
+:::
 
+### NGL 
+
+::: panel-tabset
 #### in
 
 ```{r NGL_in_adjusted}
@@ -1608,8 +1628,11 @@ f_graph_adjusted(
   )
 ```
 
-### DBO5 {.tabset .tabset-fade}
+:::
 
+### DBO5 
+
+::: panel-tabset
 #### in
 
 ```{r}
@@ -1630,8 +1653,11 @@ f_graph_adjusted(
   )
 ```
 
-### DCO {.tabset .tabset-fade}
+:::
 
+### DCO 
+
+::: panel-tabset
 #### in
 
 ```{r}
@@ -1652,8 +1678,11 @@ f_graph_adjusted(
   )
 ```
 
-### MES {.tabset .tabset-fade}
+:::
 
+### MES 
+
+::: panel-tabset
 #### in
 
 ```{r}
@@ -1674,10 +1703,18 @@ f_graph_adjusted(
   )
 ```
 
-# Ratios {.tabset .tabset-fade .tabset-pills}
+:::
 
-## Basin scale {.tabset .tabset-fade}
+:::
 
+:::
+
+# Ratios 
+
+::: panel-tabset
+## Basin scale 
+
+::: panel-tabset
 ### N:P
 
 ```{r}
@@ -1749,9 +1786,13 @@ ggplot(basin_N_P_artois_picardie) +
   )
 ```
 
+:::
 
-# Basin yield {.tabset .tabset-fade .tabset-pills}
+:::
 
+# Basin yield 
+
+::: panel-tabset
 ## Basin
 
 ```{r}
@@ -1770,7 +1811,7 @@ ggplot(basin_N_P_artois_picardie) +
     )
 ```
 
-## Basin x Capacity {.tabset .tabset-fade}
+## Basin x Capacity 
 
 ```{r}
 f_graph_yield_PE <- function(dataset, nutrient_yield, nutrient_label){
@@ -1788,6 +1829,7 @@ f_graph_yield_PE <- function(dataset, nutrient_yield, nutrient_label){
 }
 ```
 
+::: panel-tabset
 ### Pt
 
 ```{r}
@@ -1828,7 +1870,9 @@ f_graph_yield_PE(
   "MES_yield", "MES")
 ```
 
+:::
 
+:::
 
 # Save data
 

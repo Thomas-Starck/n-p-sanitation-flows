@@ -1,13 +1,8 @@
 ---
 title: "Seine-Normandie and SIAAP"
-output:
-  html_document:
-    code_folding: hide
-    toc: true
-    toc_float: true
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=T, warning=F, message=F, results=F}
 knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
 
 library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
@@ -48,7 +43,6 @@ library(readxl) #to read excel file
 theme_set(
   theme_minimal() +
     theme(
-      text = element_text(family = "Times New Roman"),
       plot.title = element_text(face="bold")
       )
   )
@@ -71,8 +65,9 @@ source("functions.R")
 ```
 
 
-# Sources and data {.tabset .tabset-fade .tabset-pills}
+# Sources and data 
 
+::: panel-tabset
 ## Basin Description
 
 Basin description in Seine-Normandie *Etat des lieux* for [2019](https://www.eau-seine-normandie.fr/sites/public_file/inline-files/AESN_etat_lieux_janvier20.pdf) and [2013](https://www.observatoire-poissons-seine-normandie.fr/wp-content/uploads/2018/03/etat-des-lieux-complet.pdf). There are 18.7 million inhabitants, and in 2019 1.2 are not connected to sewers.
@@ -1033,7 +1028,9 @@ ggplot(N_P_SIAAP_2015_2021) +
   xlim(2000, 2021)
 ```
 
-# Comparison basin and SIAAP flows {.tabset .tabset-fade .tabset-pills}
+:::
+
+# Comparison basin and SIAAP flows 
 
 For Pt, NGL, NTK, DBO5, DCO and MES we are able to compare the SIAAP data to the punctual Years data of the Seine-Normandie basin. SIAAP typically treats about half of the basin incoming pollution. The 2 datasets are coherent, except on year 2014, which we remove.
 
@@ -1128,7 +1125,7 @@ f_graph_comparison <- function(dataset_basin, dataset_SIAAP, nutrient_in, nutrie
 }
 ```
 
-
+::: panel-tabset
 ## NGL
 
 ```{r}
@@ -1343,14 +1340,16 @@ basin_PE_N_P_seine_normandie <- basin_PE_N_P_seine_normandie %>%
 ```
 
 
-# Capacity  {.tabset .tabset-fade .tabset-pills}
+:::
+
+# Capacity  
 
 ```{r}
 test <- N_P_seine_normandie %>%
   filter(is_SIAAP=="SIAAP")
 ```
 
-
+::: panel-tabset
 ## SIAAP and basin comparison
 
 ```{r}
@@ -1382,7 +1381,7 @@ plot_grid(
 ```
 
 
-## Large categories  {.tabset .tabset-fade}
+## Large categories  
 
 About half of the total capacity is from WWTP larger than 100 000 population equivalent. About 80-90% is dut to WWTP larger than 10 000 population equivalent.
 
@@ -1398,6 +1397,7 @@ temp <- N_P_seine_normandie %>%
   gather(key=capacity_or_n, value = value, `capacity (million PE)`, `number of stations`)
 ```
 
+::: panel-tabset
 ### Absolute
 
 ```{r}
@@ -1426,6 +1426,8 @@ ggplot(temp) +
     caption = Source
   )
 ```
+
+:::
 
 ## Histogram
 
@@ -1461,7 +1463,7 @@ ggplot(temp) +
     )
 ```
 
-## Cumulative distribution  {.tabset .tabset-fade}
+## Cumulative distribution  
 
 About 1% of the WWTP represent 25% of the total capacity ; 4% represent 50% of the capacity ; 10% represent 75%%
 
@@ -1486,6 +1488,8 @@ f_save_csv_files(
 coef <- max(temp$rank_STEU)/100
 coef2 <- max(temp$cumulative_capacity)/100
 ```
+
+::: panel-tabset
 
 ### Nb of WWTPs vs Capacity (linear scale)
 
@@ -1577,9 +1581,14 @@ ggplot(temp) +
 ```
 
 
-# Pollution Flows {.tabset .tabset-fade .tabset-pills}
+:::
 
-## Data Quality : reporting rates {.tabset .tabset-fade}
+:::
+
+# Pollution Flows 
+
+::: panel-tabset
+## Data Quality : reporting rates 
 
 ```{r f_graph_reporting_nutrients}
 #function for plots : to be finished
@@ -1636,6 +1645,7 @@ f_graph_reporting_nutrients <- function(pollution_in, pollution_out){
 
 Pt, NTK, DBO5, DCO and  MES pollution are reported for virtually all the capacity Ony NGL is not always reportedin 2015. When NGL in was not reported we approximate it with NTK in, so there is no problem. The only remaining issue is for NGL out, when both NTK out and NO3 out are not reported, which is the case for most WWTP but only for a small portion of the total capacity.
 
+::: panel-tabset
 ### NGL
 
 ```{r}
@@ -1685,8 +1695,11 @@ f_graph_reporting_nutrients("MES_in", "MES_out")
 ```
 
 
-## Real flow extrapolation  {.tabset .tabset-fade}
+:::
 
+## Real flow extrapolation  
+
+::: panel-tabset
 ### Coefficient calculation
 
 For Pt, NTK, DBO5, DCO and  MES we do not adjust the flows. Same for incoming NGL.
@@ -1851,11 +1864,16 @@ f_graph_adjusted(
   )
 ```
 
+:::
 
-# Ratios {.tabset .tabset-fade .tabset-pills}
+:::
 
-## Basin scale {.tabset .tabset-fade}
+# Ratios 
 
+::: panel-tabset
+## Basin scale 
+
+::: panel-tabset
 ### N:P ratio
 
 ```{r}
@@ -1934,9 +1952,13 @@ ggplot(basin_N_P_SIAAP) +
 
 
 
+:::
 
-# Yield {.tabset .tabset-fade .tabset-pills}
+:::
 
+# Yield 
+
+::: panel-tabset
 ## Basin scale
 
 ```{r}
@@ -1970,6 +1992,7 @@ ggplot(basin_N_P_SIAAP) +
 
 
 
+:::
 
 # Save data
 

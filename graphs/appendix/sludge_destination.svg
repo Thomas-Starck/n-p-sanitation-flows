@@ -515,5 +515,15 @@
 <text x='187.24' y='179.59' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.50</text>
 <text x='187.24' y='162.44' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.75</text>
 <text x='187.24' y='145.28' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
+<rect x='99.11' y='265.67' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #440154; fill-opacity: 0.60;' />
+<rect x='147.86' y='265.67' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #3B528B; fill-opacity: 0.60;' />
+<rect x='211.61' y='265.67' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #21908C; fill-opacity: 0.60;' />
+<rect x='283.78' y='265.67' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5DC863; fill-opacity: 0.60;' />
+<rect x='339.53' y='265.67' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #FDE725; fill-opacity: 0.60;' />
+<text x='121.16' y='276.75' style='font-size: 8.80px; font-family: "Arial";' textLength='20.06px' lengthAdjust='spacingAndGlyphs'>other</text>
+<text x='169.91' y='276.75' style='font-size: 8.80px; font-family: "Arial";' textLength='34.73px' lengthAdjust='spacingAndGlyphs'>landfilled</text>
+<text x='233.66' y='276.75' style='font-size: 8.80px; font-family: "Arial";' textLength='43.05px' lengthAdjust='spacingAndGlyphs'>incinerated</text>
+<text x='305.83' y='276.75' style='font-size: 8.80px; font-family: "Arial";' textLength='26.91px' lengthAdjust='spacingAndGlyphs'>spread</text>
+<text x='361.58' y='276.75' style='font-size: 8.80px; font-family: "Arial";' textLength='43.05px' lengthAdjust='spacingAndGlyphs'>composted</text>
 </g>
 </svg>

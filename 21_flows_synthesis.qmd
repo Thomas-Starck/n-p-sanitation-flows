@@ -2,7 +2,7 @@
 title: "Nutrient flows synthesis"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=T, warning=F, message=F, results=F}
 knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
 
 library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
@@ -50,7 +50,6 @@ library(cowplot) #for plot_grid()
 theme_set(
   theme_minimal() +
     theme(
-      text = element_text(family = "Times New Roman"),
       plot.title = element_text(face="bold")
       )
   )
@@ -181,9 +180,10 @@ rm(
   )
 ```
 
-# Nutrient Ratios {.tabset .tabset-fade .tabset-pills}
+# Nutrient Ratios 
 
-## Basin scale {.tabset .tabset-fade}
+::: panel-tabset
+## Basin scale 
 
 ```{r}
 f_graph_ratio_basin <- function(dataset, ratio_in, ratio_out, ratio_label, y_min, y_max, legend_x, legend_y){
@@ -252,6 +252,7 @@ f_graph_ratio_basin <- function(dataset, ratio_in, ratio_out, ratio_label, y_min
 }
 ```
 
+::: panel-tabset
 ### N:P ratio
 
 ```{r}
@@ -288,7 +289,9 @@ f_graph_ratio_basin(file_basin, "DCO_P_ratio_in", "DCO_P_ratio_out", "DCO:P rati
 f_graph_ratio_basin(file_basin, "DCO_N_ratio_in", "DCO_N_ratio_out", "DCO:N ratio", 0, 15, 0.4, 0.7)
 ```
 
-## Basin x Capacity {.tabset .tabset-fade}
+:::
+
+## Basin x Capacity 
 
 We do not analyse the very small WWTP (0 to 200 PE) which are very noisy and unreliable. Furthermore, they represent only a few percent of total flows.
 
@@ -330,8 +333,10 @@ f_graph_ratio_basin_PE <- function(dataset, nutrient_ratio, ratio_label, y_min, 
 }
 ```
 
-### N:P ratio {.tabset .tabset-fade}
+::: panel-tabset
+### N:P ratio 
 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -344,8 +349,9 @@ f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "N_P_rat
 f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "N_P_ratio_out", "discharged N:P", 0, 31)
 ```
 
-### DCO:DBO5 ratio {.tabset .tabset-fade}
-
+:::
+### DCO:DBO5 ratio 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -358,8 +364,9 @@ f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_DBO
 f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_DBO5_ratio_out", "discharged DCO:DBO5", 0, 10)
 ```
 
-### DBO5:Pt ratio {.tabset .tabset-fade}
-
+:::
+### DBO5:Pt ratio 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -372,8 +379,9 @@ f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5_P_
 f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5_P_ratio_out", "discharged DBO5:P", 0, 20)
 ```
 
-### DBO5:NGL ratio {.tabset .tabset-fade}
-
+:::
+### DBO5:NGL ratio 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -386,8 +394,9 @@ f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5_N_
 f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5_N_ratio_out", "discharged DBO5:N", 0, 2)
 ```
 
-### DCO:Pt ratio {.tabset .tabset-fade}
-
+:::
+### DCO:Pt ratio 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -400,8 +409,9 @@ f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_P_r
 f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_P_ratio_out", "discharged DCO:P", 0, 100)
 ```
 
-### DCO:NGL ratio {.tabset .tabset-fade}
-
+:::
+### DCO:NGL ratio 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -414,9 +424,16 @@ f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_N_r
 f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_N_ratio_out", "discharged DCO:N", 0, 10)
 ```
 
-# Yield {.tabset .tabset-fade .tabset-pills}
+:::
 
-## Basin {.tabset .tabset-fade}
+:::
+
+:::
+
+# Yield 
+
+::: panel-tabset
+## Basin 
 
 ```{r}
 f_graph_yield_basin <- function(dataset, nutrient_yield, yield_label){
@@ -454,6 +471,7 @@ f_graph_yield_basin <- function(dataset, nutrient_yield, yield_label){
 }
 ```
 
+::: panel-tabset
 ### Pt
 
 ```{r}
@@ -484,7 +502,9 @@ f_graph_yield_basin(file_basin, "DCO_yield", "DCO")
 f_graph_yield_basin(file_basin, "MES_yield", "MES")
 ```
 
-## Basin x Capacity {.tabset .tabset-fade}
+:::
+
+## Basin x Capacity 
 
 We do not analyse the very small WWTP (0 to 200 PE) which are very noisy and unreliable. Furthermore, they represent only a few percent of total flows.
 
@@ -526,6 +546,7 @@ f_graph_yield_basin_PE <- function(dataset, nutrient_yield, yield_label){
 }
 ```
 
+::: panel-tabset
 ### Pt
 
 ```{r}
@@ -556,9 +577,15 @@ f_graph_yield_basin_PE(file_basin_PE %>% filter(PE_bin!="0 - 200 PE"), "DCO_yiel
 f_graph_yield_basin_PE(file_basin_PE %>% filter(PE_bin!="0 - 200 PE"), "MES_yield", "MES")
 ```
 
-# Flow / Capacity {.tabset .tabset-fade .tabset-pills}
+:::
 
-## Basin {.tabset .tabset-fade}
+:::
+
+# Flow / Capacity 
+
+::: panel-tabset
+
+## Basin 
 
 ```{r}
 f_graph_capacity_basin <- function(dataset, ratio_in, ratio_out, ratio_label, y_min, y_max, legend_x, legend_y){
@@ -637,6 +664,7 @@ f_graph_capacity_basin <- function(dataset, ratio_in, ratio_out, ratio_label, y_
 }
 ```
 
+::: panel-tabset
 ### Pt / nominal PE
 
 ```{r}
@@ -667,7 +695,9 @@ f_graph_capacity_basin(file_basin, "DCO_PE_ratio_in", "DCO_PE_ratio_out", "DCO",
 f_graph_capacity_basin(file_basin, "MES_PE_ratio_in", "MES_PE_ratio_out", "MES", 0, 60, 0.6, 0.7)
 ```
 
-## Basin x Capacity {.tabset .tabset-fade}
+
+:::
+## Basin x Capacity 
 
 We do not analyse the very small WWTP (0 to 200 PE) which are very noisy and unreliable. Furthermore, they represent only a few percent of total flows.
 
@@ -717,8 +747,10 @@ f_graph_capacity_basin_PE <- function(dataset, nutrient_ratio, ratio_label, y_mi
 }
 ```
 
-### Pt / nominal PE {.tabset .tabset-fade}
+::: panel-tabset
+### Pt / nominal PE 
 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -731,8 +763,9 @@ f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "Pt_P
 f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "Pt_PE_ratio_out", "Discharged Pt", 0, 1.5)
 ```
 
-### NGL / nominal PE {.tabset .tabset-fade}
-
+:::
+### NGL / nominal PE 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -745,8 +778,9 @@ f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "NGL_
 f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "NGL_PE_ratio_out", "Discharged NGL", 0, 5)
 ```
 
-### DBO5 / nominal PE {.tabset .tabset-fade}
-
+:::
+### DBO5 / nominal PE 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -759,8 +793,9 @@ f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5
 f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5_PE_ratio_out", "Discharged DBO5", 0, 5)
 ```
 
-### DCO / nominal PE {.tabset .tabset-fade}
-
+:::
+### DCO / nominal PE 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -773,8 +808,9 @@ f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_
 f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_PE_ratio_out", "Discharged DCO", 0, 15)
 ```
 
-### MES / nominal PE {.tabset .tabset-fade}
-
+:::
+### MES / nominal PE 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -787,7 +823,12 @@ f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "MES_
 f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "MES_PE_ratio_out", "Discharged DCO", 0, 10)
 ```
 
-# Industrial network discharge {.tabset .tabset-fade .tabset-pills}
+:::
+
+:::
+
+:::
+# Industrial network discharge 
 
 ```{r}
 path_source <- "output_data/industry_network_discharge/"
@@ -830,6 +871,7 @@ f_graph_industry_discharge <- function(dataset, nutrient_select, nutrient_label)
 }
 ```
 
+::: panel-tabset
 ## Pt
 
 ```{r}
@@ -860,7 +902,9 @@ f_graph_industry_discharge(temp, "DCO_in", "DCO")
 f_graph_industry_discharge(temp, "MES_in", "MES")
 ```
 
-# Capacities distribution {.tabset .tabset-fade .tabset-pills}
+:::
+
+# Capacities distribution 
 
 ```{r}
 path_source <- "output_data/zipf_law"
@@ -878,8 +922,11 @@ file_zipf_law <-
   bind_rows
 ```
 
-## Nb of WWTPs vs Capacity {.tabset .tabset-fade}
 
+::: panel-tabset
+## Nb of WWTPs vs Capacity 
+
+::: panel-tabset
 ### linear scale
 
 ```{r}
@@ -912,6 +959,8 @@ ggplot(file_zipf_law) +
   ylim(0, 100)
 ```
 
+:::
+
 ## Zipf law
 
 ```{r}
@@ -931,6 +980,8 @@ ggplot(file_zipf_law) +
   ) +
   geom_function(fun = ~ (2*10^6)*.x^-(1), linewidth=9, alpha=.4)
 ```
+
+:::
 
 # Save final data
 

@@ -1,13 +1,8 @@
 ---
 title: "Rhone Méditerranee Corse"
-output:
-  html_document:
-    code_folding: hide
-    toc: true
-    toc_float: true
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=T, warning=F, message=F, results=F}
 knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
 
 library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
@@ -48,7 +43,6 @@ library(cowplot) #for plot_grid()
 theme_set(
   theme_minimal() +
     theme(
-      text = element_text(family = "Times New Roman"),
       plot.title = element_text(face="bold")
       )
   )
@@ -70,8 +64,9 @@ Year_analysis <- 2020
 source("functions.R")
 ```
 
-# Source and Description   {.tabset .tabset-fade .tabset-pills}
+# Source and Description   
 
+::: panel-tabset
 ## Basin description
 
 Some information can be found on the *Guide de l'eau* (water guides), [here](https://www.guide-eau.com/fichiers/donnees/rhone_mediterranee_corse.pdf) and [here](https://www.guide-eau.com/fichiers/donnees/rhone_mediterranee_corse1.pdf).
@@ -1012,10 +1007,12 @@ rm(
 
 
 
+:::
 
-# Data cleaning {.tabset .tabset-fade .tabset-pills}
+# Data cleaning 
 
-## Outliers : first visualization {.tabset .tabset-fade}
+::: panel-tabset
+## Outliers : first visualization 
 
 ```{r f_graph_nutrients}
 f_graph_nutrient <- function(dataset, nutrient_in, nutrient_out, label, legend_x, legend_y){
@@ -1115,6 +1112,7 @@ basin_PE_N_P_rhone_mediterranee$DCO_out[basin_PE_N_P_rhone_mediterranee$Year < 2
 
 It also appears that in 2014, all flows of the Pia sation (code SANDRE 060966141002) are overestimated by a 3 OM.
 
+::: panel-tabset
 ### NGL
 
 ```{r NGL_basin_visual_check}
@@ -1302,8 +1300,13 @@ basin_PE_N_P_rhone_mediterranee$DCO_out[basin_PE_N_P_rhone_mediterranee$Year < 2
 ```
 
 
-# Capacities distribution  {.tabset .tabset-fade .tabset-pills}
+:::
 
+:::
+
+# Capacities distribution  
+
+::: panel-tabset
 ## Reporting Evolution
 
 ```{r}
@@ -1349,7 +1352,7 @@ ggplot(temp) +
   )
 ```
 
-## Large categories  {.tabset .tabset-fade}
+## Large categories  
 
 ```{r}
 temp <- N_P_rhone_mediterranee %>%
@@ -1363,6 +1366,7 @@ temp <- N_P_rhone_mediterranee %>%
   gather(key=capacity_or_n, value = value, `capacity (million PE)`, `number of stations`)
 ```
 
+::: panel-tabset
 ### Absolute
 
 ```{r}
@@ -1391,6 +1395,7 @@ ggplot(temp) +
   )
 ```
 
+:::
 
 ## Histogram
 
@@ -1426,7 +1431,7 @@ ggplot(temp) +
     )
 ```
 
-## Cumulative distribution  {.tabset .tabset-fade}
+## Cumulative distribution  
 
 ```{r}
 temp <- N_P_rhone_mediterranee %>% 
@@ -1452,6 +1457,7 @@ coef <- max(temp$rank_STEU)/100
 coef2 <- max(temp$cumulative_capacity)/100
 ```
 
+::: panel-tabset
 ### Nb of WWTPs vs Capacity (linear scale)
 
 ```{r}
@@ -1550,10 +1556,14 @@ ggplot(temp) +
 
 
 
+:::
 
-# Pollution flows {.tabset .tabset-fade .tabset-pills}
+:::
 
-## Data Quality : reporting rates {.tabset .tabset-fade}
+# Pollution flows 
+
+::: panel-tabset
+## Data Quality : reporting rates 
 
 ```{r f_graph_reporting_nutrients}
 #function for plots : to be finished
@@ -1608,7 +1618,7 @@ f_graph_reporting_nutrients <- function(pollution_in, pollution_out){
 }
 ```
 
-
+::: panel-tabset
 ### NGL
 
 ```{r}
@@ -1645,7 +1655,9 @@ f_graph_reporting_nutrients("DCO_in", "DCO_out")
 f_graph_reporting_nutrients("MES_in", "MES_out")
 ```
 
-## Basin scale {.tabset .tabset-fade}
+:::
+
+## Basin scale 
 
 ```{r}
 #changing the graph function to change the subtitle (before data cleaning => after data cleaning)
@@ -1682,6 +1694,7 @@ f_graph_nutrient <- function(dataset, nutrient_in, nutrient_out, label, legend_x
 }
 ```
 
+::: panel-tabset
 ### NGL
 
 ```{r}
@@ -1719,8 +1732,11 @@ f_graph_nutrient(basin_N_P_rhone_mediterranee, "MES_in", "MES_out", "MES", 0.4, 
 ```
 
 
-## Real flow extrapolation  {.tabset .tabset-fade}
+:::
 
+## Real flow extrapolation  
+
+::: panel-tabset
 ### Coefficient calculation
 
 We compute in terms of installed capacity the reported and unreported flows for NGL, Pt, DBO5, DCO and MES. We do this for each year and for each capacity category.
@@ -1917,8 +1933,9 @@ f_graph_adjusted <- function(basin_file, basin_PE_file, nutrient_adjusted, nutri
 }
 ```
 
-### Pt {.tabset .tabset-fade}
+### Pt 
 
+::: panel-tabset
 #### in
 
 ```{r}
@@ -1939,8 +1956,11 @@ f_graph_adjusted(
   )
 ```
 
-### NGL {.tabset .tabset-fade}
+:::
 
+### NGL 
+
+::: panel-tabset
 #### in
 
 ```{r}
@@ -1961,8 +1981,11 @@ f_graph_adjusted(
   )
 ```
 
-### DBO5 {.tabset .tabset-fade}
+:::
 
+### DBO5 
+
+::: panel-tabset
 #### in
 
 ```{r}
@@ -1983,8 +2006,11 @@ f_graph_adjusted(
   )
 ```
 
-### DCO {.tabset .tabset-fade}
+:::
 
+### DCO 
+
+::: panel-tabset
 #### in
 
 ```{r}
@@ -2005,8 +2031,11 @@ f_graph_adjusted(
   )
 ```
 
-### MES {.tabset .tabset-fade}
+:::
 
+### MES 
+
+::: panel-tabset
 #### in
 
 ```{r}
@@ -2027,11 +2056,18 @@ f_graph_adjusted(
   )
 ```
 
+:::
 
-# Ratios {.tabset .tabset-fade .tabset-pills}
+:::
 
-## Basin scale {.tabset .tabset-fade}
+:::
 
+# Ratios 
+
+::: panel-tabset
+## Basin scale 
+
+::: panel-tabset
 ### N:P
 
 ```{r}
@@ -2104,8 +2140,13 @@ ggplot(basin_N_P_rhone_mediterranee) +
 ```
 
 
-# Basin yield {.tabset .tabset-fade .tabset-pills}
+:::
 
+:::
+
+# Basin yield 
+
+::: panel-tabset
 ## Basin
 
 ```{r}
@@ -2125,7 +2166,7 @@ ggplot(basin_N_P_rhone_mediterranee) +
 ```
 
 
-## Basin x Capacity {.tabset .tabset-fade}
+## Basin x Capacity 
 
 ```{r}
 f_graph_yield_PE <- function(dataset, nutrient_yield, nutrient_label){
@@ -2143,6 +2184,7 @@ f_graph_yield_PE <- function(dataset, nutrient_yield, nutrient_label){
 }
 ```
 
+::: panel-tabset
 ### Pt
 
 ```{r}
@@ -2183,6 +2225,9 @@ f_graph_yield_PE(
   "MES_yield", "MES")
 ```
 
+:::
+
+:::
 
 # Save data
 

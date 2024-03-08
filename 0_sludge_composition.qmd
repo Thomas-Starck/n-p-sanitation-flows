@@ -2,7 +2,7 @@
 title: "Sludge Composition"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=T, warning=F, message=F, results=F}
 knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
 
 
@@ -40,10 +40,7 @@ library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org
 #setting graphs theme
 theme_set(
   theme_minimal() +
-    theme(
-      #text = element_text(family = "Times New Roman"),
-      plot.title = element_text(face="bold")
-      )
+    theme(plot.title = element_text(face="bold"))
   )
 
 #setting viridis theme for colors
@@ -65,13 +62,12 @@ source("functions.R")
 
 # Esco MAFOR 
 
-::: panel-tabset
-
 We use a French review (collective scientific expertise) on organic fertilizers, called Esco MAFOR. [Link](https://hal.inrae.fr/hal-02796871/document) to the review (values used page 413).
 
+::: panel-tabset
 ## Review 
 
-::: panel-tabset
+
 
 Below are the P content, N content and N:P ratio in the reported studies, for composted and not composted urban sludge. Mohanty et al. (2006) seems to be an outlier due to very low P content and high N:P ratio. We will exclude it in the following.
 
@@ -120,6 +116,7 @@ rounded_values <- review_sludge %>%
   )
 ```
 
+::: panel-tabset
 ### P
 
 ```{r P_content_review}
@@ -221,7 +218,6 @@ f_save_csv_files(
 ```
 
 ::: panel-tabset
-
 ### P
 
 ```{r}
@@ -292,8 +288,6 @@ SILLAGE is a databse referencing analyses of sludge spread on crops in France. F
 ::: panel-tabset
 
 ## Prepare data 
-
-::: panel-tabset
 
 ```{r}
 source_data <- "source_data/0_sludge_composition/sillage_data/"
@@ -453,6 +447,7 @@ f_graph_compo_all <- function(dataset, var, var_weight, exp_min, exp_max){
 }
 ```
 
+::: panel-tabset
 ### DM
 
 ```{r}

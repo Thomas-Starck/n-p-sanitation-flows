@@ -48,7 +48,6 @@ path_source <- ""
 theme_set(
   theme_minimal() +
     theme(
-      #text = element_text(family = "Times New Roman"),
       plot.title = element_text(face="bold")
       )
   )

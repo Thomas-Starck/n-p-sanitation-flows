@@ -144,5 +144,17 @@
 <text transform='translate(349.17,71.74) rotate(90)' style='font-size: 7.70px; font-family: "Arial";' textLength='6.84px' lengthAdjust='spacingAndGlyphs'>-1</text>
 <text transform='translate(343.71,78.58) rotate(90)' style='font-size: 11.00px; font-family: "Arial";' textLength='24.46px' lengthAdjust='spacingAndGlyphs'>.year</text>
 <text transform='translate(349.17,103.04) rotate(90)' style='font-size: 7.70px; font-family: "Arial";' textLength='6.84px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<line x1='34.10' y1='175.10' x2='47.93' y2='175.10' style='stroke-width: 2.13; stroke: #440154; stroke-opacity: 0.70; stroke-linecap: butt;' />
+<line x1='34.10' y1='197.86' x2='47.93' y2='197.86' style='stroke-width: 2.13; stroke: #414487; stroke-opacity: 0.70; stroke-linecap: butt;' />
+<line x1='134.85' y1='175.10' x2='148.67' y2='175.10' style='stroke-width: 2.13; stroke: #2A788E; stroke-opacity: 0.70; stroke-linecap: butt;' />
+<line x1='134.85' y1='197.86' x2='148.67' y2='197.86' style='stroke-width: 2.13; stroke: #7AD151; stroke-opacity: 0.70; stroke-linecap: butt;' />
+<line x1='227.37' y1='175.10' x2='241.20' y2='175.10' style='stroke-width: 2.13; stroke: #22A884; stroke-opacity: 0.70; stroke-linecap: butt;' />
+<line x1='227.37' y1='197.86' x2='241.20' y2='197.86' style='stroke-width: 2.13; stroke: #FDE725; stroke-opacity: 0.70; stroke-linecap: butt;' />
+<text x='55.14' y='178.25' style='font-size: 8.80px; font-family: "Arial";' textLength='68.48px' lengthAdjust='spacingAndGlyphs'>Seine-Normandie</text>
+<text x='55.14' y='201.01' style='font-size: 8.80px; font-family: "Arial";' textLength='58.22px' lengthAdjust='spacingAndGlyphs'>Loire-Bretagne</text>
+<text x='155.88' y='178.25' style='font-size: 8.80px; font-family: "Arial";' textLength='57.20px' lengthAdjust='spacingAndGlyphs'>Artois-Picardie</text>
+<text x='155.88' y='201.01' style='font-size: 8.80px; font-family: "Arial";' textLength='60.67px' lengthAdjust='spacingAndGlyphs'>Adour-Garonne</text>
+<text x='248.40' y='178.25' style='font-size: 8.80px; font-family: "Arial";' textLength='47.44px' lengthAdjust='spacingAndGlyphs'>Rhin-Meuse</text>
+<text x='248.40' y='201.01' style='font-size: 8.80px; font-family: "Arial";' textLength='80.72px' lengthAdjust='spacingAndGlyphs'>Rhône-Méditerranée</text>
 </g>
 </svg>

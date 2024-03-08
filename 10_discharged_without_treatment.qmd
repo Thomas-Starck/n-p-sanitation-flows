@@ -2,7 +2,7 @@
 title: "Discharged without treatment"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=T, warning=F, message=F, results=F}
 knitr::opts_chunk$set(warning=F, message=F, results=F, fig.align = "center",  dev='svg')
 
 library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
@@ -40,7 +40,6 @@ library(readxl)
 theme_set(
   theme_minimal() +
     theme(
-      text = element_text(family = "Times New Roman"),
       plot.title = element_text(face="bold")
       )
   )

@@ -2,7 +2,7 @@
 title: "Sankeys"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=T, warning=F, message=F, results=F}
 knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
 
 library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
@@ -47,7 +47,6 @@ library(cowplot) #for plot_grid
 theme_set(
   theme_minimal() +
     theme(
-      text = element_text(family = "Times New Roman"),
       plot.title = element_text(face="bold")
       )
   )
@@ -149,7 +148,7 @@ file_direct_discharge <-
 rm(perc_Pt_loss, perc_NGL_loss, perc_loss, temp)
 ```
 
-# Sankeys P {.tabset .tabset-fade .tabset-pills}
+# Sankeys P 
 
 ```{r}
 f_P_file <- function(file_name, basin_selected){
@@ -377,7 +376,9 @@ IAS_balance <- file_IAS_balance %>%
   filter(nutrient=="P")
 ```
 
-## France {.tabset .tabset-fade}
+::: panel-tabset
+
+## France 
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_France.csv", "Metropolitan France")
@@ -395,7 +396,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Artois-Picardie {.tabset .tabset-fade}
+## Artois-Picardie 
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Artois_Picardie.csv", "Artois-Picardie")
@@ -413,7 +414,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Rhin-Meuse {.tabset .tabset-fade}
+## Rhin-Meuse 
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Rhin_Meuse.csv", "Rhin-Meuse")
@@ -431,7 +432,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Seine-Normandie {.tabset .tabset-fade}
+## Seine-Normandie 
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Seine_Normandie.csv", "Seine-Normandie")
@@ -449,7 +450,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Loire-Bretagne {.tabset .tabset-fade}
+## Loire-Bretagne 
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Loire_Bretagne.csv", "Loire-Bretagne")
@@ -467,7 +468,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Adour-Garonne {.tabset .tabset-fade}
+## Adour-Garonne 
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Adour_Garonne.csv", "Adour-Garonne")
@@ -485,7 +486,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Rhône-Méditerranée-Corse {.tabset .tabset-fade}
+## Rhône-Méditerranée-Corse 
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Rhone_Mediterranee.csv", "Rhône-Méditerranée")
@@ -503,7 +504,9 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-# Sankeys N {.tabset .tabset-fade .tabset-pills}
+:::
+
+# Sankeys N 
 
 ```{r}
 f_N_file <- function(file_name, basin_selected){
@@ -784,7 +787,9 @@ IAS_balance <- file_IAS_balance %>%
   filter(nutrient=="N")
 ```
 
-## France {.tabset .tabset-fade}
+::: panel-tabset
+
+## France 
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_France.csv")) 
@@ -805,7 +810,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Artois-Picardie {.tabset .tabset-fade}
+## Artois-Picardie 
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Artois_Picardie.csv")) 
@@ -826,7 +831,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Rhin-Meuse {.tabset .tabset-fade}
+## Rhin-Meuse 
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Rhin_Meuse.csv")) 
@@ -847,7 +852,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Seine-Normandie {.tabset .tabset-fade}
+## Seine-Normandie 
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Seine_Normandie.csv")) 
@@ -868,7 +873,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Loire-Bretagne {.tabset .tabset-fade}
+## Loire-Bretagne 
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Loire_Bretagne.csv")) 
@@ -889,7 +894,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Adour-Garonne {.tabset .tabset-fade}
+## Adour-Garonne 
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Adour_Garonne.csv")) 
@@ -910,7 +915,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Rhône-Méditerranée-Corse {.tabset .tabset-fade}
+## Rhône-Méditerranée-Corse 
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Rhone_Mediterranee.csv")) 
@@ -930,6 +935,8 @@ f_sankey(sankey_N)
 ```{r results = T}
 f_table(sankey_N)
 ```
+
+:::
 
 # Results
 
@@ -1028,9 +1035,15 @@ N_P_nodes_basins <- left_join(
 )
 ```
 
-## Per capita values {.tabset .tabset-fade .tabset-pills}
+::: panel-tabset
 
-### Excretions {.tabset .tabset-fade}
+## Per capita values 
+
+::: panel-tabset
+
+### Excretions 
+
+::: panel-tabset
 
 #### kg per year
 
@@ -1081,9 +1094,15 @@ ggplot(temp) +
   )
 ```
 
-### In and out of system {.tabset .tabset-fade}
+:::
 
-#### Absolute {.tabset .tabset-fade}
+### In and out of system 
+
+::: panel-tabset
+
+#### Absolute 
+
+::: panel-tabset
 
 ##### P
 
@@ -1251,7 +1270,11 @@ plot_grid(
 )
 ```
 
-#### Relative {.tabset .tabset-fade}
+:::
+
+#### Relative 
+
+::: panel-tabset
 
 ##### P
 
@@ -1381,7 +1404,11 @@ plot_grid(
 )
 ```
 
-### N:P Ratio {.tabset .tabset-fade}
+:::
+
+:::
+
+### N:P Ratio 
 
 ```{r}
 temp <- N_P_nodes_basins %>%
@@ -1429,7 +1456,11 @@ plot_grid(
 )
 ```
 
-## Recycling {.tabset .tabset-fade .tabset-pills}
+:::
+
+## Recycling 
+
+::: panel-tabset
 
 ### N
 
@@ -1488,9 +1519,15 @@ ggplot(temp) +
   ) 
 ```
 
-## Sankey in / out system {.tabset .tabset-fade .tabset-pills}
+:::
 
-### Per cap per year {.tabset .tabset-fade}
+## Sankey in / out system 
+
+::: panel-tabset
+
+### Per cap per year 
+
+::: panel-tabset
 
 #### N
 
@@ -1622,7 +1659,11 @@ f_save_csv_files(
 f_sankey(temp)
 ```
 
-### Percent {.tabset .tabset-fade}
+:::
+
+### Percent 
+
+::: panel-tabset
 
 #### N
 
@@ -1761,7 +1802,13 @@ f_save_csv_files(
 f_sankey(temp)
 ```
 
-# Comparison of sludge composition {.tabset .tabset-fade .tabset-pills}
+:::
+
+:::
+
+:::
+
+# Comparison of sludge composition 
 
 We use a French review of sludge composition from 2014, [link](https://hal.inrae.fr/hal-02796871/document) to the study (page 413)
 
@@ -1774,6 +1821,8 @@ review_sludge_composition$compost <- factor(
 )
 Source <- "Source: French Collective Scientifice Expertise on\nOrganic Fertilizers, 2014"
 ```
+
+::: panel-tabset
 
 ## Preparation
 
@@ -1906,6 +1955,8 @@ ggplot(temp) +
     title = "N content in urban sludge"
   )
 ```
+
+:::
 
 ```{r remove_all_objects_in_environment}
 rm(list = ls())
