@@ -2,7 +2,7 @@
 title: "Industrial sewage network discharge"
 ---
 
-This page describes the data used to determine how much nitrogen and phosphorus is discharges by industries to sewers networks.
+This page describes the data used to determine how much nitrogen and phosphorus is discharged by industries to sewers networks.
 
 ```{r setup, include=T, warning=F, message=F, results=F}
 knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
@@ -38,11 +38,8 @@ library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org
 # Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
 #loading additional relevant packages
-library(cowplot) #for plot_grid() and get_legend
-library(patchwork)
-
-#path for data 
-path_source <- "source_data/0_industry_discharge/georisque_data/"
+library(cowplot) #for plot_grid(), multiple plots
+library(patchwork) #also for multiple plots
 
 #setting graphs theme
 theme_set(
@@ -61,13 +58,13 @@ scale_fill_binned     <- scale_fill_viridis_b
 
 Source <- "Source: géorisque database\ncomputation by Thomas Starck"
 
-# Load the function file
+# Load the functions file
 source("functions.R")
 ```
 
 # Source, description and loading data
 
-The georisque database is public and reports industrial discharge, when they are made compulsory by the reglementary thresholds. The GEREP database is not open access but was provided by the French administration ; it contains more industry discharges than simply the mandatory reported ones.
+The géorisque database is publicly available and reports industrial discharge, when they are made compulsory by the regulatory thresholds. It reports industrial facilities name and IDs. The GEREP database is not open access but was provided by the French administration ; it contains more data than simply the mandatory reported ones, but the industrial facilities are anonymized. In the following we will use the GEREP database. We nonetheless study the géorisques database to test the consistency of the GEREP database.
 
 ::: panel-tabset
 ## Load géorisque data
@@ -75,26 +72,29 @@ The georisque database is public and reports industrial discharge, when they are
 ::: panel-tabset
 ### Source and description
 
-The data were downloaded on the [georisque](https://www.georisques.gouv.fr/installations-industrielles-rejetant-des-polluants) website, reporting industrial pollution discharges. Read the description of the data on [this page](https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes).
+The data were downloaded on the [georisque](https://www.georisques.gouv.fr/installations-industrielles-rejetant-des-polluants){target="_blank"} website, reporting industrial pollution discharges. Read the description of the data on [this page](https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes){target="_blank"}.
 
 All pollution flows are reported in kg/year in the database.
 
 ### Emissions
 
-We load the emission file emissions.csv, for each year. They report the facility ID and name, pollutant type (145 different), discharge environment (air, water direct, water indirect, ground), and quantity in kg/an. We focus only on NGL, Pt, DBO5, DCO, MES.
+We load the emission file *emissions.csv*, for each year. They report the industry facility ID and name, pollutant type (145 different), discharge environment (air, water direct, water indirect, ground), and quantity in kg/an. We focus only on NGL, Pt, DBO5, DCO, MES.
 
-```{r loading_emissions}
+```{r loading_georisques_emissions}
+#path for géorsiques data  source
+path_source <- "source_data/0_industry_discharge/georisque_data/"
+
 #loading pollutant data
-file_emission <- list.files( #read and merge csv of all years
+file_georisques_emission <- list.files( #read and merge csv of all years
     path = path_source,
     pattern = "emissions.csv", full.names = T, recursive = T) %>%
     lapply(read_csv2) %>% bind_rows()
 
 # see the 145 different pollutants
-unique(file_emission$polluant)
+unique(file_georisques_emission$polluant)
 
 # focus only on NGL, Pt, DBO5, DCO, MES
-file_emission <- file_emission %>% 
+file_georisques_emission <- file_georisques_emission %>% 
   filter(
     polluant %in% c(
       "Phosphore total",
@@ -104,19 +104,21 @@ file_emission <- file_emission %>%
       "Matières en suspension (MES)"
       )
     ) %>%
+  #transform numbers into numeric
   mutate(
     quantite = as.numeric(quantite)
   )
 ```
 
-We load the files describing the facilities (etablissements.csv). They report the site name, address, coordinates, the European Pollutant Release and Transfer Register code (EPRTR code and wording), and the APE code and wording. EPRTR categories are listed [here](https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes/synthese/donnees#/recherche=secteur), and APE codes are listed [here](https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes/etablissement/donnees#/secteur=codeAPE)
+We load the files describing the facilities (*etablissements.csv*). They report the site name, address, coordinates, the European Pollutant Release and Transfer Register code (EPRTR code and wording), and the APE code and wording. EPRTR categories are listed [here](https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes/synthese/donnees#/recherche=secteur){target="_blank"}, and APE codes are listed [here](https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes/etablissement/donnees#/secteur=codeAPE){target="_blank"}.
 
-We merge this emissions file through their unique ID. There are 200 APE codes and 50 EPRTR codes related to our pollution of interest (NGL, Pt, DBO5, DCO, MES).
-
-```{r loading_sites_ID}
+```{r loading_georisques_sites_ID}
 year_min <- 2003
 year_max <- 2020
+
+#function to load industrial sites files, from 2003 to 2020
 f_load_id_sites <- function(year_min, year_max){
+  #read the file site for the first yer
   temp <- 
     read_csv2(paste0(path_source, year_min, "/etablissements.csv")) %>% 
     mutate(
@@ -124,6 +126,7 @@ f_load_id_sites <- function(year_min, year_max){
       coordonnees_y = as.numeric(coordonnees_y),
       annee_emission = year_min
       )
+  #read the sites files for subsequent years, merge with previous years file
   for (i in (year_min+1):year_max){
     temp2 <- 
       read_csv2(paste0(path_source, i, "/etablissements.csv")) %>% 
@@ -134,26 +137,33 @@ f_load_id_sites <- function(year_min, year_max){
         )
     temp <- bind_rows(temp, temp2)
   }
+  #return file for all years
   return(temp)
 }
 
-file_id_sites <- f_load_id_sites(2003, 2020)
+#loading industrial sites files from 2003 to 2020
+file_georisques_id_sites <- f_load_id_sites(2003, 2020)
+```
 
-file_emissions_id_site <- left_join(
-  file_emission, file_id_sites, by=c("annee_emission","identifiant")
+We merge these 2 emissions files through their unique ID. There are 200 APE codes and 50 EPRTR codes related to our pollution of interest (NGL, Pt, DBO5, DCO, MES).
+
+```{r merge_georisques_sites_and_emissions_files}
+#merge the industrial sites file with the file on pollutant emissions
+file_georisques_emissions_id_site <- left_join(
+  file_georisques_emission, file_georisques_id_sites, by=c("annee_emission","identifiant")
 )
 
 # see the 300 APE codes
-unique(file_emissions_id_site$libelle_ape)
+unique(file_georisques_emissions_id_site$libelle_ape)
 
 # see the 60 EPRTR codes
-unique(file_emissions_id_site$libelle_eprtr)
+unique(file_georisques_emissions_id_site$libelle_eprtr)
 
-# we create the main file
-georisque <- file_emissions_id_site %>%
+# we create the main gérosique file, one column for each pollutant
+georisque <- file_georisques_emissions_id_site %>%
   spread(polluant, quantite)
 
-#we can also get commune, dep and region ID
+# renaming columns (we could also get commune, department and region IDs)
 georisque <- georisque %>%
   select(
     Year = annee_emission,
@@ -175,7 +185,7 @@ georisque <- georisque %>%
     libelle_eprtr
   )
 
-# we change the french wording of discharge environment to English
+# we change the french wording of discharge environment ("mileu" in original file) to English
 georisque <- georisque %>%
   mutate(
     discharge_environment = case_when(
@@ -187,7 +197,7 @@ georisque <- georisque %>%
 
 #see a summary of emissions according to the environmental discharge
 table(
-  file_emissions_id_site %>% 
+  file_georisques_emissions_id_site %>% 
     filter(
       polluant %in% c(
       "Phosphore total",
@@ -203,10 +213,11 @@ table(
 
 ### Discharged flows
 
-For 2019 and 2020, for each site (ID and name), there are files (rejets.csv) specifying if there are some discharges in the network or in the environment, in m3/y.
+Only for the years 2019 and 2020, for each site (ID and name), there are files (rejets.csv) specifically specifying if discharges are in the sewers network or in the natural environment, in m3/y. We will use it to test our main dataset on this particular point.
 
-```{r}
-file_discharge <- list.files( #read and merge csv of all years
+```{r loading_georisques_sewers_discharge_file}
+#read and merge csv of all years
+file_georisques_discharge <- list.files( 
     path = path_source,
     pattern = "rejets.csv", full.names = T, recursive = T) %>%
     lapply(
@@ -214,27 +225,30 @@ file_discharge <- list.files( #read and merge csv of all years
       ) %>% 
   bind_rows()
 
-file_discharge <- file_discharge %>%
+#renaming French columns to English
+file_georisques_discharge <- file_georisques_discharge %>%
   rename(
     Year = annee_rejet,
     Id = identifiant,
     site_name = nom_etablissement,
     discharge_network_m3_y = rejet_raccorde_m3_par_an,
     discharge_environment_m3_y = rejet_isole_m3_par_an
-    
-  )
+    )
 ```
 :::
 
 ## Load GEREP data
 
-We load the data.
+We load the data. Contrary to géorisques data, there is only 1 main file, so no need to merge several files together.
 
-```{r}
+```{r load_GEREP_data}
+#path for GEREP data source
 path_source <- "source_data/0_industry_discharge/GEREP_data/"
 
+#read GEREP file
 file_GEREP <- readxl::read_excel(paste0(path_source, "2010_2021_Rejets raccordés eau par agence.xlsx"))
 
+#rename French column names to English
 GEREP <- file_GEREP %>%
   select(
     Year = Année,
@@ -250,7 +264,7 @@ GEREP <- file_GEREP %>%
     name_COM = Commune
   )
 
-# Simplify name of the basin
+# Simplify the name of the basin rhone-med-corse basin
 GEREP <- GEREP %>%
   mutate(
     basin = case_when(
@@ -260,51 +274,51 @@ GEREP <- GEREP %>%
   )
 ```
 
-We compute the flows at the national scale
+We summarize the flows at the national scale.
 
-```{r}
-temp <- GEREP %>%
-  #We only keep metropolitan France
+```{r GEREP_data_national_scale}
+GEREP <- GEREP %>%
+  #We only keep metropolitan France sites (exclude overseas territories)
   filter(
     basin %in% c("Adour-Garonne", "Artois-Picardie", "Loire-Bretagne", "Rhin-Meuse", "Rhône-Méditerranée", "Seine-Normandie")
-    ) %>%
+    )
+
+#temporary file, incoming and discharged nutrient flows and number of facilities, at the national scale
+temp <- GEREP %>%
   group_by(Year, nutrient) %>%
+  #transform from kg/year (for each facility) to kt/year (national) for nutrient flows
   summarise(
     incoming = signif(sum(incoming, na.rm=T)/10^6, 3),
     discharged = signif(sum(discharged, na.rm=T)/10^6, 3),
     nb_facilities = sum(is.na(nutrient)==F)
     )
 
-temp_in <- temp %>% select(-c(discharged, nb_facilities)) %>%
-  spread(nutrient, incoming) %>%
-  rename(
-    NGL_in = `Azote total (N)`,
-    Pt_in = `Phosphore total (P)`,
-    DBO5_in = `Demande biologique en oxygène (DBO5)`,
-    DCO_in = `Demande chimique en oxygène (DCO)`,
-    MES_in = `Matières en suspension (MES)`
-  )
+#function to spread nutrients flows and number of facilities in columns
+f_spread_nutrients <- function(dataset, nutrient_type, suffix){
+  dataset <- dataset %>%
+    #spread in columns
+    spread(nutrient, {{ nutrient_type }}) %>%
+    #change name of the columns with suffix
+    rename(
+      !!paste0("NGL_", suffix) := `Azote total (N)`,
+      !!paste0("Pt_", suffix) := `Phosphore total (P)`,
+      !!paste0("DBO5_", suffix) := `Demande biologique en oxygène (DBO5)`,
+      !!paste0("DCO_", suffix) := `Demande chimique en oxygène (DCO)`,
+      !!paste0("MES_", suffix) := `Matières en suspension (MES)`
+    )
+  return(dataset)
+}
 
-temp_out <- temp %>% select(-c(incoming, nb_facilities)) %>%
-  spread(nutrient, discharged) %>%
-  rename(
-    NGL_out = `Azote total (N)`,
-    Pt_out = `Phosphore total (P)`,
-    DBO5_out = `Demande biologique en oxygène (DBO5)`,
-    DCO_out = `Demande chimique en oxygène (DCO)`,
-    MES_out = `Matières en suspension (MES)`
-  )
+#temporary file with incoming flow for each nutrient in columns, at the national scale
+temp_in <- f_spread_nutrients(temp %>% select(-c(discharged, nb_facilities)), incoming, "in")
 
-temp_nb <- temp %>% select(-c(incoming, discharged)) %>%
-  spread(nutrient, nb_facilities) %>%
-  rename(
-    NGL_nb_facilities = `Azote total (N)`,
-    Pt_nb_facilities = `Phosphore total (P)`,
-    DBO5_nb_facilities = `Demande biologique en oxygène (DBO5)`,
-    DCO_nb_facilities = `Demande chimique en oxygène (DCO)`,
-    MES_nb_facilities = `Matières en suspension (MES)`
-  )
+#temporary file with discharge flows for each nutrient in columns, at the national scale
+temp_out <- f_spread_nutrients(temp %>% select(-c(incoming, nb_facilities)), discharged, "out")
 
+#temporary file with number of industrial facilities for each nutrient, at the national scale
+temp_nb <- f_spread_nutrients(temp %>% select(-c(incoming, discharged)), nb_facilities, "nb_facilities")
+
+#merge together flows in, out, and number of facilities
 GEREP_national <- 
   left_join(
     temp_in, temp_out, by="Year"
@@ -314,115 +328,79 @@ GEREP_national <-   left_join(
 )
 ```
 
-We compute the flows for each basin
+We summarize the flows at each water agency basin scale.
 
-```{r}
+```{r GEREP_data_water_agency_scale}
+#temporary file, incoming and discharges nutrient flows and number of facilities, for each water agency basin
 temp <- GEREP %>%
-  #We only keep metropolitan France
-  filter(
-    basin %in% c("Adour-Garonne", "Artois-Picardie", "Loire-Bretagne", "Rhin-Meuse", "Rhône-Méditerranée", "Seine-Normandie")
-    ) %>%
   group_by(Year, basin, nutrient) %>%
   summarise(
+    #transform from kg/year (for each facility) to kt/year (for each basin) for nutrient flows
     incoming = signif(sum(incoming, na.rm=T)/10^6, 3),
     discharged = signif(sum(discharged, na.rm=T)/10^6, 3),
     nb_facilities = sum(is.na(nutrient)==F)
     )
 
-temp_in <- temp %>% select(-c(discharged, nb_facilities)) %>%
-  spread(nutrient, incoming) %>%
-  rename(
-    NGL_in = `Azote total (N)`,
-    Pt_in = `Phosphore total (P)`,
-    DBO5_in = `Demande biologique en oxygène (DBO5)`,
-    DCO_in = `Demande chimique en oxygène (DCO)`,
-    MES_in = `Matières en suspension (MES)`
-  )
+#temporary file with incoming flow for each nutrient in columns, for each water agency basin
+temp_in <- f_spread_nutrients(temp %>% select(-c(discharged, nb_facilities)), incoming, "in")
 
-temp_out <- temp %>% select(-c(incoming, nb_facilities)) %>%
-  spread(nutrient, discharged) %>%
-  rename(
-    NGL_out = `Azote total (N)`,
-    Pt_out = `Phosphore total (P)`,
-    DBO5_out = `Demande biologique en oxygène (DBO5)`,
-    DCO_out = `Demande chimique en oxygène (DCO)`,
-    MES_out = `Matières en suspension (MES)`
-  )
+#temporary file with discharge flows for each nutrient in columns, for each water agency basin
+temp_out <- f_spread_nutrients(temp %>% select(-c(incoming, nb_facilities)), discharged, "out")
 
-temp_nb <- temp %>% select(-c(incoming, discharged)) %>%
-  spread(nutrient, nb_facilities) %>%
-  rename(
-    NGL_nb_facilities = `Azote total (N)`,
-    Pt_nb_facilities = `Phosphore total (P)`,
-    DBO5_nb_facilities = `Demande biologique en oxygène (DBO5)`,
-    DCO_nb_facilities = `Demande chimique en oxygène (DCO)`,
-    MES_nb_facilities = `Matières en suspension (MES)`
-  )
+#temporary file with number of industrial facilities for each nutrient, for each water agency basin
+temp_nb <- f_spread_nutrients(temp %>% select(-c(incoming, discharged)), nb_facilities, "nb_facilities")
 
+#merge together flows in, out, and number of facilities
 GEREP_basins <- left_join(
   temp_in, temp_out, by=c("Year", "basin")
-)
+  )
 GEREP_basins <- left_join(
   GEREP_basins, temp_nb, by=c("Year", "basin")
-)
+  )
 ```
 
-We also create a file with the flows of all the facilities
+We also create a complete file with the flows of all the industrial facilities, not summarized at the basin nor national scale.
 
-```{r}
-temp <- GEREP %>%
-  #We only keep metropolitan France
-  filter(
-    basin %in% c("Adour-Garonne", "Artois-Picardie", "Loire-Bretagne", "Rhin-Meuse", "Rhône-Méditerranée", "Seine-Normandie")
-    ) %>%
-  mutate(ID = 1:n())
+```{r GEREP_all_industrial_facilities}
+# add dummy ID for each industrial facility to merge temporary files together
+temp <- GEREP %>% mutate(ID = 1:n())
 
-temp_in <- temp %>% select(-c(discharged)) %>%
-  spread(nutrient, incoming) %>%
-  rename(
-    NGL_in = `Azote total (N)`,
-    Pt_in = `Phosphore total (P)`,
-    DBO5_in = `Demande biologique en oxygène (DBO5)`,
-    DCO_in = `Demande chimique en oxygène (DCO)`,
-    MES_in = `Matières en suspension (MES)`
-  )
+# temporary file of incoming nutrient flows in columns, for each industrial facility
+temp_in <- f_spread_nutrients(temp %>% select(-c(discharged)), incoming, "in")
 
-temp_out <- temp %>% select(-c(incoming)) %>%
-  spread(nutrient, discharged) %>%
-  rename(
-    NGL_out = `Azote total (N)`,
-    Pt_out = `Phosphore total (P)`,
-    DBO5_out = `Demande biologique en oxygène (DBO5)`,
-    DCO_out = `Demande chimique en oxygène (DCO)`,
-    MES_out = `Matières en suspension (MES)`
-  )
+# temporary file of discharged nutrient flows in columns, for each industrial facility
+temp_out <- f_spread_nutrients(temp %>% select(-c(incoming)), discharged, "out")
 
-
+# merge incoming and discharged nutrient flows
 GEREP_all <- left_join(
   temp_in, 
   temp_out %>% select(ID, NGL_out, Pt_out, DBO5_out, DCO_out, MES_out), by="ID"
 )
+
+#remove temporary files
+rm(temp_in, temp_out, temp_nb)
 ```
 
 ## More information
 
-About [INERIS](https://www.ineris.fr/fr), responsible for IREP (installation registre émissions polluantes).
+About [INERIS](https://www.ineris.fr/fr){target="_blank"}, responsible for IREP (Installation Registre Emissions Polluantes, *installation register pollutant emissions*).
 
-About [Aida](https://aida.ineris.fr/recherche?search=IREP), INERIS website on risk prevention and environmental protection regulations, and the related [decree](https://aida.ineris.fr/reglementation/arrete-261212-modifiant-larrete-31-janvier-2008-relatif-registre-a-declaration).
+About [Aida](https://aida.ineris.fr/recherche?search=IREP){target="_blank"}, INERIS website on risk prevention and environmental protection regulations, and the related [decree](https://aida.ineris.fr/reglementation/arrete-261212-modifiant-larrete-31-janvier-2008-relatif-registre-a-declaration){target="_blank"} concerning the reporting of industrial pollution discharges.
 
-About the European registry [E-PRTR](https://ec.europa.eu/environment/industry/stationary/eper/legislation.htm).
+About the European registry [E-PRTR](https://ec.europa.eu/environment/industry/stationary/eper/legislation.htm){target="_blank"}.
 :::
 
 # géorisque data
 
-In the graphs below we see that there is a dsitinction between water (direct and water (indirect) discharge. On [this page](https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes/synthese/donnees#/recherche=secteur) we can see that what is called water indirect ("eau indirect") in the data base corresponds to pollutants sent to wastewater treatment plants ("eau vers station d'épuration"). However it is unclear whether the reported pollutant flows correspond to the quantity discharged to the sewage network or the quantity discharge to the environment after WWTP end of pipe pollution treatment.
+In the graphs below we see that there is a distinction in the gérosiques database between water (direct) and water (indirect) discharge. On [this page](https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes/synthese/donnees#/recherche=secteur){target="_blank"} we can see that what is called water indirect ("eau indirect") in the database corresponds to pollutants sent from industrial facilities to wastewater treatment plants ("eau vers station d'épuration"). However it is unclear whether the reported pollutant flows correspond to the quantity first discharged to the sewage network or to the quantity discharged to the environment after WWTP end of pipe pollution treatment.
 
 ::: panel-tabset
-## Outliers identification 
+## Outliers identification
 
-Spikes in the right chart indicate some potential incoherent reported pollution quantities, that we investigate.
+For 2003-2020, we plot at the national scale the number of industrial facilities reporting discharges for the concerned nutrient (left) and the quantity discharged (right). Spikes in the right chart indicate some potential incoherent data, that we investigate.
 
-```{r}
+```{r function_graph_georisques_nutrient_flows}
+#function for the graph of géorisques nutrient inflows and discharges
 f_graph <- function(nutrient){
   temp <- georisque %>%
     filter(is.na(!!as.symbol(nutrient))==F) %>%
@@ -475,52 +453,52 @@ f_graph <- function(nutrient){
 ::: panel-tabset
 ### NGL
 
-Outliers : in 2017 for indirect water discharge ; in 2010 for direct water discharge (and in 2007 ?).
+Outliers (visual identification): in 2017 for indirect water discharge; in 2010 for direct water discharge; potential outlier in 2007.
 
-```{r}
+```{r outliers_georisques_NGL}
 f_graph("NGL")
 ```
 
 ### Pt
 
-Outliers : in 2010 direct water discharge ; in 2008 and 2020 ground discharge.
+Outliers (visual identification): in 2010 direct water discharge ; in 2008 and 2020 ground discharge.
 
-```{r}
+```{r outliers_georisques_Pt}
 f_graph("Pt")
 ```
 
 ### DBO5
 
-Outliers : in 2010 direct water discharge, and in 2007.
+Outliers (visual identification): in 2010 direct water discharge, and in 2007.
 
-```{r}
+```{r outliers_georisques_DBO5}
 f_graph("DBO5")
 ```
 
 ### DCO
 
-Outliers : in 2010 direct water discharge ; in 2018, 2019 and 2020 indirect water discharge.
+Outliers (visual identification): in 2010 direct water discharge ; in 2018, 2019 and 2020 indirect water discharge.
 
-```{r}
+```{r outliers_georisques_DCO}
 f_graph("DCO")
 ```
 
 ### MES
 
-Outliers : in 2010 direct water discharge ; in 2018, 2019 and 2020 indirect water discharge.
+Outliers (visual identification): in 2010 direct water discharge ; in 2018, 2019 and 2020 indirect water discharge.
 
-```{r}
+```{r outliers_georisques_MES}
 f_graph("MES")
 ```
 
-### Outliers correction
+### Outliers investigation and correction
 
 For the 5 nutrients, in 2010 for SIAAP Marne Aval (ID 0079305101)
 
--   NGL, Pt factor 100
--   DCO, DBO5 and MES factor 1000
+-   NGL, Pt are off by a factor 100 (we divide the values by 100)
+-   DCO, DBO5 and MES are off by factor 1000 (we divide the values by 1000)
 
-```{r}
+```{r outliers_correction_georisques_2010_SIAAP}
 #NGL
 georisque$NGL[georisque$Id == "0079305101" & georisque$Year == 2010] <- 
   georisque$NGL[georisque$Id == "0079305101" & georisque$Year == 2010]/100
@@ -540,46 +518,46 @@ georisque$MES[georisque$Id == "0079305101" & georisque$Year == 2010] <-
 
 NGL :
 
--   2007, Id 0006506939, SIAAP : OK, juste change names (SIAAP - Seine Aval) and ID starting 2008, no need to correct
--   2017, Id 0005403171, SMET NORD EST 71 : only year reported =\> we remove it
+-   in 2007, Id 0006506939, SIAAP : OK, names and ID are just changes (originally SIAAP - Seine Aval) starting 2008, no need to correct for us
+-   in 2017, Id 0005403171, SMET NORD EST 71 : only year reported for this facility =\> we remove it
 
-```{r}
+```{r outliers_correction_georisques_NGL}
 georisque$NGL[georisque$Id == "0005403171" & georisque$Year == 2017] <- NA
 ```
 
 Pt :
 
--   2008, Id 0005103644 SOVALD : only year reported =\> we remove it
--   2020, Id 0005106528 SUEZ ORGANIQUE : only year reported =\> we remove it
+-   in 2008, Id 0005103644 SOVALD : only year reported =\> we remove it
+-   in 2020, Id 0005106528 SUEZ ORGANIQUE : only year reported for this facility =\> we remove it
 
-```{r}
+```{r outliers_correction_georisques_Pt}
 georisque$Pt[georisque$Id == "0005103644" & georisque$Year == 2008] <- NA
 georisque$Pt[georisque$Id == "0005106528" & georisque$Year == 2020] <- NA
 ```
 
 DBO5 :
 
--   2007, Id 0009000031, Base Aérienne 103 CDT René MOUCHOTTE : only year reported =\> we remove it
+-   in 2007, Id 0009000031, Base Aérienne 103 CDT René MOUCHOTTE : only year reported for this facility =\> we remove it
 
-```{r}
+```{r outliers_correction_georisques_DBO5}
 georisque$DBO5[georisque$Id == "0009000031" & georisque$Year == 2007] <- NA
 ```
 
 DCO :
 
--   2018, 2019 and 2020, Id 0006402259 SERAMM, Usine des boues : about 10 times higher than the previous years (same with MES but not with DBO5 which is coherent). We divide the values of these years by 10.
+-   in 2018, 2019 and 2020, Id 0006402259 SERAMM, Usine des boues: values about 10 times higher than the previous years. We divide the values of these years by 10.
 
-```{r}
+```{r outliers_correction_georisques_DCO}
 georisque$DCO[georisque$Id == "0006402259" & georisque$Year %in% c(2018, 2019, 2020)] <- 
   georisque$DCO[georisque$Id == "0006402259" & georisque$Year %in% c(2018, 2019, 2020)]/10
 ```
 
 MES :
 
--   2019, Id 0006700018, Matthieu COTTING : only year reported =\> we remove it
--   2018, 2019, 2020, Id 0006402259 SERAMM Usine des boues : about 10 times higher than the previous years (same with DCO but not with DBO5, which is coherent). We divide by 10.
+-   in 2019, Id 0006700018, Matthieu COTTING : only year reported for this facility =\> we remove it
+-   in 2018, 2019, 2020, Id 0006402259 SERAMM Usine des boues : about 10 times higher than the previous years. We divide by 10.
 
-```{r}
+```{r outliers_correction_georisques_MES}
 georisque$MES[georisque$Id == "0006700018" & georisque$Year ==2019] <- NA
 
 georisque$MES[georisque$Id == "0006402259" & georisque$Year %in% c(2018, 2019, 2020)] <- 
@@ -587,49 +565,50 @@ georisque$MES[georisque$Id == "0006402259" & georisque$Year %in% c(2018, 2019, 2
 ```
 :::
 
-## Corrected Flows 
+## Corrected Flows
 
 Here are the pollutant flows after outliers correction. For the 5 nutrients, the data seem reliable starting 2008.
 
 ::: panel-tabset
 ### NGL
 
-```{r}
+```{r georisques_corrected_NGL}
 f_graph("NGL")
 ```
 
 ### Pt
 
-```{r}
+```{r georisques_corrected_Pt}
 f_graph("Pt")
 ```
 
 ### DBO5
 
-```{r}
+```{r georisques_corrected_DBO5}
 f_graph("DBO5")
 ```
 
 ### DCO
 
-```{r}
+```{r georisques_corrected_DCO}
 f_graph("DCO")
 ```
 
 ### MES
 
-```{r}
+```{r georisques_corrected_MES}
 f_graph("MES")
 ```
 :::
 
-## Understand network discharge 
+## Understand network discharge
 
-For 2019 and 2020 discharge flows (in m3/year) in the sanitation network and in the environment are reported in the emission.csv file. We combine these data with the one presented in the previous Emission flows part, to check for coherence. Normally the nutrient flows discharged in the network should correspond to the "water (indirect)" flows of the Emission flows part.
+For 2019 and 2020 discharged flows in the sanitation network and in the environment are reported (in m3/year) in the *emission.csv* file. We compare these data with the ones presented in the previous graphs, to check for coherence. Normally the nutrient flows discharged in the network should correspond to the "water (indirect)" flows of the previous graphs.
 
-```{r}
-merge <- inner_join(
-  file_discharge %>% 
+```{r merge_main_georisque_and_sewer_discharges}
+#merge our main georisque data with file on network discharges
+data_sewers_discharge_merged <- inner_join(
+  file_georisques_discharge %>% 
     #We only keep non null discharge flows into networks
     filter(is.na(discharge_network_m3_y)==F) %>%
     filter(discharge_network_m3_y != 0),
@@ -637,39 +616,42 @@ merge <- inner_join(
   by = c("Year", "Id")
 )
 
-# check the in the 2 databases the site names are the same
-nrow(merge %>% filter(site_name.x != site_name.y))
-# 0 lines, OK, so we only keep one site_name
-merge <- merge %>% 
+# check that in the 2 databases the site names are the same. if returns 0 lines => OK
+nrow(data_sewers_discharge_merged %>% filter(site_name.x != site_name.y))
+# we only keep 1 site name
+data_sewers_discharge_merged <- data_sewers_discharge_merged %>% 
   select(-site_name.y) %>%
   rename(site_name = site_name.x)
 ```
 
-Some of what is reported as "connected disharged" in the emission file is actually not a discharge into the sanitation network, but a discharge in the environment from waste water treatment plant. We identify the waste water treatment plants by their APE code ("Collecte et traitement des eaux usées") and EPRTR code ("Installations de traitement des eaux urbaines résiduaires d'une capacité de 100 000 équivalents habitants").
+Some of what is reported as "connected disharged" in the emission file is actually not a discharge into the sanitation network, but a discharge in the environment from waste water treatment plant. We identify these waste water treatment plants by their APE code ("Collecte et traitement des eaux usées") and EPRTR code ("Installations de traitement des eaux urbaines résiduaires d'une capacité de 100 000 équivalents habitants").
 
-```{r}
-unique(merge$libelle_ape)
-unique(merge$libelle_eprtr)
+```{r classify_merged_georisque_WWTP_or_not}
+#see all the APE labels (about 90)
+unique(data_sewers_discharge_merged$libelle_ape)
+#see al the EPRTR labels (about 30)
+unique(data_sewers_discharge_merged$libelle_eprtr)
 
-merge <- merge %>% 
+# classify each row in WWTP / not WWTP, based on APE and EPRTR labels
+data_sewers_discharge_merged <- data_sewers_discharge_merged %>% 
   mutate(
     WWTP = case_when(
       libelle_ape == "Collecte et traitement des eaux usées" | 
         libelle_eprtr == "Installations de traitement des eaux urbaines résiduaires d'une capacité de 100 000 équivalents habitants" ~
         "WWTP", 
-      T ~ "not WWTP"
+      T ~ "not WWTP (=industrial facilities)"
     )
   )
 ```
 
-In the graphs below, we can see that besides what looks like some little incoherences, the "indirect water discharge" (black line) corresponds well to the discharge into networks of facilities that are not WWTP (columns for 2019 and 2020, left).
+In the graphs below, we can see that besides what looks like some little incoherences, the "indirect water discharge" of our previous data (black line) corresponds well to the discharge into networks of facilities that are not WWTP (columns for 2019 and 2020, left).
 
 So in the following, we will use the "indirect water discharge" as a proxy for what is discharged into the sanitation networks.
 
-```{r}
+```{r function_graph_consistency_sewers_discharge}
 f_graph_comparison <- function(nutrient_select){
-  #in the main file keep only indirect water discharge of NGL, normally corresponding to discharge in sanitation networks.
-  #agregate at the nationa scale
+  #in the main file keep only indirect water discharge of nutrient, normally corresponding to discharge in sanitation networks.
+  #agregate at the national scale
   temp <- georisque %>%
     filter(
       is.na(!!as.symbol(nutrient_select))==F & discharge_environment == "water (indirect)"
@@ -678,7 +660,7 @@ f_graph_comparison <- function(nutrient_select){
     summarise(nutrient=sum(!!as.symbol(nutrient_select)))
   
   #keep only non null NGL emissions
-  temp2 <- merge %>% 
+  temp2 <- data_sewers_discharge_merged %>% 
     filter(is.na(!!as.symbol(nutrient_select))==F) %>%
     rename(nutrient = !!as.symbol(nutrient_select))
   
@@ -691,7 +673,7 @@ f_graph_comparison <- function(nutrient_select){
       alpha=.8
       ) +
     geom_line(
-      data=temp %>% mutate(WWTP = "not WWTP"),
+      data=temp %>% mutate(WWTP = "not WWTP (=industrial facilities)"),
       aes(Year, nutrient/10^6)
       ) +
     facet_wrap(vars(WWTP)) +
@@ -700,65 +682,71 @@ f_graph_comparison <- function(nutrient_select){
       title = paste("Comparison of", nutrient_select, "'network discharge' to 'indirect water discharge'"),
       subtitle = "network discharge of WWTP (right) and other facilities (left)\nwater discharged in sewage networks (columns) and indirect water discharge (line)",
       caption=Source,
-      fill = "network discharge to"
+      fill = "discharge to\n sewers networks"
     )
-  
 }
 ```
 
 ::: panel-tabset
 ### NGL
 
-```{r}
+```{r sewers_discarge_consistency_NGL}
 f_graph_comparison("NGL")
 ```
 
 ### Pt
 
-```{r}
+```{r sewers_discarge_consistency_Pt}
 f_graph_comparison("Pt")
 ```
 
 ### DCO
 
-```{r}
+```{r sewers_discarge_consistency_DCO}
 f_graph_comparison("DCO")
 ```
 
 ### DBO5
 
-```{r}
+```{r sewers_discarge_consistency_DBO5}
 f_graph_comparison("DBO5")
 ```
 
 ### MES
 
-```{r}
+```{r sewers_discarge_consistency_MES}
 f_graph_comparison("MES")
 ```
 :::
 
-## Final data 
+## Final data
 
-We save the sewage network discharge for all the undustrial sites.
+We save the sewage network discharge for all the industrial sites.
 
-```{r}
+```{r save_georisque_all_data}
+#remove temporary file used only to check consistency of sewers discharge
+rm(data_sewers_discharge_merged)
+
+#in the main georisques databse, select only "water (indirect)", i.e. discharge to sewers networks
 temp <- georisque %>%
   filter(
     discharge_environment=="water (indirect)"
     )
 
-output_data <- "output_data/industry_network_discharge/"
+#output path
+output_data <- "output_data/industry_sewers_network_discharge/"
+#save the géorisques data on industrial discharge to sewers
 f_save_csv_files(
   temp, 
   output_data, 
-  "industry_network_discharge_georisque_ALL.csv"
+  "industry_sewers_network_discharge_georisque_ALL.csv"
   )
 ```
 
-We also save the data agregated at the national scale. Below are the grahps for each nutrient.
+We also save the data aggregated at the national scale. Below are the graphs for each nutrient.
 
-```{r}
+```{r save_georisque_data_national_scale}
+#same as before, but flows summarized at the national scale
 national_network_discharge <- georisque %>%
   filter(
     discharge_environment=="water (indirect)"
@@ -771,6 +759,7 @@ national_network_discharge <- georisque %>%
     )
   )
 
+#temporary file summarizing the number of industrial facilities at the national scale for each nutrient
 temp <- georisque %>%
   filter(
     discharge_environment=="water (indirect)"
@@ -783,18 +772,22 @@ temp <- georisque %>%
     )
   )
 
+#merge the 2 files (flows and number of facilities)
 national_network_discharge <- 
   left_join(national_network_discharge, temp, by="Year")
 
-output_data <- "output_data/industry_network_discharge/"
+#output patch
+output_data <- "output_data/industry_sewers_network_discharge/"
+#save data at the national scale
 f_save_csv_files(
   national_network_discharge, 
   output_data, 
-  "industry_network_discharge_georisque_national.csv"
+  "industry_sewers_network_discharge_georisque_national.csv"
   )
 ```
 
-```{r}
+```{r function_graph_industries_dicharge_sewers}
+#function for graph of industries discharge to sewers networks
 f_graph_final <- function(dataset, nutrient_flow, nutrient_nb_facilities){
   g <- plot_grid(
     ggplot(dataset) +
@@ -818,7 +811,6 @@ f_graph_final <- function(dataset, nutrient_flow, nutrient_nb_facilities){
     )
   return(g)
 }
-
 ```
 
 ::: panel-tabset
@@ -826,7 +818,7 @@ f_graph_final <- function(dataset, nutrient_flow, nutrient_nb_facilities){
 
 Order of magnitude for the 2010s : 0.7 ktP/year.
 
-```{r}
+```{r graph_georisque_final_discharge_sewers_Pt}
 f_graph_final(national_network_discharge, "Pt", "Pt_nb_facilities")
 ```
 
@@ -834,7 +826,7 @@ f_graph_final(national_network_discharge, "Pt", "Pt_nb_facilities")
 
 Order of magnitude for the 2010s : 3-4 ktN/year.
 
-```{r}
+```{r graph_georisque_final_discharge_sewers_NGL}
 f_graph_final(national_network_discharge, "NGL", "NGL_nb_facilities")
 ```
 
@@ -842,7 +834,7 @@ f_graph_final(national_network_discharge, "NGL", "NGL_nb_facilities")
 
 Order of magnitude for the 2010s : 60-70 ktDBO5/year.
 
-```{r}
+```{r graph_georisque_final_discharge_sewers_DBO5}
 f_graph_final(national_network_discharge, "DBO5", "DBO5_nb_facilities")
 ```
 
@@ -850,7 +842,7 @@ f_graph_final(national_network_discharge, "DBO5", "DBO5_nb_facilities")
 
 Order of magnitude for the 2010s : 150 ktDCO/year.
 
-```{r}
+```{r graph_georisque_final_discharge_sewers_DCO}
 f_graph_final(national_network_discharge, "DCO", "DCO_nb_facilities")
 ```
 
@@ -858,7 +850,7 @@ f_graph_final(national_network_discharge, "DCO", "DCO_nb_facilities")
 
 Order of magnitude for the 2010s : 10-15 ktMES/year.
 
-```{r}
+```{r graph_georisque_final_discharge_sewers_MES}
 f_graph_final(national_network_discharge, "MES", "MES_nb_facilities")
 ```
 :::
@@ -867,36 +859,368 @@ f_graph_final(national_network_discharge, "MES", "MES_nb_facilities")
 # GEREP data
 
 ::: panel-tabset
-## Before Correction 
+## Before Correction
 
-<details>
+Below, we plot the GEREP nutrient flows of discharges in sewers networks, at the national and water agency basins scales. Spikes indicate potential outliers, that we investigate. At the national scale, we also compare it to the géorisques data. There are many more facilities reported in the GEREP database than in géorisques, but the difference in actual nutrient flows is much smaller. This indicates that the géorisques database captures the majority of large discharges. However the temporal dynamics are very similar in the 2 database.
 
-<summary>see outliers</summary>
+The database also reports the discharge downstream of the sewer network, after the WWTP treatment (in yellow on th egraphs below), using actual or estimated WWTP removal efficiencies. We show it as an indication, but will not use it.
 
-PHOSPHORUS
+::: panel-tabset
+### National (georisque comparison)
 
--   in 2017 for CHAGNY, in and out, factor 100 (incoming==55879, there are several Chagny)
--   in 2010 and 2011 for PORT-SUR-SAONE, does not exist afterwards. We did not correct it for now.
--   in 2010 and 2011 for VITRY-SUR-SEINE, factor 100 in, factor 10 out
+```{r functions_for_GEREP_graphs}
+#caption of the comparison graph
+Source_GEREP_georisque <- "Source: géorisque and GEREP database\ncomputation by Thomas Starck"
+
+#function for graph comparison between GEREP and géorisques databases
+f_graph_data_comparison <- function(
+    dataset_GEREP, dataset_national_network_discharge, 
+    nutri_georisq, nutri_GEREP_in, nutri_GEREP_out, nutri_nb_facilities, nutrient_label
+    ){
+  g1 <- ggplot(dataset_GEREP) +
+    geom_area(
+      data = dataset_national_network_discharge, 
+      aes(Year, !!as.symbol(nutri_georisq), fill="discharged in\nsewage network"), 
+      alpha=.5
+      ) +
+    geom_line(
+      aes(Year, !!as.symbol(nutri_GEREP_out), color = "discharged\nafter treatment")
+      ) +
+    geom_line(
+      aes(Year, !!as.symbol(nutri_GEREP_in), color = " discharged")
+      ) +
+    labs(
+      x="", y="",
+      color="GEREP database",
+      fill="gérosique database",
+      caption = Source_GEREP_georisque,
+      title = "Comparison of discharge in sewage network\nin GEREP and géorisques databases",
+      subtitle = paste0("kt", nutrient_label, " per year")
+    )
+  
+  g2 <- ggplot(dataset_GEREP) +
+    geom_area(
+      data = dataset_national_network_discharge, 
+      aes(Year, !!as.symbol(nutri_nb_facilities), fill="géorisque database"), 
+      alpha=.5
+      ) +
+    geom_line(
+      aes(Year, !!as.symbol(nutri_nb_facilities), color = "GEREP database")
+      ) +
+    theme(legend.position = c(.5, .5)) +
+    labs(
+      x="", y="",
+      color="",
+      fill="",
+      caption = "\n",
+      title = "\n",
+      subtitle = "Number of facilities"
+    )
+  
+  g <- plot_grid(g1, g2, rel_widths = c(.6, .4))
+  return(g)
+}
+
+#caption for gerep flows graph
+Source_GEREP <- "Source: GEREP database\ncomputation by Thomas Starck"
+
+#function for graph of GEREP nutrient flows
+f_graph_basin <- function(dataset, basin_select, nutri_in, nutri_out, nutri_nb_facilities, nutrient_label){
+  g1 <- ggplot(dataset %>% filter(basin == basin_select)) +
+    geom_line(
+      aes(Year, !!as.symbol(nutri_out), color = "discharged\nafter treatment")
+      ) +
+    geom_line(
+      aes(Year, !!as.symbol(nutri_in), color = " discharged")
+      ) +
+    labs(
+      x="", y="",
+      color="",
+      caption = "\n",
+      title = "Pollution discharged to sewage networks",
+      subtitle = paste0("kt", nutrient_label, " per year"),
+    ) +
+    ylim(0, NA)
+  
+  g2 <- ggplot(dataset %>% filter(basin == basin_select)) +
+    geom_line(
+      aes(Year, !!as.symbol(nutri_nb_facilities))
+      ) +
+    theme(legend.position = "none") +
+    labs(
+      x="", y="",
+      title = "",
+      caption = Source_GEREP,
+      subtitle = "number of facilities"
+    ) +
+    ylim(0, NA)
+  g <- plot_grid(g1, g2, rel_widths = c(.6, .4))
+  return(g)
+}
+```
+
+::: panel-tabset
+#### Pt
+
+```{r comparison_GEREP_georisques_Pt_before_correction}
+f_graph_data_comparison(GEREP_national, national_network_discharge, "Pt", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
+```
+
+#### NGL
+
+```{r comparison_GEREP_georisques_NGL_before_correction}
+f_graph_data_comparison(GEREP_national, national_network_discharge, "NGL", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
+```
+
+#### DBO5
+
+```{r comparison_GEREP_georisques_DBO5_before_correction}
+f_graph_data_comparison(GEREP_national, national_network_discharge, "DBO5", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
+```
+
+#### DCO
+
+```{r comparison_GEREP_georisques_DCO_before_correction}
+f_graph_data_comparison(GEREP_national, national_network_discharge, "DCO", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
+```
+
+#### MES
+
+```{r comparison_GEREP_georisques_MES_before_correction}
+f_graph_data_comparison(GEREP_national, national_network_discharge, "MES", "MES_in", "MES_out", "MES_nb_facilities", "MES")
+```
+:::
+
+### Water Agencies Basins
+
+::: panel-tabset
+#### Pt
+
+::: panel-tabset
+##### Adour-Garonne
+
+```{r}
+f_graph_basin(GEREP_basins, "Adour-Garonne", "Pt_in", "Pt_out", "Pt_nb_facilities","P")
+```
+
+##### Artois-Picardie
+
+```{r}
+f_graph_basin(GEREP_basins, "Artois-Picardie", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
+```
+
+##### Loire-Bretagne
+
+```{r}
+f_graph_basin(GEREP_basins, "Loire-Bretagne", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
+```
+
+##### Rhin-Meuse
+
+```{r}
+f_graph_basin(GEREP_basins, "Rhin-Meuse", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
+```
+
+##### Rhône-Méditerranée
+
+```{r}
+f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
+```
+
+##### Seine-Normandie
+
+```{r}
+f_graph_basin(GEREP_basins, "Seine-Normandie", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
+```
+:::
+
+#### NGL
+
+::: panel-tabset
+##### Adour-Garonne
+
+```{r}
+f_graph_basin(GEREP_basins, "Adour-Garonne", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
+```
+
+##### Artois-Picardie
+
+```{r}
+f_graph_basin(GEREP_basins, "Artois-Picardie", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
+```
+
+##### Loire-Bretagne
+
+```{r}
+f_graph_basin(GEREP_basins, "Loire-Bretagne", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
+```
+
+##### Rhin-Meuse
+
+```{r}
+f_graph_basin(GEREP_basins, "Rhin-Meuse", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
+```
+
+##### Rhône-Méditerranée
+
+```{r}
+f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
+```
+
+##### Seine-Normandie
+
+```{r}
+f_graph_basin(GEREP_basins, "Seine-Normandie", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
+```
+:::
+
+#### DBO5
+
+::: panel-tabset
+##### Adour-Garonne
+
+```{r}
+f_graph_basin(GEREP_basins, "Adour-Garonne", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
+```
+
+##### Artois-Picardie
+
+```{r}
+f_graph_basin(GEREP_basins, "Artois-Picardie", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
+```
+
+##### Loire-Bretagne
+
+```{r}
+f_graph_basin(GEREP_basins, "Loire-Bretagne", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
+```
+
+##### Rhin-Meuse
+
+```{r}
+f_graph_basin(GEREP_basins, "Rhin-Meuse", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
+```
+
+##### Rhône-Méditerranée
+
+```{r}
+f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
+```
+
+##### Seine-Normandie
+
+```{r}
+f_graph_basin(GEREP_basins, "Seine-Normandie", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
+```
+:::
+
+#### DCO
+
+::: panel-tabset
+##### Adour-Garonne
+
+```{r}
+f_graph_basin(GEREP_basins, "Adour-Garonne", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
+```
+
+##### Artois-Picardie
+
+```{r}
+f_graph_basin(GEREP_basins, "Artois-Picardie", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
+```
+
+##### Loire-Bretagne
+
+```{r}
+f_graph_basin(GEREP_basins, "Loire-Bretagne", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
+```
+
+##### Rhin-Meuse
+
+```{r}
+f_graph_basin(GEREP_basins, "Rhin-Meuse", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
+```
+
+##### Rhône-Méditerranée
+
+```{r}
+f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
+```
+
+##### Seine-Normandie
+
+```{r}
+f_graph_basin(GEREP_basins, "Seine-Normandie", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
+```
+:::
+
+#### MES
+
+::: panel-tabset
+##### Adour-Garonne
+
+```{r}
+f_graph_basin(GEREP_basins, "Adour-Garonne", "MES_in", "MES_out", "MES_nb_facilities", "MES")
+```
+
+##### Artois-Picardie
+
+```{r}
+f_graph_basin(GEREP_basins, "Artois-Picardie", "MES_in", "MES_out", "MES_nb_facilities", "MES")
+```
+
+##### Loire-Bretagne
+
+```{r}
+f_graph_basin(GEREP_basins, "Loire-Bretagne", "MES_in", "MES_out", "MES_nb_facilities", "MES")
+```
+
+##### Rhin-Meuse
+
+```{r}
+f_graph_basin(GEREP_basins, "Rhin-Meuse", "MES_in", "MES_out", "MES_nb_facilities", "MES")
+```
+
+##### Rhône-Méditerranée
+
+```{r}
+f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "MES_in", "MES_out", "MES_nb_facilities", "MES")
+```
+
+##### Seine-Normandie
+
+```{r}
+f_graph_basin(GEREP_basins, "Seine-Normandie", "MES_in", "MES_out", "MES_nb_facilities", "MES")
+```
+:::
+:::
+
+### Outliers investigation and correction
+
+Here are the identified outliers and corrections we make, for each nutrient.
+
+Pt
+
+-   in 2017 for CHAGNY, in and out, factor 100 (select incoming==55879 because there are several Chagny)
+-   in 2010 and 2011 for PORT-SUR-SAONE, does not exist afterwards. We do not correct it
+-   in 2010 and 2011 for VITRY-SUR-SEINE, correct factor 100 in, factor 10 out
 
 NGL
 
--   in 2017 for CHAGNY, factor 100 (incoming == 7711302, there are several Chagny)
--   in 2019 for AUBIGNY, factor 1000 in, factor 10 000 out
--   in 2013 for ILLZACH, factor 10 in and out
+-   in 2017 for CHAGNY, correct factor 100 (select incoming == 7711302 because there are several Chagny)
+-   in 2019 for AUBIGNY, correct factor 1000 in, factor 10 000 out
+-   in 2013 for ILLZACH, correct factor 10 in and out
 
 DCO
 
--   in 2018 for MARSEILLE, factor 10 in and out 10 (incoming==94603000, there are several Marseille)
+-   in 2018 for MARSEILLE, correct factor 10 in and out 10 (select incoming==94603000 because there are several Marseille)
 
 MES
 
--   in 2018, MARSEILLE, factor 10 in and out 10 (incoming==24927000, there are several Marseille)
--   in 2019 for BISCHWILLER, factor 10 000 in and out
+-   in 2018, MARSEILLE, correct factor 10 in and out 10 (select incoming==24927000 because there are several Marseille)
+-   in 2019 for BISCHWILLER, correct factor 10 000 in and out
 
-</details>
-
-```{r}
+```{r GEREP_outliers_correction}
 #PHOSPHORUS
 #CHAGNY in, 2017
 GEREP$incoming[
@@ -1012,385 +1336,35 @@ GEREP$discharged[
     GEREP$Year==2019 & GEREP$name_COM == "BISCHWILLER" & GEREP$nutrient=="Matières en suspension (MES)"
     ]/10000
 ```
-
-::: panel-tabset
-### National (georisque comparison) 
-
-The GEREP database reports higher amounts of discharged pollution in sewage networks. The explanation seems to be that the GEREP database reports more facilities than the gérosique database.
-
-```{r}
-Source_GEREP_georisque <- "Source: géorisque and GEREP database\ncomputation by Thomas Starck"
-
-f_graph_data_comparison <- function(
-    dataset_GEREP, dataset_national_network_discharge, 
-    nutri_georisq, nutri_GEREP_in, nutri_GEREP_out, nutri_nb_facilities, nutrient_label
-    ){
-  g1 <- ggplot(dataset_GEREP) +
-    geom_area(
-      data = dataset_national_network_discharge, 
-      aes(Year, !!as.symbol(nutri_georisq), fill="discharged in\nsewage network"), 
-      alpha=.5
-      ) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_GEREP_out), color = "discharged\nafter treatment")
-      ) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_GEREP_in), color = " discharged")
-      ) +
-    labs(
-      x="", y="",
-      color="GEREP database",
-      fill="gérosique database",
-      caption = Source_GEREP_georisque,
-      title = "Comparison of discharge in sewage network in GEREP and géorisques databases",
-      subtitle = paste0("kt", nutrient_label, " per year")
-    )
-  
-  g2 <- ggplot(dataset_GEREP) +
-    geom_area(
-      data = dataset_national_network_discharge, 
-      aes(Year, !!as.symbol(nutri_nb_facilities), fill="géorisque database"), 
-      alpha=.5
-      ) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_nb_facilities), color = "GEREP database")
-      ) +
-    theme(legend.position = c(.5, .5)) +
-    labs(
-      x="", y="",
-      color="",
-      fill="",
-      caption = "\n",
-      title = "",
-      subtitle = "Number of facilities"
-    )
-  
-  g <- plot_grid(g1, g2, rel_widths = c(.6, .4))
-  return(g)
-}
-
-Source_GEREP <- "Source: GEREP database\ncomputation by Thomas Starck"
-
-f_graph_basin <- function(dataset, basin_select, nutri_in, nutri_out, nutri_nb_facilities, nutrient_label){
-  g1 <- ggplot(dataset %>% filter(basin == basin_select)) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_out), color = "discharged\nafter treatment")
-      ) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_in), color = " discharged")
-      ) +
-    labs(
-      x="", y="",
-      color="",
-      caption = "\n",
-      title = "Pollution discharged to sewage networks",
-      subtitle = paste0("kt", nutrient_label, " per year"),
-    ) +
-    ylim(0, NA)
-  
-  g2 <- ggplot(dataset %>% filter(basin == basin_select)) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_nb_facilities))
-      ) +
-    theme(legend.position = "none") +
-    labs(
-      x="", y="",
-      title = "",
-      caption = Source_GEREP,
-      subtitle = "number of facilities"
-    ) +
-    ylim(0, NA)
-  g <- plot_grid(g1, g2, rel_widths = c(.6, .4))
-  return(g)
-}
-```
-
-::: panel-tabset
-#### Pt
-
-```{r}
-f_graph_data_comparison(GEREP_national, national_network_discharge, "Pt", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
-```
-
-#### NGL
-
-```{r}
-f_graph_data_comparison(GEREP_national, national_network_discharge, "NGL", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
-```
-
-#### DBO5
-
-```{r}
-f_graph_data_comparison(GEREP_national, national_network_discharge, "DBO5", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
-```
-
-#### DCO
-
-```{r}
-f_graph_data_comparison(GEREP_national, national_network_discharge, "DCO", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
-```
-
-#### MES
-
-```{r}
-f_graph_data_comparison(GEREP_national, national_network_discharge, "MES", "MES_in", "MES_out", "MES_nb_facilities", "MES")
-```
 :::
 
-### Basins
+## After Correction
 
-::: panel-tabset
-#### Pt 
+We recompute the aggregated (national and basin scale) flows after our corrections on the GEREP database.
 
-::: panel-tabset
-##### Adour-Garonne
+```{r GEREP_national_and_basins_recomputed}
+#We recompute the flows at the national scale
 
-```{r}
-f_graph_basin(GEREP_basins, "Adour-Garonne", "Pt_in", "Pt_out", "Pt_nb_facilities","P")
-```
-
-##### Artois-Picardie
-
-```{r}
-f_graph_basin(GEREP_basins, "Artois-Picardie", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
-```
-
-##### Loire-Bretagne
-
-```{r}
-f_graph_basin(GEREP_basins, "Loire-Bretagne", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
-```
-
-##### Rhin-Meuse
-
-```{r}
-f_graph_basin(GEREP_basins, "Rhin-Meuse", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
-```
-
-##### Rhône-Méditerranée
-
-```{r}
-f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
-```
-
-##### Seine-Normandie
-
-```{r}
-f_graph_basin(GEREP_basins, "Seine-Normandie", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
-```
-:::
-
-#### NGL 
-
-::: panel-tabset
-##### Adour-Garonne
-
-```{r}
-f_graph_basin(GEREP_basins, "Adour-Garonne", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
-```
-
-##### Artois-Picardie
-
-```{r}
-f_graph_basin(GEREP_basins, "Artois-Picardie", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
-```
-
-##### Loire-Bretagne
-
-```{r}
-f_graph_basin(GEREP_basins, "Loire-Bretagne", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
-```
-
-##### Rhin-Meuse
-
-```{r}
-f_graph_basin(GEREP_basins, "Rhin-Meuse", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
-```
-
-##### Rhône-Méditerranée
-
-```{r}
-f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
-```
-
-##### Seine-Normandie
-
-```{r}
-f_graph_basin(GEREP_basins, "Seine-Normandie", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
-```
-:::
-
-#### DBO5 
-
-::: panel-tabset
-##### Adour-Garonne
-
-```{r}
-f_graph_basin(GEREP_basins, "Adour-Garonne", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
-```
-
-##### Artois-Picardie
-
-```{r}
-f_graph_basin(GEREP_basins, "Artois-Picardie", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
-```
-
-##### Loire-Bretagne
-
-```{r}
-f_graph_basin(GEREP_basins, "Loire-Bretagne", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
-```
-
-##### Rhin-Meuse
-
-```{r}
-f_graph_basin(GEREP_basins, "Rhin-Meuse", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
-```
-
-##### Rhône-Méditerranée
-
-```{r}
-f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
-```
-
-##### Seine-Normandie
-
-```{r}
-f_graph_basin(GEREP_basins, "Seine-Normandie", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
-```
-:::
-
-#### DCO 
-
-::: panel-tabset
-##### Adour-Garonne
-
-```{r}
-f_graph_basin(GEREP_basins, "Adour-Garonne", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
-```
-
-##### Artois-Picardie
-
-```{r}
-f_graph_basin(GEREP_basins, "Artois-Picardie", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
-```
-
-##### Loire-Bretagne
-
-```{r}
-f_graph_basin(GEREP_basins, "Loire-Bretagne", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
-```
-
-##### Rhin-Meuse
-
-```{r}
-f_graph_basin(GEREP_basins, "Rhin-Meuse", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
-```
-
-##### Rhône-Méditerranée
-
-```{r}
-f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
-```
-
-##### Seine-Normandie
-
-```{r}
-f_graph_basin(GEREP_basins, "Seine-Normandie", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
-```
-:::
-
-#### MES 
-
-::: panel-tabset
-##### Adour-Garonne
-
-```{r}
-f_graph_basin(GEREP_basins, "Adour-Garonne", "MES_in", "MES_out", "MES_nb_facilities", "MES")
-```
-
-##### Artois-Picardie
-
-```{r}
-f_graph_basin(GEREP_basins, "Artois-Picardie", "MES_in", "MES_out", "MES_nb_facilities", "MES")
-```
-
-##### Loire-Bretagne
-
-```{r}
-f_graph_basin(GEREP_basins, "Loire-Bretagne", "MES_in", "MES_out", "MES_nb_facilities", "MES")
-```
-
-##### Rhin-Meuse
-
-```{r}
-f_graph_basin(GEREP_basins, "Rhin-Meuse", "MES_in", "MES_out", "MES_nb_facilities", "MES")
-```
-
-##### Rhône-Méditerranée
-
-```{r}
-f_graph_basin(GEREP_basins, "Rhône-Méditerranée", "MES_in", "MES_out", "MES_nb_facilities", "MES")
-```
-
-##### Seine-Normandie
-
-```{r}
-f_graph_basin(GEREP_basins, "Seine-Normandie", "MES_in", "MES_out", "MES_nb_facilities", "MES")
-```
-:::
-:::
-:::
-
-## After Correction 
-
-We recompute the aggregated flows after the correction.
-
-```{r}
-#We compute the flows at the national scale
-
+#temporary file, incoming and discharged nutrient flows and number of facilities, at the national scale
 temp <- GEREP %>%
-  #We only keep metropolitan France
-  filter(
-    basin %in% c("Adour-Garonne", "Artois-Picardie", "Loire-Bretagne", "Rhin-Meuse", "Rhône-Méditerranée", "Seine-Normandie")
-    ) %>%
   group_by(Year, nutrient) %>%
+  #transform from kg/year (for each facility) to kt/year (national) for nutrient flows
   summarise(
     incoming = signif(sum(incoming, na.rm=T)/10^6, 3),
     discharged = signif(sum(discharged, na.rm=T)/10^6, 3),
     nb_facilities = sum(is.na(nutrient)==F)
     )
 
-temp_in <- temp %>% select(-c(discharged, nb_facilities)) %>%
-  spread(nutrient, incoming) %>%
-  rename(
-    NGL_in = `Azote total (N)`,
-    Pt_in = `Phosphore total (P)`,
-    DBO5_in = `Demande biologique en oxygène (DBO5)`,
-    DCO_in = `Demande chimique en oxygène (DCO)`,
-    MES_in = `Matières en suspension (MES)`
-  )
+#temporary file with incoming flow for each nutrient in columns, at the national scale
+temp_in <- f_spread_nutrients(temp %>% select(-c(discharged, nb_facilities)), incoming, "in")
 
-temp_out <- temp %>% select(-c(incoming, nb_facilities)) %>%
-  spread(nutrient, discharged) %>%
-  rename(
-    NGL_out = `Azote total (N)`,
-    Pt_out = `Phosphore total (P)`,
-    DBO5_out = `Demande biologique en oxygène (DBO5)`,
-    DCO_out = `Demande chimique en oxygène (DCO)`,
-    MES_out = `Matières en suspension (MES)`
-  )
+#temporary file with discharge flows for each nutrient in columns, at the national scale
+temp_out <- f_spread_nutrients(temp %>% select(-c(incoming, nb_facilities)), discharged, "out")
 
-temp_nb <- temp %>% select(-c(incoming, discharged)) %>%
-  spread(nutrient, nb_facilities) %>%
-  rename(
-    NGL_nb_facilities = `Azote total (N)`,
-    Pt_nb_facilities = `Phosphore total (P)`,
-    DBO5_nb_facilities = `Demande biologique en oxygène (DBO5)`,
-    DCO_nb_facilities = `Demande chimique en oxygène (DCO)`,
-    MES_nb_facilities = `Matières en suspension (MES)`
-  )
+#temporary file with number of industrial facilities for each nutrient, at the national scale
+temp_nb <- f_spread_nutrients(temp %>% select(-c(incoming, discharged)), nb_facilities, "nb_facilities")
 
+#merge together flows in, out, and number of facilities
 GEREP_national <- 
   left_join(
     temp_in, temp_out, by="Year"
@@ -1399,49 +1373,31 @@ GEREP_national <-   left_join(
     GEREP_national, temp_nb, by="Year"
 )
 
-# We compute the flows for each basin
+
+
+
+# We recompute the flows for each basin
+
+#temporary file, incoming and discharges nutrient flows and number of facilities, for each water agency basin
 temp <- GEREP %>%
-  #We only keep metropolitan France
-  filter(
-    basin %in% c("Adour-Garonne", "Artois-Picardie", "Loire-Bretagne", "Rhin-Meuse", "Rhône-Méditerranée", "Seine-Normandie")
-    ) %>%
   group_by(Year, basin, nutrient) %>%
   summarise(
+    #transform from kg/year (for each facility) to kt/year (for each basin) for nutrient flows
     incoming = signif(sum(incoming, na.rm=T)/10^6, 3),
     discharged = signif(sum(discharged, na.rm=T)/10^6, 3),
     nb_facilities = sum(is.na(nutrient)==F)
     )
 
-temp_in <- temp %>% select(-c(discharged, nb_facilities)) %>%
-  spread(nutrient, incoming) %>%
-  rename(
-    NGL_in = `Azote total (N)`,
-    Pt_in = `Phosphore total (P)`,
-    DBO5_in = `Demande biologique en oxygène (DBO5)`,
-    DCO_in = `Demande chimique en oxygène (DCO)`,
-    MES_in = `Matières en suspension (MES)`
-  )
+#temporary file with incoming flow for each nutrient in columns, for each water agency basin
+temp_in <- f_spread_nutrients(temp %>% select(-c(discharged, nb_facilities)), incoming, "in")
 
-temp_out <- temp %>% select(-c(incoming, nb_facilities)) %>%
-  spread(nutrient, discharged) %>%
-  rename(
-    NGL_out = `Azote total (N)`,
-    Pt_out = `Phosphore total (P)`,
-    DBO5_out = `Demande biologique en oxygène (DBO5)`,
-    DCO_out = `Demande chimique en oxygène (DCO)`,
-    MES_out = `Matières en suspension (MES)`
-  )
+#temporary file with discharge flows for each nutrient in columns, for each water agency basin
+temp_out <- f_spread_nutrients(temp %>% select(-c(incoming, nb_facilities)), discharged, "out")
 
-temp_nb <- temp %>% select(-c(incoming, discharged)) %>%
-  spread(nutrient, nb_facilities) %>%
-  rename(
-    NGL_nb_facilities = `Azote total (N)`,
-    Pt_nb_facilities = `Phosphore total (P)`,
-    DBO5_nb_facilities = `Demande biologique en oxygène (DBO5)`,
-    DCO_nb_facilities = `Demande chimique en oxygène (DCO)`,
-    MES_nb_facilities = `Matières en suspension (MES)`
-  )
+#temporary file with number of industrial facilities for each nutrient, for each water agency basin
+temp_nb <- f_spread_nutrients(temp %>% select(-c(incoming, discharged)), nb_facilities, "nb_facilities")
 
+#merge together flows in, out, and number of facilities
 GEREP_basins <- left_join(
   temp_in, temp_out, by=c("Year", "basin")
 )
@@ -1449,161 +1405,41 @@ GEREP_basins <- left_join(
   GEREP_basins, temp_nb, by=c("Year", "basin")
 )
 
-# We aslo create a the file with the flows of all the facilities
-temp <- GEREP %>%
-  #We only keep metropolitan France
-  filter(
-    basin %in% c("Adour-Garonne", "Artois-Picardie", "Loire-Bretagne", "Rhin-Meuse", "Rhône-Méditerranée", "Seine-Normandie")
-    ) %>%
-  mutate(ID = 1:n())
-
-temp_in <- temp %>% select(-c(discharged)) %>%
-  spread(nutrient, incoming) %>%
-  rename(
-    NGL_in = `Azote total (N)`,
-    Pt_in = `Phosphore total (P)`,
-    DBO5_in = `Demande biologique en oxygène (DBO5)`,
-    DCO_in = `Demande chimique en oxygène (DCO)`,
-    MES_in = `Matières en suspension (MES)`
-  )
-
-temp_out <- temp %>% select(-c(incoming)) %>%
-  spread(nutrient, discharged) %>%
-  rename(
-    NGL_out = `Azote total (N)`,
-    Pt_out = `Phosphore total (P)`,
-    DBO5_out = `Demande biologique en oxygène (DBO5)`,
-    DCO_out = `Demande chimique en oxygène (DCO)`,
-    MES_out = `Matières en suspension (MES)`
-  )
-
-
-GEREP_all <- left_join(
-  temp_in, 
-  temp_out %>% select(ID, NGL_out, Pt_out, DBO5_out, DCO_out, MES_out), by="ID"
-)
+#remove temporary files
+rm(temp_in, temp_out, temp_nb)
 ```
 
 ::: panel-tabset
-### National (georisque comparison) 
-
-The GEREP database reports higher amounts of discharged pollution in sewage networks. The explanation seems to be that the GEREP database reports more facilities than the gérosique database. Contrary to the géorisque database, for now we are not able to correct the outliers in the GEREP database.
-
-```{r}
-Source_GEREP_georisque <- "Source: géorisque and GEREP database\ncomputation by Thomas Starck"
-
-f_graph_data_comparison <- function(
-    dataset_GEREP, dataset_national_network_discharge, 
-    nutri_georisq, nutri_GEREP_in, nutri_GEREP_out, nutri_nb_facilities, nutrient_label
-    ){
-  g1 <- ggplot(dataset_GEREP) +
-    geom_area(
-      data = dataset_national_network_discharge, 
-      aes(Year, !!as.symbol(nutri_georisq), fill="discharged in\nsewage network"), 
-      alpha=.5
-      ) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_GEREP_out), color = "discharged\nafter treatment")
-      ) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_GEREP_in), color = " discharged")
-      ) +
-    labs(
-      x="", y="",
-      color="GEREP database",
-      fill="gérosique database",
-      caption = Source_GEREP_georisque,
-      title = "Comparison of discharge in sewage network in GEREP and géorisques databases",
-      subtitle = paste0("kt", nutrient_label, " per year")
-    )
-  
-  g2 <- ggplot(dataset_GEREP) +
-    geom_area(
-      data = dataset_national_network_discharge, 
-      aes(Year, !!as.symbol(nutri_nb_facilities), fill="géorisque database"), 
-      alpha=.5
-      ) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_nb_facilities), color = "GEREP database")
-      ) +
-    theme(legend.position = c(.5, .5)) +
-    labs(
-      x="", y="",
-      color="",
-      fill="",
-      caption = "\n",
-      title = "",
-      subtitle = "Number of facilities"
-    )
-  
-  g <- plot_grid(g1, g2, rel_widths = c(.6, .4))
-  return(g)
-}
-
-Source_GEREP <- "Source: GEREP database\ncomputation by Thomas Starck"
-
-f_graph_basin <- function(dataset, basin_select, nutri_in, nutri_out, nutri_nb_facilities, nutrient_label){
-  g1 <- ggplot(dataset %>% filter(basin == basin_select)) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_out), color = "discharged\nafter treatment")
-      ) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_in), color = " discharged")
-      ) +
-    labs(
-      x="", y="",
-      color="",
-      caption = "\n",
-      title = "Pollution discharged to sewage networks",
-      subtitle = paste0("kt", nutrient_label, " per year"),
-    ) +
-    ylim(0, NA)
-  
-  g2 <- ggplot(dataset %>% filter(basin == basin_select)) +
-    geom_line(
-      aes(Year, !!as.symbol(nutri_nb_facilities))
-      ) +
-    theme(legend.position = "none") +
-    labs(
-      x="", y="",
-      title = "",
-      caption = Source_GEREP,
-      subtitle = "number of facilities"
-    ) +
-    ylim(0, NA)
-  g <- plot_grid(g1, g2, rel_widths = c(.6, .4))
-  return(g)
-}
-```
+### National (georisque comparison)
 
 ::: panel-tabset
 #### Pt
 
-```{r}
+```{r comparison_GEREP_georisques_Pt_after_correction}
 f_graph_data_comparison(GEREP_national, national_network_discharge, "Pt", "Pt_in", "Pt_out", "Pt_nb_facilities", "P")
 ```
 
 #### NGL
 
-```{r}
+```{r comparison_GEREP_georisques_NGL_after_correction}
 f_graph_data_comparison(GEREP_national, national_network_discharge, "NGL", "NGL_in", "NGL_out", "NGL_nb_facilities", "N")
 ```
 
 #### DBO5
 
-```{r}
+```{r comparison_GEREP_georisques_DBO5_after_correction}
 f_graph_data_comparison(GEREP_national, national_network_discharge, "DBO5", "DBO5_in", "DBO5_out", "DBO5_nb_facilities", "DBO5")
 ```
 
 #### DCO
 
-```{r}
+```{r comparison_GEREP_georisques_DCO_after_correction}
 f_graph_data_comparison(GEREP_national, national_network_discharge, "DCO", "DCO_in", "DCO_out", "DCO_nb_facilities", "DCO")
 ```
 
 #### MES
 
-```{r}
+```{rcomparison_GEREP_georisques_MES_after_correction}
 f_graph_data_comparison(GEREP_national, national_network_discharge, "MES", "MES_in", "MES_out", "MES_nb_facilities", "MES")
 ```
 :::
@@ -1611,7 +1447,7 @@ f_graph_data_comparison(GEREP_national, national_network_discharge, "MES", "MES_
 ### Basins
 
 ::: panel-tabset
-#### Pt 
+#### Pt
 
 ::: panel-tabset
 ##### Adour-Garonne
@@ -1651,7 +1487,7 @@ f_graph_basin(GEREP_basins, "Seine-Normandie", "Pt_in", "Pt_out", "Pt_nb_facilit
 ```
 :::
 
-#### NGL 
+#### NGL
 
 ::: panel-tabset
 ##### Adour-Garonne
@@ -1691,7 +1527,7 @@ f_graph_basin(GEREP_basins, "Seine-Normandie", "NGL_in", "NGL_out", "NGL_nb_faci
 ```
 :::
 
-#### DBO5 
+#### DBO5
 
 ::: panel-tabset
 ##### Adour-Garonne
@@ -1731,7 +1567,7 @@ f_graph_basin(GEREP_basins, "Seine-Normandie", "DBO5_in", "DBO5_out", "DBO5_nb_f
 ```
 :::
 
-#### DCO 
+#### DCO
 
 ::: panel-tabset
 ##### Adour-Garonne
@@ -1771,7 +1607,7 @@ f_graph_basin(GEREP_basins, "Seine-Normandie", "DCO_in", "DCO_out", "DCO_nb_faci
 ```
 :::
 
-#### MES 
+#### MES
 
 ::: panel-tabset
 ##### Adour-Garonne
@@ -1814,33 +1650,63 @@ f_graph_basin(GEREP_basins, "Seine-Normandie", "MES_in", "MES_out", "MES_nb_faci
 :::
 :::
 
-# Corrections and save
+# Save
 
-Note : it is also possible to save industrial pollution at the department and regional scale.
+In the *géorisques data* paragraph, we already saved the cleaned géorisques database.
 
-We consider the GEREP database is more complete than the géorisque database. So we save the GEREP data.
+We also save the GEREP data, which is more complete than the géorisques database. Note: with a little more work, it would also be possible to save industrial pollution at the departmental and regional scale. 
 
-```{r}
+```{r save_GEREP_at_national_and_water_agencies_scales}
+#output path
+output_data <- "output_data/industry_sewers_network_discharge/"
+
+#aggregate GEREP water agencies basins and national data
 temp <- bind_rows(
   GEREP_national %>% mutate(basin = "Metropolitan France"),
   GEREP_basins
 )
-
-#agregated basin and national data
-output_data <- "output_data/industry_network_discharge/"
+#save
 f_save_csv_files(
   temp,
   output_data,
-  "industry_network_discharge_GEREP_basins.csv"
+  "industry_sewers_network_discharge_GEREP_basins.csv"
 )
 
-# all facilities
+# save all facilities of GEREP database
 f_save_csv_files(
   GEREP_all,
   output_data,
-  "industry_network_discharge_GEREP_ALL.csv"
+  "industry_sewers_network_discharge_GEREP_ALL.csv"
 )
 ```
+
+We add a metadata file to describe our saved files.
+
+```{r write_metadata}
+writeLines(
+
+"The files in this folder report industries discharge to sewers networks. Géorisque database is publicly available, but less complete than GEREP database. GEREP is more complete, but anonymized (industry names and IDs are not reported). We report both databases. All files report pollution for each year for the following nutrients: NGL, Pt, DBO5, DCO, MES.
+  
+  
+GEORISQUES DATABASE
+  
+**industry_sewers_network_discharge_georisque_ALL.csv** reports individual industrial facilities discharges to sewers networks, with their name and ID. Pollutant flows are in **kg/year**. 
+    
+**industry_sewers_network_discharge_georisque_national.csv** reports industrial facilities discharges to sewers networks at the national scale. Pollutant flows are in **kt/year**. We also report the number of industrial facilities for each nutrient.
+    
+    
+GEREP DATABASE
+  
+We report both nutrient _in and _out. _in refers to what enters the sewers after industry discharge. _out refers to release downstream, after wastewater treatment plant, based on actual measure or estimation of wastewater treatment plant removal efficiency. We report it as an indication but do not use it. 
+  
+**industry_sewers_network_discharge_GEREP_ALL.csv** reports individual industrial facilities discharges to sewers networks, with their city (COM), department (DEP) and region (REG) names (name_) and INSEE code (INSEE_). There is also an industry facility dummy ID (the data is anonymized). Pollutant flows are in **kg/year**.
+    
+**industry_sewers_network_discharge_GEREP_basins.csv** reports industrial facilities discharges to sewers networks at the national scale and for each water agency basin. Pollutant flows are in **kt/year**. We also report the number of industrial facilities for each nutrient.
+  ", 
+  paste(output_data, "metadata.md")
+  )
+```
+
 
 ```{r remove_all_objects_in_environment}
 rm(list = ls())

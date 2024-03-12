@@ -39,7 +39,7 @@ library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org
 library(networkD3) #for sankey
 library(htmlwidgets) #for sankey
 library(readxl) #to read excel file
-library(cowplot) #for plot_grid
+library(cowplot) #for plot_grid, multiple plots
 
 #path for data 
 
@@ -68,22 +68,25 @@ source("functions.R")
 
 # Load data
 
+We load the data produced in the preparation pages, for each water agency basin and at the national scale: wastewater treatment plants inflows and outflows, industry discharge to sewers networks, French nutrient ingestion/excretion, share of population with individual autonomous system (not connected to sewers), 
+
 ```{r}
-#human ingestion
-path_source <- "output_data/nutrient_ingestion_excretion/"
+#human ingestion/excretion
+path_source <- "output_data/nutrient_ingestion_excretion/" #source of the data
 #load France excretions
 file_human_excretions <- read_csv(paste0(path_source, "excretions_human_france_kt_year.csv")) %>%
   mutate(basin = "Metropolitan France")
-#load basins excretions and merge 2 files
+#load water agency basins excretions and merge with France excretions
 file_human_excretions <- bind_rows(
   file_human_excretions,
   read_csv(paste0(path_source, "excretions_human_basins_kt_year.csv"))
 )  
 
-#large industries network discharge
-path_source <- "output_data/industry_network_discharge/"
-file_industry_discharge <- read_csv(paste0(path_source, "industry_network_discharge_GEREP_basins.csv"))
-file_industry_discharge <- file_industry_discharge %>% #mean of the 2015-2020 period
+#large industries network discharge at water agency scale and national scale
+path_source <- "output_data/industry_sewers_network_discharge/" #source of the data
+file_industry_discharge <- read_csv(paste0(path_source, "industry_sewers_network_discharge_GEREP_basins.csv")) #load data 
+#take the mean of the 2015-2020 period
+file_industry_discharge <- file_industry_discharge %>%
   filter(Year>2014 & Year<2021) %>%
   group_by(basin) %>%
   summarise(
@@ -96,20 +99,20 @@ file_industry_discharge <- file_industry_discharge %>% #mean of the 2015-2020 pe
     )
   )
 
-#inflow and outflows of WWTP, by basin
-path_source <- "output_data/0_final_data/"
-file_in_out_flows <- read_csv(paste0(path_source, "basins_flows_2015_2020.csv"))
+#inflow and outflows of WWTP, by basin and at the national scale
+path_source <- "output_data/0_final_data/" #source of the data
+file_in_out_flows <- read_csv(paste0(path_source, "basins_flows_2015_2020.csv")) #load data
 
 #discharged without treatment (% as share of pollution entering WWTP)
-path_source <- "source_data/10_discharge_without_treatment/"
-file_direct_discharge <- read_csv(paste0(path_source, "discharge_without_treatment_estimations.csv"))
+path_source <- "source_data/10_discharge_without_treatment/" #source of the data
+file_direct_discharge <- read_csv(paste0(path_source, "discharge_without_treatment_estimations.csv")) #load data
 
 #connection to sewer networks
-path_source <- "source_data/pop_sewage_connection/"
+path_source <- "source_data/pop_sewage_connection/" #source of the data
 file_sewage_connection <- read_excel(paste0(path_source, "pop_basins_sewage_connection.xlsx"), range = "A1:F8")
 
 #individual autonomous system balance
-path_source <- "source_data/pop_sewage_connection/"
+path_source <- "source_data/pop_sewage_connection/" #source of the data
 file_IAS_balance <- read_csv(paste0(path_source, "balance_individual_autonomous_system.csv"))
 
 #sludge destination
@@ -117,7 +120,7 @@ path_source <- "output_data/sludge_destination/"
 file_sludge_destination <- read_csv(paste0(path_source, "sludge_destination.csv"))
 
 #N:P ratio of sludge
-path_source <- "output_data/sludge_composition/"
+path_source <- "output_data/sludge_composition/" #source of the data
 file_sludge_composition <- read_csv(paste0(path_source, "N_P_sludge_review.csv"))
 N_P_ratio_sludge_review <- 
   file_sludge_composition$N_P_ratio[file_sludge_composition$compost=="not composted"]
@@ -125,7 +128,7 @@ N_P_ratio_sludge_review <-
 #NH3 volatilization during composting
 N_compost_volatilization <- 0.3
 
-#proportion of people in IAS to sewers (due to excretions in public spaces connected to sewers)
+#proportion excretions to sewers from people with Individual Autonomous System (due to excretions in public spaces connected to sewers)
 perc_non_IAS <- 0.33
 ```
 
@@ -148,7 +151,7 @@ file_direct_discharge <-
 rm(perc_Pt_loss, perc_NGL_loss, perc_loss, temp)
 ```
 
-# Sankeys P 
+# Sankeys P
 
 ```{r}
 f_P_file <- function(file_name, basin_selected){
@@ -377,8 +380,7 @@ IAS_balance <- file_IAS_balance %>%
 ```
 
 ::: panel-tabset
-
-## France 
+## France
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_France.csv", "Metropolitan France")
@@ -396,7 +398,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Artois-Picardie 
+## Artois-Picardie
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Artois_Picardie.csv", "Artois-Picardie")
@@ -414,7 +416,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Rhin-Meuse 
+## Rhin-Meuse
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Rhin_Meuse.csv", "Rhin-Meuse")
@@ -432,7 +434,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Seine-Normandie 
+## Seine-Normandie
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Seine_Normandie.csv", "Seine-Normandie")
@@ -450,7 +452,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Loire-Bretagne 
+## Loire-Bretagne
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Loire_Bretagne.csv", "Loire-Bretagne")
@@ -468,7 +470,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Adour-Garonne 
+## Adour-Garonne
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Adour_Garonne.csv", "Adour-Garonne")
@@ -486,7 +488,7 @@ f_sankey(sankey_P)
 f_table(sankey_P)
 ```
 
-## Rhône-Méditerranée-Corse 
+## Rhône-Méditerranée-Corse
 
 ```{r}
 sankey_P <- f_P_file("sankey_P_flows_Rhone_Mediterranee.csv", "Rhône-Méditerranée")
@@ -503,10 +505,9 @@ f_sankey(sankey_P)
 ```{r results = T}
 f_table(sankey_P)
 ```
-
 :::
 
-# Sankeys N 
+# Sankeys N
 
 ```{r}
 f_N_file <- function(file_name, basin_selected){
@@ -788,8 +789,7 @@ IAS_balance <- file_IAS_balance %>%
 ```
 
 ::: panel-tabset
-
-## France 
+## France
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_France.csv")) 
@@ -810,7 +810,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Artois-Picardie 
+## Artois-Picardie
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Artois_Picardie.csv")) 
@@ -831,7 +831,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Rhin-Meuse 
+## Rhin-Meuse
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Rhin_Meuse.csv")) 
@@ -852,7 +852,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Seine-Normandie 
+## Seine-Normandie
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Seine_Normandie.csv")) 
@@ -873,7 +873,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Loire-Bretagne 
+## Loire-Bretagne
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Loire_Bretagne.csv")) 
@@ -894,7 +894,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Adour-Garonne 
+## Adour-Garonne
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Adour_Garonne.csv")) 
@@ -915,7 +915,7 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 
-## Rhône-Méditerranée-Corse 
+## Rhône-Méditerranée-Corse
 
 ```{r}
 P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Rhone_Mediterranee.csv")) 
@@ -935,7 +935,6 @@ f_sankey(sankey_N)
 ```{r results = T}
 f_table(sankey_N)
 ```
-
 :::
 
 # Results
@@ -1036,15 +1035,12 @@ N_P_nodes_basins <- left_join(
 ```
 
 ::: panel-tabset
-
-## Per capita values 
-
-::: panel-tabset
-
-### Excretions 
+## Per capita values
 
 ::: panel-tabset
+### Excretions
 
+::: panel-tabset
 #### kg per year
 
 ```{r check excretions}
@@ -1093,17 +1089,14 @@ ggplot(temp) +
     subtitle = "g per day"
   )
 ```
-
 :::
 
-### In and out of system 
+### In and out of system
 
 ::: panel-tabset
-
-#### Absolute 
+#### Absolute
 
 ::: panel-tabset
-
 ##### P
 
 ```{r}
@@ -1269,13 +1262,11 @@ plot_grid(
   rel_widths = c(0.5, 0.5)
 )
 ```
-
 :::
 
-#### Relative 
+#### Relative
 
 ::: panel-tabset
-
 ##### P
 
 ```{r}
@@ -1403,12 +1394,10 @@ plot_grid(
   rel_widths = c(0.5, 0.5)
 )
 ```
-
+:::
 :::
 
-:::
-
-### N:P Ratio 
+### N:P Ratio
 
 ```{r}
 temp <- N_P_nodes_basins %>%
@@ -1455,13 +1444,11 @@ plot_grid(
   rel_widths = c(0.3, 0.7)
 )
 ```
-
 :::
 
-## Recycling 
+## Recycling
 
 ::: panel-tabset
-
 ### N
 
 ```{r}
@@ -1518,17 +1505,14 @@ ggplot(temp) +
     caption = "Source:\ncomputation by Thomas Starck from multiple sources"
   ) 
 ```
-
 :::
 
-## Sankey in / out system 
+## Sankey in / out system
 
 ::: panel-tabset
-
-### Per cap per year 
+### Per cap per year
 
 ::: panel-tabset
-
 #### N
 
 ```{r}
@@ -1658,13 +1642,11 @@ f_save_csv_files(
 
 f_sankey(temp)
 ```
-
 :::
 
-### Percent 
+### Percent
 
 ::: panel-tabset
-
 #### N
 
 ```{r}
@@ -1801,14 +1783,11 @@ f_save_csv_files(
 
 f_sankey(temp)
 ```
-
+:::
+:::
 :::
 
-:::
-
-:::
-
-# Comparison of sludge composition 
+# Comparison of sludge composition
 
 We use a French review of sludge composition from 2014, [link](https://hal.inrae.fr/hal-02796871/document) to the study (page 413)
 
@@ -1823,7 +1802,6 @@ Source <- "Source: French Collective Scientifice Expertise on\nOrganic Fertilize
 ```
 
 ::: panel-tabset
-
 ## Preparation
 
 To assess our sludge composition, we use the sludge production data for each basin, and take the mean over 2015-2020. We then combine this with the N and P flows computed in the Sankey diagram to deduce the sludge compositions at the basin scales.
@@ -1955,7 +1933,6 @@ ggplot(temp) +
     title = "N content in urban sludge"
   )
 ```
-
 :::
 
 ```{r remove_all_objects_in_environment}

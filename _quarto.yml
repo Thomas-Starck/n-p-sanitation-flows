@@ -62,11 +62,11 @@ website:
           href: 10_discharged_without_treatment.html
       - text: "Results"
         menu:
-        - text: "Sensitive areas"
+        - text: "Sensitive Areas"
           href: 12_sensitive_areas.html
-        - text: "Nutrient flows synthesis"
+        - text: "First Nutrient Synthesis"
           href: 21_flows_synthesis.html
-        - text: "Sankeys"
+        - text: "Sankeys N P sanitation flows"
           href: 31_Sankeys.html
         - text: "Main Figures"
           href: 32_figures.html
