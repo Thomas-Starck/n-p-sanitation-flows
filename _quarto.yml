@@ -24,6 +24,7 @@ project:
     - "!appendix"
     - "!renv.lock"
     - "!graphs"
+    - "!readme.md"
 
 website:
   title: "Sanitation-NP-Flows-France"
@@ -70,19 +71,19 @@ website:
           href: 31_Sankeys.html
         - text: "Main Figures"
           href: 32_figures.html
+    right:
+      - icon: github
+        href: https://github.com/Thomas-Starck/n-p-sanitation-flows
           
 format:
   html:
-    theme: cosmo
+    theme: 
+      light: flatly
+      dark: darkly
     css: styles.css
     toc: true
     code-fold: true
     toc_float: true
-
-editor: visual
-
-theme:
-  light: flatly
-  dark: darkly
+  
       
 

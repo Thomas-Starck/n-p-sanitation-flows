@@ -1378,8 +1378,8 @@ ggplot(temp) +
 ## Large industries flows 
 
 ```{r}
-path_source <- "output_data/industry_network_discharge/"
-file_industry_discharge <- read_csv(paste0(path_source, "industry_network_discharge_GEREP_basins.csv")) %>%
+path_source <- "output_data/industry_sewers_network_discharge/"
+file_industry_discharge <- read_csv(paste0(path_source, "industry_sewers_network_discharge_GEREP_basins.csv")) %>%
   filter(basin != "Metropolitan France"
          )
 

@@ -69,10 +69,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -196,7 +198,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
         <li>
     <a class="dropdown-item" href="./31_Sankeys.html" rel="" target="">
- <span class="dropdown-text">Sankeys N P saniation flows</span></a>
+ <span class="dropdown-text">Sankeys N P sanitation flows</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./32_figures.html" rel="" target="">
@@ -205,7 +207,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </ul>
   </li>
 </ul>
-            <div class="quarto-navbar-tools ms-auto">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Thomas-Starck/n-p-sanitation-flows" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
@@ -2044,8 +2054,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<pre class="rcomparison_gerep_georisques_mes_after_correction cell-code"><code>f_graph_data_comparison(GEREP_national, national_network_discharge, "MES", "MES_in", "MES_out", "MES_nb_facilities", "MES")</code></pre>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_data_comparison</span>(GEREP_national, national_network_discharge, <span class="st">"MES"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output-display">
+<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_MES_after_correction-1.svg" class="img-fluid" width="672"></p>
+</div>
 </div>
 </div>
 </div>
@@ -2066,7 +2079,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>,<span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-32-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-31-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2077,7 +2090,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-33-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-32-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2088,7 +2101,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-34-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-33-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2099,7 +2112,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-35-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-34-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2110,7 +2123,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-36-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-35-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2121,7 +2134,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-37-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-36-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2139,7 +2152,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-38-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-37-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2150,7 +2163,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-39-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-38-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2161,7 +2174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-40-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-39-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2172,7 +2185,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-41-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-40-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2183,7 +2196,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-42-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-41-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2194,7 +2207,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-43-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-42-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2212,7 +2225,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-44-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-43-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2223,7 +2236,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-45-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-44-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2234,7 +2247,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-46-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-45-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2245,7 +2258,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-47-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-46-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2256,7 +2269,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-48-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-47-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2267,7 +2280,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-49-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-48-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2285,7 +2298,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-50-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-49-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2296,7 +2309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-51-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-50-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2307,7 +2320,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-52-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-51-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2318,7 +2331,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-53-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-52-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2329,7 +2342,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-54-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-53-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2340,7 +2353,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-55-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-54-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2358,7 +2371,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-56-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-55-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2369,7 +2382,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-57-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-56-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2380,7 +2393,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-58-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-57-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2391,7 +2404,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-59-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-58-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2402,7 +2415,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-60-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-59-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2413,7 +2426,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-61-1.svg" class="img-fluid" width="672"></p>
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-60-1.svg" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -2518,6 +2531,121 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {

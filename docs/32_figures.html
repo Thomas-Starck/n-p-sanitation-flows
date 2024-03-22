@@ -69,10 +69,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -192,15 +194,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="dropdown-menu" aria-labelledby="nav-menu-results">    
         <li>
     <a class="dropdown-item" href="./12_sensitive_areas.html" rel="" target="">
- <span class="dropdown-text">Sensitive areas</span></a>
+ <span class="dropdown-text">Sensitive Areas</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./21_flows_synthesis.html" rel="" target="">
- <span class="dropdown-text">Nutrient flows synthesis</span></a>
+ <span class="dropdown-text">First Nutrient Synthesis</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./31_Sankeys.html" rel="" target="">
- <span class="dropdown-text">Sankeys</span></a>
+ <span class="dropdown-text">Sankeys N P sanitation flows</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./32_figures.html" rel="" target="">
@@ -209,7 +211,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </ul>
   </li>
 </ul>
-            <div class="quarto-navbar-tools ms-auto">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Thomas-Starck/n-p-sanitation-flows" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
@@ -1370,8 +1380,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f_sankey</span>(temp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-57e95e721077ff7d4172" style="width:100%;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-57e95e721077ff7d4172">{"x":{"links":{"source":[0,0,1,1,2,3,4,4,3,5,5,6,6],"target":[1,3,7,4,3,4,8,5,8,9,10,3,1],"value":[2.89,25.51,3.55,0.63,1.12,30.17,6.6,24.2,3.39,18.63,5.57,7.13,1.28],"group":["excretion","excretion","water","WWTP","large industries","WWTP","water","sludge","water","sludge","lost","large industries","sewage network"]},"nodes":{"name":["excretion","IAS","large industries","sewage network","WWTP","sludge","residual","groundwater","water","composted, spread","landfill, incineration.."],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\",\"large industries\" ,\"lost\", \"water\", \"sludge\", \"nodes_group\"])\n  .range([\"#7d6608\" , \"grey\" , \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
+<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-3afe75a019c2c860f4ec" style="width:100%;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-3afe75a019c2c860f4ec">{"x":{"links":{"source":[0,0,1,1,2,3,4,4,3,5,5,6,6],"target":[1,3,7,4,3,4,8,5,8,9,10,3,1],"value":[2.89,25.51,3.55,0.63,1.12,30.17,6.6,24.2,3.39,18.63,5.57,7.13,1.28],"group":["excretion","excretion","water","WWTP","large industries","WWTP","water","sludge","water","sludge","lost","large industries","sewage network"]},"nodes":{"name":["excretion","IAS","large industries","sewage network","WWTP","sludge","residual","groundwater","water","composted, spread","landfill, incineration.."],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\",\"large industries\" ,\"lost\", \"water\", \"sludge\", \"nodes_group\"])\n  .range([\"#7d6608\" , \"grey\" , \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
 </div>
 </div>
 </div>
@@ -1384,8 +1394,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f_sankey</span>(temp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-dbcc0867fc4aec0d8f77" style="width:100%;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-dbcc0867fc4aec0d8f77">{"x":{"links":{"source":[0,1,2,3,3,3,3],"target":[3,3,3,4,5,6,7],"value":[438,130,17,154,55,86,288],"group":["excretion","residual","large industries","water","groundwater","landfill, incineration..","recycled"]},"nodes":{"name":["excretion","residual","large industries","Sanitation System","water","groundwater","landfill, incineration..","recycled"],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\",\"large industries\" ,\"lost\", \"water\", \"sludge\", \"nodes_group\"])\n  .range([\"#7d6608\" , \"grey\" , \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
+<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-0f8b9f7c2d309f51a27e" style="width:100%;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-0f8b9f7c2d309f51a27e">{"x":{"links":{"source":[0,1,2,3,3,3,3],"target":[3,3,3,4,5,6,7],"value":[438,130,17,154,55,86,288],"group":["excretion","residual","large industries","water","groundwater","landfill, incineration..","recycled"]},"nodes":{"name":["excretion","residual","large industries","Sanitation System","water","groundwater","landfill, incineration..","recycled"],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\",\"large industries\" ,\"lost\", \"water\", \"sludge\", \"nodes_group\"])\n  .range([\"#7d6608\" , \"grey\" , \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
 </div>
 </div>
 </div>
@@ -1398,8 +1408,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f_sankey</span>(temp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-8ce30a8a7946acbc7bfc" style="width:100%;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-8ce30a8a7946acbc7bfc">{"x":{"links":{"source":[0,1,2,3,3,3,3],"target":[3,3,3,4,5,6,7],"value":[75,22,3,26,9,15,49],"group":["excretion","residual","large industries","water","groundwater","landfill, incineration..","recycled"]},"nodes":{"name":["excretion","residual","large industries","Sanitation System","water","groundwater","landfill, incineration..","recycled"],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\",\"large industries\" ,\"lost\", \"water\", \"sludge\", \"nodes_group\"])\n  .range([\"#7d6608\" , \"grey\" , \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
+<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-55bda692abd33dc077da" style="width:100%;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-55bda692abd33dc077da">{"x":{"links":{"source":[0,1,2,3,3,3,3],"target":[3,3,3,4,5,6,7],"value":[75,22,3,26,9,15,49],"group":["excretion","residual","large industries","water","groundwater","landfill, incineration..","recycled"]},"nodes":{"name":["excretion","residual","large industries","Sanitation System","water","groundwater","landfill, incineration..","recycled"],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\",\"large industries\" ,\"lost\", \"water\", \"sludge\", \"nodes_group\"])\n  .range([\"#7d6608\" , \"grey\" , \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
 </div>
 </div>
 </div>
@@ -1472,8 +1482,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f_sankey</span>(temp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-016f8ccc70599c20455f" style="width:100%;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-016f8ccc70599c20455f">{"x":{"links":{"source":[0,0,1,1,1,2,3,4,3,4,4,5,5,5,6,6,7,8,8],"target":[1,3,9,4,10,3,4,11,11,5,10,7,6,12,10,13,13,3,1],"value":[30.27,266.73,23.49,1.61,7.4,7.52,256.39,72.09999999999999,28.38,48.4,137.5,16.46,20.81,11.13,6.24,14.57,16.46,10.62,1.9],"group":["excretion","excretion","water","WWTP","air","large industries","WWTP","water","water","sludge","air","sludge","sludge","lost","air","sludge","sludge","large industries","sewage network"]},"nodes":{"name":["excretion","IAS","large industries","sewage network","WWTP","sludge","composted","spread","residual","groundwater","air","water","landfill, incineration..","recycled"],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\", \"large industries\", \"lost\", \"water\", \"sludge\", \"air\", \"nodes_group\"])\n  .range([\"#7d6608\", \"grey\", \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"#3ab02a\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
+<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-c586e7df17134b9f15ca" style="width:100%;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-c586e7df17134b9f15ca">{"x":{"links":{"source":[0,0,1,1,1,2,3,4,3,4,4,5,5,5,6,6,7,8,8],"target":[1,3,9,4,10,3,4,11,11,5,10,7,6,12,10,13,13,3,1],"value":[30.27,266.73,23.49,1.61,7.4,7.52,256.39,72.09999999999999,28.38,48.4,137.5,16.46,20.81,11.13,6.24,14.57,16.46,10.62,1.9],"group":["excretion","excretion","water","WWTP","air","large industries","WWTP","water","water","sludge","air","sludge","sludge","lost","air","sludge","sludge","large industries","sewage network"]},"nodes":{"name":["excretion","IAS","large industries","sewage network","WWTP","sludge","composted","spread","residual","groundwater","air","water","landfill, incineration..","recycled"],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\", \"large industries\", \"lost\", \"water\", \"sludge\", \"air\", \"nodes_group\"])\n  .range([\"#7d6608\", \"grey\", \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"#3ab02a\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
 </div>
 </div>
 </div>
@@ -1486,8 +1496,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f_sankey</span>(temp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-9101a41eba7878ad3c29" style="width:100%;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-9101a41eba7878ad3c29">{"x":{"links":{"source":[0,1,2,3,3,3,3,3],"target":[3,3,3,4,5,6,7,8],"value":[4.583,0.193,0.116,1.551,0.362,2.332,0.172,0.479],"group":["excretion","residual","large industries","water","groundwater","air","landfill, incineration..","recycled"]},"nodes":{"name":["excretion","residual","large industries","Sanitation System","water","groundwater","air","landfill, incineration..","recycled"],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\", \"large industries\", \"lost\", \"water\", \"sludge\", \"air\", \"nodes_group\"])\n  .range([\"#7d6608\", \"grey\", \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"#3ab02a\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
+<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-0173fbebab8b1fd090e1" style="width:100%;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-0173fbebab8b1fd090e1">{"x":{"links":{"source":[0,1,2,3,3,3,3,3],"target":[3,3,3,4,5,6,7,8],"value":[4.583,0.193,0.116,1.551,0.362,2.332,0.172,0.479],"group":["excretion","residual","large industries","water","groundwater","air","landfill, incineration..","recycled"]},"nodes":{"name":["excretion","residual","large industries","Sanitation System","water","groundwater","air","landfill, incineration..","recycled"],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\", \"large industries\", \"lost\", \"water\", \"sludge\", \"air\", \"nodes_group\"])\n  .range([\"#7d6608\", \"grey\", \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"#3ab02a\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
 </div>
 </div>
 </div>
@@ -1500,8 +1510,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f_sankey</span>(temp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-17a56df6d8b3b90b1534" style="width:100%;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-17a56df6d8b3b90b1534">{"x":{"links":{"source":[0,1,2,3,3,3,3,3],"target":[3,3,3,4,5,6,7,8],"value":[94,4,2,32,7,48,4,10],"group":["excretion","residual","large industries","water","groundwater","air","landfill, incineration..","recycled"]},"nodes":{"name":["excretion","residual","large industries","Sanitation System","water","groundwater","air","landfill, incineration..","recycled"],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\", \"large industries\", \"lost\", \"water\", \"sludge\", \"air\", \"nodes_group\"])\n  .range([\"#7d6608\", \"grey\", \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"#3ab02a\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
+<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-057f3a0ea12aca4353e5" style="width:100%;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-057f3a0ea12aca4353e5">{"x":{"links":{"source":[0,1,2,3,3,3,3,3],"target":[3,3,3,4,5,6,7,8],"value":[94,4,2,32,7,48,4,10],"group":["excretion","residual","large industries","water","groundwater","air","landfill, incineration..","recycled"]},"nodes":{"name":["excretion","residual","large industries","Sanitation System","water","groundwater","air","landfill, incineration..","recycled"],"group":["nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group","nodes_group"]},"options":{"NodeID":"name","NodeGroup":"group","LinkGroup":"flow_group","colourScale":"d3.scaleOrdinal()\n  .domain([\"excretion\", \"large industries\", \"lost\", \"water\", \"sludge\", \"air\", \"nodes_group\"])\n  .range([\"#7d6608\", \"grey\", \"#5e5e5e\", \"#2e86c1\", \"#6e2c00\", \"#3ab02a\", \"black\"])","fontSize":25,"fontFamily":null,"nodeWidth":15,"nodePadding":50,"units":"","margin":{"top":0,"right":0,"bottom":0,"left":0},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"\n  function(el,x) { \n      var link = d3.selectAll(\".link\");\n  \n      var format = d3.formatLocale({\"decimal\": \".\", \"thousands\": \",\", \"grouping\": [3], \"currency\": [\"\", \" €\"]}).format(\",.1f\");\n  \n      link.select(\"title\").select(\"body\")\n          .html(function(d) { return \"<pre>\" + d.source.name + \" → \" + d.target.name +\n              \"\\n\" + format(d.value) + \" \" + \"<pre>\"; });\n              \n      d3.select(el).selectAll(\".node text\")\n          .html(function(d) { return d.name + \" \" + format(d.value) + \" \"; });\n              \n  }\n  ","data":null}]}}</script>
 </div>
 </div>
 </div>
@@ -1808,8 +1818,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>path_source <span class="ot">&lt;-</span> <span class="st">"output_data/industry_network_discharge/"</span></span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>file_industry_discharge <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">paste0</span>(path_source, <span class="st">"industry_network_discharge_GEREP_basins.csv"</span>)) <span class="sc">%&gt;%</span></span>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>path_source <span class="ot">&lt;-</span> <span class="st">"output_data/industry_sewers_network_discharge/"</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>file_industry_discharge <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">paste0</span>(path_source, <span class="st">"industry_sewers_network_discharge_GEREP_basins.csv"</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(basin <span class="sc">!=</span> <span class="st">"Metropolitan France"</span></span>
 <span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>         )</span>
 <span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a></span>
@@ -2538,6 +2548,121 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {

@@ -14,3 +14,5 @@ This project assesses the nutrient flows in the French sanitation system. Multip
 In *WWTP flows preparation* and *Other flows preparation*, we present, clean and normalize the data related to wastewater treatment plants and the other flows (industry, food ingestion / excretion, sludge composition...).
 
 In *Results*, we show our main results: nutrients flows in wastewater treatment plants, nitrogen and phosphorus nutrient flow analysis in the whole sanitation system, and the main figures used in our articles.
+
+The source data, output data, and code to generate it is accessible on this [github repository](https://github.com/Thomas-Starck/n-p-sanitation-flows){target="_blank"}, which produced this website. It is also stored on a permanent repository on zenodo at [https://doi.org/10.5281/zenodo.7990172](https://doi.org/10.5281/zenodo.7990172){target="_blank"}.

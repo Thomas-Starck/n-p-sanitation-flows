@@ -1439,7 +1439,7 @@ f_graph_data_comparison(GEREP_national, national_network_discharge, "DCO", "DCO_
 
 #### MES
 
-```{rcomparison_GEREP_georisques_MES_after_correction}
+```{r comparison_GEREP_georisques_MES_after_correction}
 f_graph_data_comparison(GEREP_national, national_network_discharge, "MES", "MES_in", "MES_out", "MES_nb_facilities", "MES")
 ```
 :::

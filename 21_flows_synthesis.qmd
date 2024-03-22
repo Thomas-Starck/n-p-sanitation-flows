@@ -831,8 +831,8 @@ f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "MES_
 # Industrial network discharge 
 
 ```{r}
-path_source <- "output_data/industry_network_discharge/"
-temp <- read_csv(paste0(path_source, "industry_network_discharge_GEREP_basins.csv"))
+path_source <- "output_data/industry_sewers_network_discharge/"
+temp <- read_csv(paste0(path_source, "industry_sewers_network_discharge_GEREP_basins.csv"))
 ```
 
 ```{r}
