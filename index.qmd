@@ -1,0 +1,18 @@
+---
+title: "Home"
+bibliography: references.bib  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
+```
+
+This website describes the data sources and processing to get the results presented in @starck2024fate (for nitrogen) and @starck2023phosphorus (for phosphorus). The results here go beyond what is presented in the articles. 
+
+This project assesses the nutrient flows in the French sanitation system. Multiple sources are used: wastewater treatment plant data from water agencies, industry discharge, food intakes surveys...
+
+In *WWTP flows preparation* and *Other flows preparation*, we present, clean and normalize the data related to wastewater treatment plants and the other flows (industry, food ingestion / excretion, sludge composition...).
+
+In *Results*, we show our main results: nutrients flows in wastewater treatment plants, nitrogen and phosphorus nutrient flow analysis in the whole sanitation system, and the main figures used in our articles.
+
+The source data, output data, and code to generate it is accessible on this [github repository](https://github.com/Thomas-Starck/n-p-sanitation-flows){target="_blank"}, which produced this website. It is also stored on a permanent repository on zenodo at [https://doi.org/10.5281/zenodo.7990172](https://doi.org/10.5281/zenodo.7990172){target="_blank"}.

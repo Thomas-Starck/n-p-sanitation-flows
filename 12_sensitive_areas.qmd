@@ -1,0 +1,812 @@
+---
+title: "Sensitive Areas"
+---
+
+```{r setup, include=T, warning=F, message=F, results=F}
+knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
+
+library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
+
+#core tidyverse packages loaded:
+# ggplot2, for data visualisation. https://ggplot2.tidyverse.org/
+# dplyr, for data manipulation. https://dplyr.tidyverse.org/
+# tidyr, for data tidying. https://tidyr.tidyverse.org/
+# readr, for data import. https://readr.tidyverse.org/
+# purrr, for functional programming. https://purrr.tidyverse.org/
+# tibble, for tibbles, a modern re-imagining of data frames. https://tibble.tidyverse.org/
+# stringr, for strings. https://stringr.tidyverse.org/
+# forcats, for factors. https://forcats.tidyverse.org/
+# lubridate, for date/times. https://lubridate.tidyverse.org/
+
+#also loads the following packages (less frequently used):
+# Working with specific types of vectors:
+#     hms, for times. https://hms.tidyverse.org/
+# Importing other types of data:
+#     feather, for sharing with Python and other languages. https://github.com/wesm/feather
+#     haven, for SPSS, SAS and Stata files. https://haven.tidyverse.org/
+#     httr, for web apis. https://httr.r-lib.org/
+#     jsonlite for JSON. https://arxiv.org/abs/1403.2805
+#     readxl, for .xls and .xlsx files. https://readxl.tidyverse.org/
+#     rvest, for web scraping. https://rvest.tidyverse.org/
+#     xml2, for XML. https://xml2.r-lib.org/
+# Modelling
+#     modelr, for modelling within a pipeline. https://modelr.tidyverse.org/
+#     broom, for turning models into tidy data. https://broom.tidymodels.org/
+
+# Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+#loading relevant packages
+library(cowplot) #for plot_grid() (multiple plots)
+library(readxl) # to read excel file
+library(sf) #for spherical geometry operations
+#at first with sf there was an issues with GDAL and PROJ librairies that were not found. I found the answer here https://github.com/r-spatial/sf/issues/2302 and here https://github.com/r-spatial/sf/issues/2298. I uninstalled the sf package and manually installed it with install.packages('sf', repos = c('https://r-spatial.r-universe.dev')). This changed the version from 1.0-15 to 1.0-16
+
+#path for data 
+path_source <- ""
+
+#setting graphs theme
+theme_set(
+  theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold")
+      )
+  )
+
+#setting viridis theme for colors
+scale_colour_continuous <- scale_colour_viridis_c
+scale_colour_discrete   <- scale_colour_viridis_d
+scale_colour_binned     <- scale_colour_viridis_b
+#setting viridis theme for fill
+scale_fill_continuous <- scale_fill_viridis_c
+scale_fill_discrete   <- scale_fill_viridis_d
+scale_fill_binned     <- scale_fill_viridis_b
+
+#caption for all graphs
+Source <- "Source: data.europa.eu\ncomputation by Thomas Starck"
+```
+
+[link](https://www.assainissement.developpement-durable.gouv.fr/PortailAC/regs) to the decrees defining the sensitive zones. Go to *TEXTES TECHNIQUES RELATIFS A L'ASSAINISSEMENT COLLECTIF* -\> *2.1. Arrêtés de délimitation*
+
+-   [1994 ministerial ruling, November 23](https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000734192/1995-06-07/). No quantitative objectives, just says that for WWTP discharging more than 600 kg of organic pollution per day, the prefect gives goals of reduction. Refers to the [1994, June 3 decree](https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000713789/1995-05-08/) whose article 6 which says that in water bodies sensitive to eutrophication, nitrogen and phosphorus discharges must be reduced.
+-   [1999 ministerial ruling](https://www.assainissement.developpement-durable.gouv.fr/PortailAC/documents/recueil/03_AC/212.pdf)
+-   [2022 ministerial rulin](https://www.assainissement.developpement-durable.gouv.fr/PortailAC/documents/recueil/03_AC/joe_20230326_0073_0032.pdf) for Martinique
+
+# Sources 
+
+The data for the water agencies areas were found on the French [data.gouv](https://geo.data.gouv.fr/fr/datasets/1923ec5c368b44a4b84c4528b391af0575d96229) portal.
+
+The geographical data of N and P sensitive zones were found [here](https://data.europa.eu/data/datasets/5ea6cf179c53660fe1cc9ad6?locale=fr), on the european data portal.
+
+Additional data about N and P sensitive zones were also found on the [French sanitation portal](https://www.assainissement.developpement-durable.gouv.fr/PortailAC/docs).
+
+# Prepare Data
+
+We load the geographical borders of the 6 water agencies.
+
+```{r load_water_agencies_borders}
+#load water agencies border data shapefile
+basins <- sf::st_read("source_data/maps/water_agencies/simplified_CircAdminBassin2021/CircAdminBassin2021.shp")
+
+#focus on metropole
+basins_metropole <- basins %>%
+  #keep only metropolitan basins
+  filter(
+    NumCircAdm %in% c("01", "02", "03", "04", "05", "06")
+  ) %>%
+  #remove useless columns
+  select(
+    basin_name = NomCircAdm, 
+    basin_num = NumCircAdm
+  ) %>%
+  #change name to be similar to the other files
+  mutate(
+    basin_name = case_when(
+      basin_name == "ADOUR-GARONNE" ~ "Adour-Garonne",
+      basin_name == "ARTOIS-PICARDIE" ~ "Artois-Picardie",
+      basin_name == "LOIRE-BRETAGNE" ~ "Loire-Bretagne",
+      basin_name == "RHIN-MEUSE" ~ "Rhin-Meuse",
+      basin_name == "RHONE-MEDITERRANEE" ~ "Rhone-Méditerranée",
+      basin_name == "SEINE-NORMANDIE" ~ "Seine-Normandie"
+    )
+  )
+#keep only metropolitan data
+rm(basins)
+```
+
+We load the data of the sensitive zones and focus only on metropolitan France. The European file gives us the geographical areas, the sanitation portal file adds data about the "conformity date" besides the "decree date".
+
+```{r preapre_main_file_sensitive_zones}
+#load EU geographical data about sensitive zones (shapefile)
+file_sensitive_zones <- sf::st_read("source_data/maps/sensitive_zones/ZoneSensible_FRA_ZRPE_2.shp") %>%
+  #more explicit name, also used in file below, used to merge the 2 files
+  rename(EU_code_zone = CdEuZS)
+
+#load French spreadsheet, gives addictional info on conformity dates and so on
+file_sanitation_portal <- read_excel("source_data/maps/sensitive_zones/Export_ZS_2020_05_29-1.xlsx", range = "A1:I142") %>%
+  #more explicit name, also used in file above, used to merge the 2 files
+  rename(EU_code_zone = `Code-européen  CM* - CA*`) %>%
+  #add water agencies names
+  mutate(
+    basin = case_when(
+      substr(code_national, 1, 2) == "01" ~  "Artois-Picardie",
+      substr(code_national, 1, 2) == "02" ~  "Rhin-Meuse",
+      substr(code_national, 1, 2) == "03" ~ "Seine-Normandie", 
+      substr(code_national, 1, 2) == "04" ~ "Loire-Bretagne",
+      substr(code_national, 1, 2) == "05" ~  "Adour-Garonne",
+      substr(code_national, 1, 2) == "06" ~  "Rhône-Méditerranée",
+      T~"Overseas"
+    )
+  )
+
+#merging the 2 files
+temp <- merge(
+  file_sensitive_zones, 
+  file_sanitation_portal, 
+  by="EU_code_zone"
+  )
+#keeping columns of interest from each of the 2 files
+temp <- temp %>%
+  select(
+    #sanitation portal file
+    EU_code_zone, code_national, nom, nom_court, traitement_requis, basin,
+    date_arrêté_N, date_arrêté_P, date_conformité_N, date_conformité_P,
+    
+    #EU file
+    gml_id, gid, NomZS, NomCourtZS, StZS, timePositi, CdTraiteme, LbTraiteme, DateLimite,
+    CdTypeZone, MnTypeZone, LbTypeZone, 
+    DatePubliT, #date of decree for P sensitive zone ?
+    DateLimi_1, #date of decree for N sensitive zone ?
+    DatePubl_1, 
+    ComZS
+  )
+
+#final file
+sensitive_zones <- temp %>%
+  select(
+    basin,
+    P_decree_date = date_arrêté_P, 
+    N_decree_date = date_arrêté_N,
+    P_conformity_date = date_conformité_P, 
+    N_conformity_date = date_conformité_N,
+    sensitive_type = LbTraiteme,
+    name_sensitive_zone = NomZS,
+    name_sensitive_zone_simple = NomCourtZS,
+    id_sensitive_zone = gid,
+    geometry
+    
+  )
+rm(temp)
+
+#remove non-metropolitan sensitive zones
+metropole <- function(map_sf){
+  map_sf <- map_sf %>% 
+    filter(!id_sensitive_zone %in% c(14, 15, 16, 17, 18, 137, 138, 139, 140, 141))
+  return(map_sf)
+}
+sensitive_zones <- metropole(sensitive_zones)
+
+#color scale for basins
+basin_colors <- c("#440154", "#414487", "#2a788e", "#7ad151", "#22a884", "#fde725")
+basin_names <- c("Seine-Normandie", "Loire-Bretagne", "Artois-Picardie", "Adour-Garonne", "Rhin-Meuse", "Rhône-Méditerranée")
+sensitive_zones$basin <- 
+  factor(
+    sensitive_zones$basin, 
+    levels = 
+      c("Seine-Normandie",
+        "Loire-Bretagne",
+        "Artois-Picardie",
+        "Rhin-Meuse",
+        "Adour-Garonne", 
+        "Rhône-Méditerranée"
+        )
+      )
+```
+
+# Sensitive areas 
+
+Logically, the cards below in the 2 panes are identical, because the 2017 decree sets the 2024 to reach conformity.
+
+::: panel-tabset
+
+## Latest conformity date (2024)
+
+```{r function_draw_map_2024_conformity}
+draw_map_2024_conformity <- function(sensitive_zones, basins_metropole){
+  temp <-  sensitive_zones %>%
+    select(
+      basin,
+      `Sensitive Area P`=P_conformity_date,
+      `Sensitive Area N`=N_conformity_date,
+      geometry
+      ) %>%
+    gather(N_or_P, date, `Sensitive Area P`, `Sensitive Area N`) %>%
+    filter(is.na(date)==F)
+  
+  p <- ggplot(temp) + 
+    geom_sf(
+      aes(fill=basin), 
+      color = NA, size=0, alpha=.6
+      ) + 
+    geom_sf(
+      data = basins_metropole, 
+      color = "black", fill=NA,
+      ) +
+    scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+    coord_sf(datum = NA, expand = FALSE) + #remove coordinates
+    theme(
+      panel.background = element_blank(),
+      legend.position = "bottom"
+      ) +
+    facet_wrap(vars(N_or_P)) +
+    labs(
+      title = "Sensitive areas N and P, for each water agency",
+      subtitle = "defined by 2024 conformity date",
+      caption = Source,
+      fill=""
+    )
+  return(p)
+}
+draw_map_2024_conformity(sensitive_zones, basins_metropole) 
+```
+
+## Latest decree (2017)
+
+```{r function_draw_map_2017_decree}
+draw_map_2017_decree <- function(sensitive_zones, basins_metropole){
+  temp <-  sensitive_zones %>%
+    select(
+      basin,
+      `Sensitive Area P`=P_decree_date,
+      `Sensitive Area N`=N_decree_date,
+      geometry
+      ) %>%
+    gather(N_or_P, date, `Sensitive Area P`, `Sensitive Area N`) %>%
+    filter(is.na(date)==F)
+  
+  p <- ggplot(temp) + 
+    geom_sf(
+      aes(fill=basin), 
+      color = NA, size=0, alpha=.6
+      ) + 
+    geom_sf(
+      data = basins_metropole, 
+      color = "black", fill=NA,
+      ) +
+    scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+    coord_sf(datum = NA, expand = FALSE) + #remove coordinates
+    theme(
+      panel.background = element_blank(),
+      legend.position = "bottom"
+      ) +
+    facet_wrap(vars(N_or_P)) +
+    labs(
+      title = "Sensitive areas N and P, for each water agency",
+      subtitle = "defined by 2017 decree",
+      caption = Source,
+      fill=""
+    )
+  return(p)
+}
+draw_map_2017_decree(sensitive_zones, basins_metropole) 
+```
+
+:::
+
+# Evolution, by decree date 
+
+```{r function_expand_sentitive_zones}
+# Define the expand_sensitive_zones function
+expand_sensitive_zones <- function(df, date_column) {
+  df <- df %>% st_drop_geometry()
+  
+  # Create a vector of unique id_sensitive_zone
+  unique_zones <- df %>%
+    filter(!is.na(.data[[date_column]])) %>%  # Use .data to access the column by name
+    distinct(id_sensitive_zone) %>%
+    pull()
+
+  # Initialize an empty data frame to store the expanded rows
+  expanded_df <- data.frame(
+    id_sensitive_zone = character(),
+    date = as.Date(character())
+  )
+
+  # Loop through each unique id_sensitive_zone and their corresponding date
+  for (zone in unique_zones) {
+    # Get the date of the sensitive zone
+    date_id <- df[df$id_sensitive_zone == zone, date_column]
+
+    # Get unique dates greater or equal to the date of the sensitive zone
+    unique_dates <- na.omit(unique(df[, date_column][df[, date_column] >= date_id]))
+
+    # Create rows for (id_sensitive_zone, date_i) combinations
+    new_rows <- data.frame(id_sensitive_zone = zone, date = unique_dates)
+
+    # Add the new rows to the expanded data frame
+    expanded_df <- rbind(expanded_df, new_rows)
+  }
+
+  return(expanded_df)
+}
+```
+
+```{r function_draw_map_decree}
+draw_map_decree <- function(sensitive_zones, basins_metropole, date_column){
+  temp <-  sensitive_zones %>%
+    filter(!is.na(.data[[date_column]]))
+  
+  p <- ggplot(temp) + 
+    geom_sf(
+      fill = "#440154", size=0, alpha=.6, color="NA"
+      ) + 
+    geom_sf(
+      data = basins_metropole, 
+      color = "black", fill=NA,
+    ) +
+    scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+    coord_sf(datum = NA, expand = FALSE) +
+    theme(
+      panel.background = element_blank()
+    ) +
+    facet_wrap(vars(year(.data[[date_column]]))) +
+    labs(
+      title = paste("Sensitive areas ", date_column, ", for each water agency", sep=""),
+      caption = Source
+    )
+  return(p)
+}
+```
+
+::: panel-tabset
+
+## N 
+
+::: panel-tabset
+
+```{r prepare_N_decree}
+# Call the function with the "N_decree_date" column
+expanded_df_N <- expand_sensitive_zones(sensitive_zones, "N_decree_date")
+
+# Get geometry and transform to sf file for N_decree_date
+expanded_sf_N <- st_as_sf(
+  left_join(
+    expanded_df_N %>% rename(N_decree_date = date),
+    sensitive_zones %>% select(-N_decree_date),
+    by = "id_sensitive_zone"
+  )
+)
+```
+
+### Maps
+
+```{r maps_decrees_N}
+draw_map_decree(expanded_sf_N, basins_metropole, "N_decree_date") 
+```
+
+### Animated
+
+<!-- ```{r animated_maps_decrees_N, fig.show='animate', animation.hook='gifski', dev='png'} -->
+
+<!-- decree_date <- sort(unique(expanded_sf_N$N_decree_date)) -->
+
+<!-- for (i in decree_date) { -->
+
+<!--   print(draw_map_decree(expanded_sf_N %>% filter(N_decree_date==i), basins_metropole, "N_decree_date")) -->
+
+<!-- } -->
+
+<!-- ``` -->
+
+:::
+
+## P 
+
+::: panel-tabset
+
+```{r prepare_P_decree}
+# Call the function with the "P_decree_date" column
+expanded_df_P <- expand_sensitive_zones(sensitive_zones, "P_decree_date")
+
+# Get geometry and transform to sf file for P_decree_date
+expanded_sf_P <- st_as_sf(
+  left_join(
+    expanded_df_P %>% rename(P_decree_date = date),
+    sensitive_zones %>% select(-P_decree_date),
+    by = "id_sensitive_zone"
+  )
+)
+```
+
+### Maps
+
+```{r maps_decrees_P}
+draw_map_decree(expanded_sf_P, basins_metropole, "P_decree_date") 
+```
+
+### Animated
+
+<!-- ```{r animated_maps_decrees_P, fig.show='animate', animation.hook='gifski', dev='png'} -->
+
+<!-- decree_date <- sort(unique(expanded_sf_P$P_decree_date)) -->
+
+<!-- for (i in decree_date) { -->
+
+<!--   print(draw_map_decree(expanded_sf_P %>% filter(P_decree_date==i), basins_metropole, "P_decree_date")) -->
+
+<!-- } -->
+
+<!-- ``` -->
+
+:::
+
+:::
+
+# Evolution, by conformity date 
+
+::: panel-tabset
+
+## N 
+
+```{r prepare_N_conformity}
+# Call the function with the "N_decree_date" column
+expanded_df_N <- expand_sensitive_zones(sensitive_zones, "N_conformity_date")
+
+# Get geometry and transform to sf file for N_decree_date
+expanded_sf_N <- st_as_sf(
+  left_join(
+    expanded_df_N %>% rename(N_conformity_date = date),
+    sensitive_zones %>% select(-N_conformity_date),
+    by = "id_sensitive_zone"
+  )
+)
+```
+
+::: panel-tabset
+
+### Maps
+
+```{r maps_conformity_N}
+draw_map_decree(expanded_sf_N, basins_metropole, "N_conformity_date") 
+```
+
+### Animated
+
+<!-- ```{r animated_maps_conformity_N, fig.show='animate', animation.hook='gifski', dev='png'} -->
+
+<!-- decree_date <- sort(unique(expanded_sf_N$N_conformity_date)) -->
+
+<!-- for (i in decree_date) { -->
+
+<!--   print(draw_map_decree(expanded_sf_N %>% filter(N_conformity_date==i), basins_metropole, "N_conformity_date")) -->
+
+<!-- } -->
+
+<!-- ``` -->
+
+### Compare to official maps 
+
+```{r}
+# Load necessary libraries
+library(jpeg)
+library(png)
+
+#boundaries of France, to have the png and jpg maps at scale next to our map
+
+# Calculate the bounding box
+bbox <- st_bbox(expanded_sf_N)
+# Set the plot extents
+xmin <- bbox$xmin
+xmax <- bbox$xmax
+ymin <- bbox$ymin
+ymax <- bbox$ymax
+```
+
+```{r}
+side_by_side_maps <- function(map_image, year, rel_w1, rel_w2, date_column){
+  
+  # Create sensitive zones maps for the year
+  gg <- draw_map_decree(
+    expanded_sf_N %>% filter(year(expanded_sf_N[[date_column]])==year), 
+    basins_metropole, 
+    date_column
+    ) +
+    labs(title = "", caption = "")
+  
+  # Create a ggplot2 plot with the JPEG image annotation
+  gg_1 <- ggplot() +
+    annotation_raster(map_image, xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax) +
+    coord_sf(xlim = c(xmin, xmax), ylim = c(ymin, ymax), expand=F, crs=st_crs(expanded_sf_N), datum=NA) 
+  
+  #2 maps side by side
+  combined_plots <- plot_grid(
+    gg, gg_1, 
+    nrow = 1, 
+    rel_widths = c(rel_w1, rel_w2), 
+    axis="tblr", align = "hv"
+    )
+  
+  return(combined_plots)
+}
+```
+
+::: panel-tabset
+
+#### 1998
+
+ne correspond pas. [1994 minister ruling](https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000734192/1995-06-07/)
+
+```{r}
+map_image <- readJPEG("source_data/12_sensitive_areas/1998_sensitive_areas.jpg")
+side_by_side_maps(map_image, 1998, .5, .5, "N_conformity_date")
+```
+
+#### 2006
+
+je n'ai pas les dates 2006 pour l'azote, mais semble correspondre à 1998, manque juste frontière suisse
+
+```{r}
+map_image <- readJPEG("source_data/12_sensitive_areas/2006_N_sensitive_areas.jpg")
+side_by_side_maps(map_image, 1998, .4, .6, "N_conformity_date")
+```
+
+#### 2013
+
+manque juste frontière suisse
+
+```{r}
+map_image <- readJPEG("source_data/12_sensitive_areas/2013_N_sensitive_areas.jpg")
+side_by_side_maps(map_image, 2013, .4, .6, "N_conformity_date")
+```
+
+#### 2017
+
+correspond bien
+
+```{r}
+map_image <- readPNG("source_data/12_sensitive_areas/2017_N_sensitive_areas.png")
+side_by_side_maps(map_image, 2017, .4, .6, "N_conformity_date")
+```
+
+#### 2024
+
+correspond bien
+
+```{r}
+map_image <- readPNG("source_data/12_sensitive_areas/2024_N_sensitive_areas.png")
+side_by_side_maps(map_image, 2024, .4, .6, "N_conformity_date")
+```
+
+:::
+
+:::
+
+## P 
+
+```{r prepare_P_conformity}
+# Call the function with the "N_decree_date" column
+expanded_df_P <- expand_sensitive_zones(sensitive_zones, "P_conformity_date")
+
+# Get geometry and transform to sf file for N_decree_date
+expanded_sf_P <- st_as_sf(
+  left_join(
+    expanded_df_P %>% rename(P_conformity_date = date),
+    sensitive_zones %>% select(-P_conformity_date),
+    by = "id_sensitive_zone"
+  )
+)
+```
+
+::: panel-tabset
+
+### Maps
+
+```{r maps_conformity_P}
+draw_map_decree(expanded_sf_P, basins_metropole, "P_conformity_date") 
+```
+
+### Animated
+
+<!-- ```{r animated_maps_conformity_P, fig.show='animate', animation.hook='gifski', dev='png'} -->
+
+<!-- decree_date <- sort(unique(expanded_sf_P$P_conformity_date)) -->
+
+<!-- for (i in decree_date) { -->
+
+<!--   print(draw_map_decree(expanded_sf_P %>% filter(P_conformity_date==i), basins_metropole, "P_conformity_date")) -->
+
+<!-- } -->
+
+<!-- ``` -->
+
+:::
+
+:::
+
+# Effectively sensitive 
+
+sûrement enlever les années avant 2006
+
+```{r prepare_effectively_sensitive_data}
+# get all decrees and conformity dates
+years <- sort(na.omit(unique(year(
+  c(sensitive_zones$P_decree_date,
+    sensitive_zones$N_decree_date,
+    sensitive_zones$N_conformity_date,
+    sensitive_zones$P_conformity_date
+    )
+  ))))
+years
+
+#preapre empty df
+effectively_sensitive_zones <- sensitive_zones %>% mutate(Year = year(as.POSIXct(0)))
+effectively_sensitive_zones <- effectively_sensitive_zones[0, ]
+
+for (year in years) {
+  temp2 <- sensitive_zones %>% 
+    mutate(
+      Year = year(as.POSIXct(paste0(year, "-01-01")))
+      )
+  
+  # N sensitivity
+  temp2 <- temp2 %>%
+    mutate(
+      N_sensitivity = case_when(
+        is.na(N_decree_date) | is.na(N_conformity_date) ~ "non sensitive",
+        (year(N_conformity_date) <= Year) & (Year < year(N_decree_date)) ~ "non sensitive",
+        (year(N_conformity_date) <= Year) & (year(N_decree_date) <= Year) ~ "sensitive",
+        (Year < year(N_conformity_date)) & (year(N_decree_date) <= Year)  ~ "sensitive in progress",
+        (Year < year(N_conformity_date)) & (Year < year(N_decree_date))  ~ "non sensitive",
+        T~"forgotten condition N"
+      )
+    )
+  
+  # P sensitivity
+  temp2 <- temp2 %>%
+    mutate(
+      P_sensitivity = case_when(
+        is.na(P_decree_date) | is.na(P_conformity_date) ~ "non sensitive",
+        (year(P_conformity_date) <= Year) & (Year < year(P_decree_date)) ~ "non sensitive",
+        (year(P_conformity_date) <= Year) & (year(P_decree_date) <= Year) ~ "sensitive",
+        (Year < year(P_conformity_date)) & (year(P_decree_date) <= Year)  ~ "sensitive in progress",
+        (Year < year(P_conformity_date)) & (Year < year(P_decree_date))  ~ "non sensitive",
+        T~"forgotten condition P"
+      )
+    )
+  
+  #remove non sensitive zone(s
+  temp2 <- temp2 %>% filter(!(P_sensitivity=="non sensitive" & N_sensitivity=="non sensitive"))
+  
+  effectively_sensitive_zones <- bind_rows(effectively_sensitive_zones, temp2)
+  
+}
+```
+
+```{r draw_map_effectively_sensitive_function}
+draw_map_effectively_sensitive <- function(data, basins_metropole, N_or_P_sensitivity){
+  data <- data %>% filter({{ N_or_P_sensitivity }} != "non sensitive")
+  data
+  
+  p <- ggplot(data) + 
+    geom_sf(
+      aes(fill={{ N_or_P_sensitivity }}),
+      size=0, alpha=.6, color=NA
+      ) + 
+    scale_fill_manual(
+      values = c("sensitive" = "#440154", "sensitive in progress" = "#fde725"),
+      limits = c("sensitive", "sensitive in progress") #to display all the colors in legend, even when not present in data (for year by year gif)
+      ) +
+    geom_sf(
+      data = basins_metropole, 
+      color = "black", fill=NA,
+    ) +
+    coord_sf(datum = NA, expand = FALSE) +
+    theme(
+      panel.background = element_blank(),
+      legend.position = "top"
+    ) +
+    facet_wrap(~Year) +
+    labs(
+      title = "Sensitive areas for each water agency",
+      caption = Source,
+      fill=""
+    )
+  return(p)
+}
+
+```
+
+::: panel-tabset
+
+## N 
+
+::: panel-tabset
+
+### Maps
+
+```{r N_maps_effectively_sensitive}
+draw_map_effectively_sensitive(
+  effectively_sensitive_zones, 
+  basins_metropole,
+  N_sensitivity
+  )
+```
+
+### Animated Map
+
+<!-- ```{r N_maps_effectively_sensitive_animated, fig.show='animate', animation.hook='gifski', dev='png'} -->
+
+<!-- #given previous maps, we remove 1999 which is the same as 1998 -->
+
+<!-- for (i in years[years!=1999]) { -->
+
+<!--   print( -->
+
+<!--     draw_map_effectively_sensitive( -->
+
+<!--       effectively_sensitive_zones %>% filter(Year==i),  -->
+
+<!--       basins_metropole, -->
+
+<!--       N_sensitivity -->
+
+<!--       ) -->
+
+<!--   ) -->
+
+<!-- } -->
+
+<!-- ``` -->
+
+:::
+
+## P 
+
+::: panel-tabset
+
+### Maps
+
+```{r P_maps_effectively_sensitive}
+draw_map_effectively_sensitive(
+  effectively_sensitive_zones, 
+  basins_metropole,
+  P_sensitivity
+  )
+```
+
+### Animated Map
+
+<!-- ```{r P_maps_effectively_sensitive_animated, fig.show='animate', animation.hook='gifski', dev='png'} -->
+
+<!-- for (i in years) { -->
+
+<!--   print( -->
+
+<!--     draw_map_effectively_sensitive( -->
+
+<!--       effectively_sensitive_zones %>% filter(Year==i),  -->
+
+<!--       basins_metropole, -->
+
+<!--       P_sensitivity -->
+
+<!--       ) -->
+
+<!--   ) -->
+
+<!-- } -->
+
+<!-- ``` -->
+
+:::
+
+:::
+
+```{r remove_all_objects_in_environment}
+rm(list = ls())
+```

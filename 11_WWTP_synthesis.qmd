@@ -1,0 +1,8 @@
+---
+title: "Synthesis"
+---
+
+In a further version of the project, we will merge the data from the 6 different basins with the data from the sanitation portal. 
+
+This will produce a unique dataset of harmonized WWTP data, with extensive description of their characteristics and inflows and outflows, over 1-2 decades (depending on the water agency basin).
+

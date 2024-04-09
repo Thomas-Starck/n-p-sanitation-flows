@@ -1,0 +1,89 @@
+project:
+  type: website
+  output-dir: docs
+  render: 
+    - index.qmd
+    - 0_industry_discharge.qmd
+    - 0_nutrient_excretions.qmd
+    - 0_sanitation_portal.qmd
+    - 0_sludge_composition.qmd
+    - 01_artois_picardie.qmd
+    - 02_rhin_meuse.qmd
+    - 03_seine_normandie_SIAAP.qmd
+    - 04_loire_bretagne.qmd
+    - 05_adour_garonne.qmd
+    - 06_rhone_mediterranee.qmd
+    - 10_discharged_without_treatment.qmd
+    - 11_WWTP_synthesis.qmd
+    - 12_sensitive_areas.qmd
+    - 21_flows_synthesis.qmd
+    - 31_Sankeys.qmd
+    - 32_figures.qmd
+    - "!source_data"
+    - "!output_data"
+    - "!appendix"
+    - "!renv.lock"
+    - "!graphs"
+    - "!readme.md"
+
+website:
+  title: "Sanitation-NP-Flows-France"
+  navbar:
+    left:
+      - text: "Home"
+        href: index.html
+      - text: "WWTP flows preparation"
+        menu:
+        - text: "Sanitation portal"
+          href: 0_sanitation_portal.html
+        - text: "01 Artois-Picardie"
+          href: 01_artois_picardie.html
+        - text: "02 Rhin-Meuse"
+          href: 02_rhin_meuse.html
+        - text: "03 Seine-Normandie & SIAAP"
+          href: 03_seine_normandie_SIAAP.html
+        - text: "04 Loire-Bretagne"
+          href: 04_loire_bretagne.html
+        - text: "05 Adour-Garonne"
+          href: 05_adour_garonne.html
+        - text: "06 Rhône-Méditerranée"
+          href: 06_rhone_mediterranee.html
+        - text: "Synthesis"
+          href: 11_WWTP_synthesis.html
+          
+      - text: "Other flows preparation"
+        menu:
+        - text: "Industry discharge"
+          href: 0_industry_discharge.html
+        - text: "Nutrient excretion"
+          href: 0_nutrient_excretions.html
+        - text: "Sludge composition"
+          href: 0_sludge_composition.html
+        - text: "Direct discharge"
+          href: 10_discharged_without_treatment.html
+      - text: "Results"
+        menu:
+        - text: "Sensitive Areas"
+          href: 12_sensitive_areas.html
+        - text: "First Nutrient Synthesis"
+          href: 21_flows_synthesis.html
+        - text: "Sankeys N P sanitation flows"
+          href: 31_Sankeys.html
+        - text: "Main Figures"
+          href: 32_figures.html
+    right:
+      - icon: github
+        href: https://github.com/Thomas-Starck/n-p-sanitation-flows
+          
+format:
+  html:
+    theme: 
+      light: flatly
+      dark: darkly
+    css: styles.css
+    toc: true
+    code-fold: true
+    toc_float: true
+  
+      
+

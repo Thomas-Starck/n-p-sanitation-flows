@@ -1,0 +1,37 @@
+﻿group,crop,perc_N,perc_P
+Cereals,Wheat,1.95,0.33
+Cereals,Rye,1.76,0.33
+Cereals,Barley,1.76,0.33
+Cereals,Oat,2.08,0.33
+Cereals,Grain maize,1.52,0.25
+Cereals,Rice ,1.07,0.11
+Cereals,Other cereals,1.8,0.33
+Cereals,Straw,0.5,0.056
+Oil crops,Rapeseed,3.5,0.4
+Oil crops,Sunflower,1.96,0.33
+Oil crops,Soybean,6,0.61
+Oil crops,Other oil crops,3.5,0.5
+Protein crops,Horse beans and faba beans,3.6,0.1
+Protein crops,Peas,3.6,0.34
+Protein crops,Other protein crops,3.6,0.3
+Roots and tubers,Sugar beet,0.208,0.0405
+Roots and tubers,Potatoes,0.256,0.025
+Roots and tubers,Other roots,0.23,0.023
+Fruits and vegetables,Green peas,0.5,0.035
+Fruits and vegetables,Dry beans,1.5,0.15
+Fruits and vegetables,Green beans,0.5,0.05
+Fruits and vegetables,Dry vegetables,3.6,0.34
+Fruits and vegetables,Dry fruits,2,0.39
+Fruits and vegetables,Squash and melons,0.18,0.03
+Fruits and vegetables,Cabbage,0.36,0.075
+Fruits and vegetables,Leaves vegetables,0.22,0.075
+Fruits and vegetables,Fruits,0.1,0.025
+Fruits and vegetables,Olives,0.67,0.07
+Fruits and vegetables,Citrus,0.18,0.01
+Fodder and meadows,Hemp,0.35,0.035
+Fodder and meadows,Flax,0.35,0.035
+Fodder and meadows,Forage maize,1,0.18
+Fodder and meadows,Forage cabbages,0.36,0.075
+Fodder and meadows,Alfalfa and clover,2.8,0.225
+Fodder and meadows,Non-legume temporary meadow,1.25,0.18
+Fodder and meadows,Natural meadow,2,0.2

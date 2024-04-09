@@ -1,0 +1,2196 @@
+---
+title: "Main figures"
+---
+
+```{r setup, include=T, warning=F, message=F, results=F}
+knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
+
+library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
+
+#core tidyverse packages loaded:
+# ggplot2, for data visualisation. https://ggplot2.tidyverse.org/
+# dplyr, for data manipulation. https://dplyr.tidyverse.org/
+# tidyr, for data tidying. https://tidyr.tidyverse.org/
+# readr, for data import. https://readr.tidyverse.org/
+# purrr, for functional programming. https://purrr.tidyverse.org/
+# tibble, for tibbles, a modern re-imagining of data frames. https://tibble.tidyverse.org/
+# stringr, for strings. https://stringr.tidyverse.org/
+# forcats, for factors. https://forcats.tidyverse.org/
+# lubridate, for date/times. https://lubridate.tidyverse.org/
+
+#also loads the following packages (less frequently used):
+# Working with specific types of vectors:
+#     hms, for times. https://hms.tidyverse.org/
+# Importing other types of data:
+#     feather, for sharing with Python and other languages. https://github.com/wesm/feather
+#     haven, for SPSS, SAS and Stata files. https://haven.tidyverse.org/
+#     httr, for web apis. https://httr.r-lib.org/
+#     jsonlite for JSON. https://arxiv.org/abs/1403.2805
+#     readxl, for .xls and .xlsx files. https://readxl.tidyverse.org/
+#     rvest, for web scraping. https://rvest.tidyverse.org/
+#     xml2, for XML. https://xml2.r-lib.org/
+# Modelling
+#     modelr, for modelling within a pipeline. https://modelr.tidyverse.org/
+#     broom, for turning models into tidy data. https://broom.tidymodels.org/
+
+# Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+
+#loading additional packages
+library(cowplot) #for plot_grid() (multiple plots) 
+
+#path for data 
+path_source <- ""
+
+
+#setting graphs theme
+theme_set(
+  theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold")
+      )
+  )
+
+#setting viridis theme for colors
+scale_colour_continuous <- scale_colour_viridis_c
+scale_colour_discrete   <- scale_colour_viridis_d
+scale_colour_binned     <- scale_colour_viridis_b
+#setting viridis theme for fill
+scale_fill_continuous <- scale_fill_viridis_c
+scale_fill_discrete   <- scale_fill_viridis_d
+scale_fill_binned     <- scale_fill_viridis_b
+
+#caption for all graphs
+Source <- "Source: data.europa.eu\ncomputation by Thomas Starck"
+
+# Load the functions file
+source("functions.R")
+```
+
+# Removal efficiency and sensitive area  
+
+We load the geographical data of the 6 water agencies. We load the data of the sensitive zones and focus only on metropolitan France. 
+
+```{r}
+basins <- sf::st_read("source_data/maps/water_agencies/simplified_CircAdminBassin2021/CircAdminBassin2021.shp")
+
+basins_metropole <- basins %>%
+  filter(
+    NumCircAdm %in% c("01", "02", "03", "04", "05", "06")
+  ) %>%
+  select(
+    basin_name = NomCircAdm, 
+    basin_num = NumCircAdm
+  ) %>%
+  mutate(
+    basin_name = case_when(
+      basin_name == "ADOUR-GARONNE" ~ "Adour-Garonne",
+      basin_name == "ARTOIS-PICARDIE" ~ "Artois-Picardie",
+      basin_name == "LOIRE-BRETAGNE" ~ "Loire-Bretagne",
+      basin_name == "RHIN-MEUSE" ~ "Rhin-Meuse",
+      basin_name == "RHONE-MEDITERRANEE" ~ "Rhone-Méditerranée",
+      basin_name == "SEINE-NORMANDIE" ~ "Seine-Normandie"
+    )
+  )
+```
+
+```{r}
+file_sensitive_zones <- sf::st_read("source_data/maps/sensitive_zones/ZoneSensible_FRA_ZRPE_2_simplified/ZoneSensible_FRA_ZRPE_2.shp") %>%
+  rename(EU_code_zone = CdEuZS)
+
+file_sanitation_portal <- readxl::read_excel("source_data/maps/sensitive_zones/Export_ZS_2020_05_29-1.xlsx", range = "A1:I142") %>%
+  rename(EU_code_zone = `Code-européen  CM* - CA*`) %>%
+  mutate(
+    basin = case_when(
+      substr(code_national, 1, 2) == "01" ~  "Artois-Picardie",
+      substr(code_national, 1, 2) == "02" ~  "Rhin-Meuse",
+      substr(code_national, 1, 2) == "03" ~ "Seine-Normandie", 
+      substr(code_national, 1, 2) == "04" ~ "Loire-Bretagne",
+      substr(code_national, 1, 2) == "05" ~  "Adour-Garonne",
+      substr(code_national, 1, 2) == "06" ~  "Rhône-Méditerranée",
+      T~"Overseas"
+    )
+  )
+
+temp <- merge(file_sensitive_zones, file_sanitation_portal, by="EU_code_zone")
+
+temp <- temp %>%
+  select(
+    #sanitation portal file
+    EU_code_zone, code_national, nom, nom_court, traitement_requis, basin,
+    date_arrêté_N, date_arrêté_P, date_conformité_N, date_conformité_P,
+    
+    #EU file
+    gml_id, gid, NomZS, NomCourtZS, StZS, timePositi, CdTraiteme, LbTraiteme, DateLimite,
+    CdTypeZone, MnTypeZone, LbTypeZone, 
+    DatePubliT, #date of decree for P sensitive zone ?
+    DateLimi_1, #date of decree for N sensitive zone ?
+    DatePubl_1, 
+    ComZS
+  )
+
+#final file
+sensitive_zones <- temp %>%
+  select(
+    basin,
+    P_decree_date = date_arrêté_P, 
+    N_decree_date = date_arrêté_N,
+    P_conformity_date = date_conformité_P, 
+    N_conformity_date = date_conformité_N,
+    sensitive_type = LbTraiteme,
+    name_sensitive_zone = NomCourtZS,
+    id_sensitive_zone = gid,
+    geometry
+    
+  )
+
+#remove non-metropolitan sensitive zones
+metropole <- function(map_sf){
+  map_sf <- map_sf %>% 
+    filter(!id_sensitive_zone %in% c(14, 15, 16, 17, 18, 137, 138, 139, 140, 141))
+  return(map_sf)
+}
+sensitive_zones <- metropole(sensitive_zones)
+```
+
+Function to draw sensitive zones according to last decree (2017).
+
+```{r}
+basin_names <- c("Seine-Normandie", "Loire-Bretagne", "Artois-Picardie", "Adour-Garonne", "Rhin-Meuse", "Rhône-Méditerranée")
+basin_colors <- c("#440154", "#414487", "#2a788e", "#7ad151", "#22a884", "#fde725")
+draw_map <- function(sensitive_zones, basins_metropole, nutrient_decree){
+  temp <-  sensitive_zones %>%
+    select(
+      basin, !!as.symbol(nutrient_decree), geometry
+      ) %>%
+    filter(is.na(!!as.symbol(nutrient_decree))==F)
+  
+  p <- ggplot(temp) + 
+    geom_sf(
+      aes(fill=basin), 
+      color = NA, size=0, alpha=.6
+      ) + 
+    scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+    geom_sf(
+      data = basins_metropole, 
+      color = "black", fill=NA,
+      ) +
+    coord_sf(datum = NA, expand = FALSE) + #remove coordinates
+    theme(panel.background = element_blank()) +
+    labs(
+      fill=""
+    ) + 
+    theme(legend.position = "none")
+  return(p)
+}
+```
+
+We create a file combining the different basins flows and ratios, for metropolitan France and for each basin. Since the Seine-Normandie basin data is only available for 2015, we also load the SIAAP data, containing 5 of the largest WWTP of Seine-Normandie, over a longer time period.
+
+```{r}
+path_source <- "output_data/basins/"
+#artois-picardie
+file_basin_artois_picardie <- read_csv(paste0(path_source, "basin_01_artois_picardie.csv")) %>% 
+  mutate(basin="Artois-Picardie")
+#rhin-meuse
+file_basin_rhin_meuse <- read_csv(paste0(path_source, "basin_02_rhin_meuse.csv")) %>% 
+  mutate(basin="Rhin-Meuse")
+#SIAAP
+file_basin_SIAAP <- read_csv(paste0(path_source, "basin_03_SIAAP.csv")) %>%
+  mutate(basin="SIAAP")
+#Seine-Normandie
+file_basin_seine_normandie <- read_csv(paste0(path_source, "basin_03_seine_normandie.csv")) %>%
+  mutate(basin="Seine-Normandie")
+#Loire-Bretagne
+file_basin_loire_bretagne <- read_csv(paste0(path_source, "basin_04_loire_bretagne.csv")) %>% 
+  mutate(basin="Loire-Bretagne")
+#Adour-Garonne
+file_basin_adour_garonne <- read_csv(paste0(path_source, "basin_05_adour_garonne.csv")) %>% 
+  mutate(basin="Adour-Garonne")
+#Rhone-Mediterranée
+file_basin_rhone_mediterranee <- read_csv(paste0(path_source, "basin_06_rhone_mediterranee.csv")) %>% 
+  mutate(basin="Rhône-Méditerranée")
+
+file_basin <- 
+  bind_rows(
+    file_basin_artois_picardie,
+    file_basin_rhin_meuse,
+    file_basin_seine_normandie,
+    file_basin_loire_bretagne,
+    file_basin_adour_garonne,
+    file_basin_rhone_mediterranee
+  )
+rm(
+  file_basin_artois_picardie, 
+  file_basin_rhin_meuse, 
+  file_basin_seine_normandie, 
+  file_basin_loire_bretagne, 
+  file_basin_adour_garonne, 
+  file_basin_rhone_mediterranee
+  )
+file_basin <- file_basin %>%
+  mutate(
+    Pt_yield = Pt_yield/100,
+    NGL_yield = NGL_yield/100
+  )
+file_basin_SIAAP <- file_basin_SIAAP %>%
+  mutate(
+    Pt_yield = Pt_yield/100,
+    NGL_yield = NGL_yield/100
+  )
+```
+
+Function to draw removal efficiencies by basins.
+
+```{r}
+f_graph_yield_basin <- function(dataset, nutrient_yield, yield_label){
+
+  g <- ggplot(dataset) +
+    #basins and the adapted legend
+    geom_line(
+      data = dataset %>% filter(basin != "Seine-Normandie"), #seine normandie in points and not lines
+      aes(Year, !!as.symbol(nutrient_yield), color=basin),
+      linewidth=1, alpha=.6
+      ) +
+    guides(
+        color =
+          guide_legend(
+            override.aes =
+              list(
+                linetype = c(3, 1, 1, 1, 1, 1),
+                shape = c(19, NA, NA, NA, NA, NA)
+                )
+            )
+      ) +
+    #SIAAP data
+    geom_line(
+      data=file_basin_SIAAP, 
+      color="#440154", linetype="dotted", linewidth=1, alpha=.6,
+      aes(Year, !!as.symbol(nutrient_yield))
+    ) +
+    scale_color_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+    #Seine-Normandie 2015 point
+    geom_point(
+      data = dataset %>% filter(basin=="Seine-Normandie"), 
+      aes(Year, !!as.symbol(nutrient_yield), color=basin), alpha=.7
+      ) +
+    scale_y_continuous(
+      limits = c(0, 1),
+      breaks = seq(0, 1, 0.2),
+      labels = scales::label_percent()
+    ) +
+    scale_x_continuous(
+      limits = c(1990, 2020),
+      breaks = seq(1990, 2020, 10)
+    ) +
+    labs(
+      x="", y="removal efficiency", color="",
+      linetype = ""
+    ) +
+  theme(legend.position = "bottom")
+  return(g)
+}
+```
+
+::: panel-tabset
+## Phosphorus
+
+```{r}
+g1 <- draw_map(sensitive_zones, basins_metropole, "P_decree_date") 
+g2 <- f_graph_yield_basin(file_basin, "Pt_yield", "Pt")
+p <- get_plot_component(g2, "guide-box", return_all = TRUE)
+
+plot_grid(
+  plot_grid(
+    g1, g2 + theme(legend.position = "none"),
+    rel_widths = c(0.35, 0.65), labels = "auto"
+    ),
+  p[[3]], rel_heights = c(0.85, 0.15), ncol = 1
+  )
+
+ggsave(#svg
+  "graphs/P_basin_removal_efficiency_sensitive_zone.svg",
+  dpi=1000, width=5, height=2.8, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/P_basin_removal_efficiency_sensitive_zone.pdf",
+  dpi=1000, width=5, height=2.8, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/P_basin_removal_efficiency_sensitive_zone.png",
+  dpi=1000, width=5, height=2.8, bg="white", create.dir = T
+  )
+```
+
+## Nitrogen
+
+```{r}
+g1 <- draw_map(sensitive_zones, basins_metropole, "N_decree_date") 
+g2 <- f_graph_yield_basin(file_basin, "NGL_yield", "NGL")
+
+plot_grid(
+  plot_grid(
+    g1, g2 + theme(legend.position = "none"),
+    rel_widths = c(0.35, 0.65), labels = "auto"
+    ),
+  p, rel_heights = c(0.85, 0.15), ncol = 1
+  )
+
+ggsave(#svg
+  "graphs/N_basin_removal_efficiency_sensitive_zone.svg",
+  dpi=1000, width=5, height=2.8, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/N_basin_removal_efficiency_sensitive_zone.pdf",
+  dpi=1000, width=5, height=2.8, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/N_basin_removal_efficiency_sensitive_zone.png",
+  dpi=1000, width=5, height=2.8, bg="white", create.dir = T
+  )
+```
+
+:::
+
+# Individual WWTP removal efficiency by size and sensitive zone  
+
+```{r}
+all_WWTP_adour_garonne <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_05_adour_garonne.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Adour-Garonne"
+  )
+all_WWTP_rhin_meuse <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_02_rhin_meuse.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Rhin-Meuse"
+  )
+all_WWTP_loire_bretagne <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_04_loire_bretagne.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Loire-Bretagne"
+  )
+all_WWTP_seine_normandie <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_03_seine_normandie.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Seine-Normandie"
+  )
+all_WWTP_rhone_mediterranee <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_06_rhone_mediterranee.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Rhône-Méditerranée"
+  )
+all_WWTP_artois_picardie <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_01_artois_picardie.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Artois-Picardie"
+  )
+
+all_WWTP <- 
+  bind_rows(
+    all_WWTP_adour_garonne, all_WWTP_rhin_meuse, 
+    all_WWTP_loire_bretagne, all_WWTP_seine_normandie,
+    all_WWTP_rhone_mediterranee, all_WWTP_artois_picardie
+    ) %>%
+  mutate(
+    NGL_yield = NGL_yield/100,
+    Pt_yield = Pt_yield/100
+  )
+
+
+rm(all_WWTP_adour_garonne, all_WWTP_artois_picardie, all_WWTP_loire_bretagne, all_WWTP_rhin_meuse,
+   all_WWTP_rhone_mediterranee, all_WWTP_seine_normandie)
+
+#order size categories for graph disposition
+all_WWTP$PE_bin <- 
+    factor(
+      all_WWTP$PE_bin, 
+      levels = 
+        c("0 - 200 PE", 
+          "200 - 2 000 PE", 
+          "2 000 - 10 000 PE",
+          "10 000 - 100 000 PE", 
+          "> 100 000 PE"
+          )
+        )
+#order the basins for graph disposition
+all_WWTP$basin <- 
+  factor(
+    all_WWTP$basin, 
+    levels = 
+      c("Loire-Bretagne",
+        "Rhin-Meuse",
+        "Adour-Garonne", 
+        "Rhône-Méditerranée"
+        )
+      )
+```
+
+```{r}
+#we load the sanitation portal data to know if individual WWTP are in sensitive zones or not
+file_sanitation_portal <- read_csv("output_data/all_WWTP/all_WWTP_sanitation_portal.csv") %>%
+  #for 2018-2020 + exclude small WWTP
+  filter(
+    Year>2017 & Year<2021, 
+    PE_bin != "0 - 200 PE"
+    ) %>%
+  select(
+    code_WWTP, N_sens, P_sens
+    )
+#as there can be occasional misreporting concerning N and P sensitive zones, we take the most frequent value over the 3 years
+file_sanitation_portal <- file_sanitation_portal %>% 
+  group_by(code_WWTP) %>% 
+  summarize (
+    N_sens =names(which.max(table(N_sens))),
+    P_sens =names(which.max(table(P_sens)))
+    )
+
+#we take the mean N and P yields over 2018-2020
+temp <- all_WWTP %>%
+  filter(
+    NGL_yield>0, Pt_yield>0, #exclude incoherent yields
+    Year>2017 & Year<2021, #over 2018-2020
+    PE_bin != "0 - 200 PE", #exclude small WWTP
+    is.na(PE_bin)==F,
+    ) %>%
+  group_by(
+    code_WWTP, name_WWTP, basin, PE_bin, capacity
+    ) %>%
+  summarise(
+    NGL_yield = round(mean(NGL_yield, na.rm=T), 2),
+    Pt_yield = round(mean(Pt_yield, na.rm=T), 2)
+    ) %>%
+ filter(
+   !basin %in% c("Seine-Normandie", "Artois-Picardie")
+ )
+
+#merge yield file and sensitive area file, add colors for graph
+temp <- left_join(file_sanitation_portal, temp, by="code_WWTP") %>%
+  filter(is.na(basin)==F) %>%
+  #colored if in sensitive area + large enough to be in decree
+  mutate(
+    N_sens_color = case_when(
+      PE_bin %in% c("PE 200 - 2 000 PE", "2 000 - 10 000 PE") ~ "grey",
+      (PE_bin %in% c("10 000 - 100 000 PE", "> 100 000 PE") & N_sens == "oui") ~ as.character(basin),
+      T ~ "grey"
+    ),
+    P_sens_color = case_when(
+      PE_bin %in% c("PE 200 - 2 000 PE", "2 000 - 10 000 PE") ~ "grey",
+      (PE_bin %in% c("10 000 - 100 000 PE", "> 100 000 PE") & P_sens == "oui") ~ as.character(basin),
+      T ~ "grey"
+    )
+  )
+```
+
+```{r}
+#function for graph
+f_graph_yield_WWTP <- function(dataset, nutrient_yield, sensitive_color){
+  
+  g <- ggplot(dataset) + 
+    geom_jitter(
+      aes(x= PE_bin, y=!!as.symbol(nutrient_yield), size = capacity/10^3, color=!!as.symbol(sensitive_color)), 
+      alpha=.5
+      ) +
+    scale_size_continuous(range = c(0, 15)) + 
+    scale_color_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+    coord_flip() + 
+    scale_y_continuous(
+      limits = c(0, 1),
+      breaks=seq(0, 1, 0.2),
+      labels = scales::label_percent()
+    ) +
+    labs(
+      x="", y="removal efficiency"
+    ) + 
+    theme(legend.position = "none") +
+    facet_wrap(vars(basin))
+  
+  return(g)
+}
+```
+
+::: panel-tabset
+
+## Phosphorus
+
+```{r}
+f_graph_yield_WWTP(temp, "Pt_yield", "P_sens_color")
+ggsave(#svg
+  "graphs/P_WWTP_removal_efficiency.svg",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/P_WWTP_removal_efficiency.pdf",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/P_WWTP_removal_efficiency.png",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+```
+
+
+## Nitrogen
+
+```{r}
+f_graph_yield_WWTP(temp, "NGL_yield", "N_sens_color")
+ggsave(#svg
+  "graphs/N_WWTP_removal_efficiency.svg",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/N_WWTP_removal_efficiency.pdf",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/N_WWTP_removal_efficiency.png",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+```
+
+
+:::
+
+# N:P ratio et P:capacity ratio
+
+```{r}
+f_graph_ratio_basin <- function(dataset, ratio_in){
+  g <-ggplot(dataset) +
+    #basins 
+    geom_line(
+      aes(Year, !!as.symbol(ratio_in), color=basin),
+      alpha=.7, linewidth=1
+      ) +
+    scale_color_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+    scale_x_continuous(
+      limits = c(1990, 2020),
+      breaks = seq(1990, 2020, 10)
+    ) +
+    theme(legend.position = "bottom")
+  return(g)
+}
+
+
+```
+
+```{r}
+g1 <- f_graph_ratio_basin(file_basin, "Pt_PE_ratio_in") +
+    labs(
+      x="", y=expression(paste("gP.PE"^"-1", ".day"^"-1")),
+      color=""
+    ) +
+    scale_y_continuous(
+      limits = c(0, 2),
+      sec.axis = 
+        sec_axis(
+          trans=~.*(365/1000), 
+          name=expression(paste("kgP.PE"^"-1", ".year"^"-1"))
+          )
+      ) 
+g2 <- f_graph_ratio_basin(file_basin, "N_P_ratio_in") +
+  labs(
+    x="", y="N:P ratio",
+    color=""
+    ) +
+  scale_y_continuous(
+    limits = c(0, 10),
+    breaks = seq(0, 10, 2)
+    ) 
+p <- get_plot_component(g1, "guide-box", return_all = TRUE)
+
+plot_grid(
+  plot_grid(
+    g2 + theme(legend.position = "none"), g1 + theme(legend.position = "none")
+  ),
+  p[[3]], rel_heights = c(0.85, 0.15), ncol=1
+)
+ggsave(#png
+  "graphs/P_ratios.png",
+  dpi=1000, width=5, height=2.8, bg="white", create.dir = T
+  )
+ggsave(#svg
+  "graphs/P_ratios.svg",
+  dpi=1000, width=5, height=2.8, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/P_ratios.png",
+  dpi=1000, width=5, height=2.8, bg="white", create.dir = T
+  )
+```
+
+# Excretions 
+
+
+```{r}
+path_source <- "source_data/0_nutrient_excretion/"
+
+review_excretion <- read_csv(paste0(path_source, "n_p_fractions.csv"))
+
+temp <- read_csv("output_data/nutrient_ingestion_excretion/excretions_human_france_kt_year.csv")
+#mean excretion values per capita, four our comparison with litterature review
+N_excr_kg_year <- round(temp$N_excretion/temp$capita, 1)
+P_excr_kg_year <- round(temp$P_excretion/temp$capita, 2)
+N_P_ratio_excr <- round(temp$N_excretion/temp$P_excretion, 1)
+
+review_excretion <- review_excretion %>%
+  select(
+    P_excr = `total P excretion (kg/y)`, 
+    perc_P_urine = `% urine P`, 
+    perc_P_feces = `% feces P`, 
+    N_excr = `total N excretion (kg/y)`, 
+    perc_N_urine = `% urine N`, 
+    perc_N_feces = `% feces N`, 
+    N_P_ratio = `N:P ratio`,
+    year, country, authors
+  ) %>%
+  mutate(
+    study = paste0(authors, ", ", year, ", ", country),
+    P_urine = round(P_excr*perc_P_urine/100, 2),
+    P_feces = round(P_excr*perc_P_feces/100, 2),
+    N_urine = round(N_excr*perc_N_urine/100, 2),
+    N_feces = round(N_excr*perc_N_feces/100, 2)
+    ) %>%
+  select(-c(year, country, authors)) 
+
+g_excr <- function(dataset, label_nutrient, y_lim, our_value, label_unit, g_title){
+  #mean total excretion
+  mean_excr <- round(mean(dataset %>% pull(excr), na.rm=T), 2)
+  
+  #order studies by increasing value
+  dataset$study <- reorder(dataset$study, dataset %>% pull(value_urine_feces))
+  #remove empty values
+  dataset <- dataset %>% filter(is.na(value_urine_feces)==F)
+  
+  #colors of urine and feces 
+  colors_fill <- scale_fill_manual(
+    limits = c("urine", "feces"),
+    values=c("#e3dc00", "#591000")
+  )
+  
+  
+  plot_grid(
+    
+    #plot of the review values
+    ggplot(dataset) +
+      #urine and feces values
+      geom_col(
+        aes(study, value_urine_feces, fill=urine_feces)
+        ) +
+      #urine + feces value (black contour)
+      geom_col(
+        aes(study, excr),
+        color="black", fill="transparent"
+        ) +
+      #label for urine+feces value
+      geom_text(
+        aes(study, excr, label=excr),
+        hjust=-0.1, fontface="italic"
+        ) +
+      colors_fill +#colors
+      ylim(c(0, y_lim)) +
+      coord_flip() +
+      theme(
+        legend.position = "none",
+        axis.text.x = element_blank(),
+        plot.subtitle = ggtext::element_markdown() #for colored title
+        ) +
+      labs(
+        x="", y="", 
+        title = g_title,
+        subtitle = "in <span style='color:#e3dc00;'>urine,</span><span style='color:#591000;'> feces,</span> and urine+feces",
+        ),
+    
+    #plot of our values (INCA3)
+    ggplot(data_frame(study = "This study (based on INCA3)", value = our_value)) +
+      geom_col(
+        aes(study, value), fill="black"
+          ) +
+      geom_label(
+        aes(study, value, label=value),
+        hjust=-0.2, fontface="bold"
+        ) +
+      coord_flip() +
+      ylim(c(0, y_lim)) +
+      labs(
+        x="", y=label_unit, 
+        fill = ""
+      ),
+    
+    
+    ncol=1, rel_heights = c(0.8, 0.2), align="v"
+    
+  )
+}
+```
+
+::: panel-tabset
+
+## P
+
+```{r}
+#prepare for P excretion graph
+temp <- review_excretion %>% 
+  select(study, excr=P_excr, urine=P_urine, feces=P_feces) %>%
+  gather(urine_feces, value_urine_feces, urine, feces)
+temp$urine_feces <- factor(temp$urine_feces, c("feces", "urine"))
+
+#graph
+g_excr(temp, "P", 0.8, P_excr_kg_year, "kgP per year", "P excretions")
+
+ggsave(#svg
+  "graphs/P_excretions_review.svg",
+  dpi=500, width=6, height=4, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/P_excretions_review.pdf",
+  dpi=500, width=6, height=4, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/P_excretions_review.png",
+  dpi=500, width=6, height=4, bg="white", create.dir = T
+  )
+```
+
+
+## N
+
+```{r}
+#prepare for N excretion graph
+temp <- review_excretion %>% 
+  select(study, excr=N_excr, urine=N_urine, feces=N_feces) %>%
+  gather(urine_feces, value_urine_feces, urine, feces) %>%
+  #we round the value
+  mutate(
+    excr = round(excr, 1), 
+    value_urine_feces = round(value_urine_feces, 1)
+    )
+
+temp$urine_feces <- factor(temp$urine_feces, c("feces", "urine"))
+g_excr(temp, "N", 5, N_excr_kg_year, "kgN per year", "N excretions")
+
+ggsave(#svg
+  "graphs/N_excretions_review.svg",
+  dpi=500, width=6, height=4, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/N_excretions_review.pdf",
+  dpi=500, width=6, height=4, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/N_excretions_review.png",
+  dpi=500, width=6, height=4, bg="white", create.dir = T
+  )
+```
+
+## N:P ratio
+
+```{r}
+#prepare data for ratio graph
+temp <- review_excretion %>%
+  mutate(
+    N_P_ratio_excr = round(N_excr/P_excr, 1),
+    N_P_ratio_urine = round(N_urine/P_urine, 1),
+    N_P_ratio_feces = round(N_feces/P_feces, 1)
+  )
+temp$study <- reorder(temp$study, temp$N_P_ratio_excr)
+temp <- temp %>%
+  select(study, N_P_ratio_excr, N_P_ratio_urine, N_P_ratio_feces) %>%
+  gather(ratio_type, ratio_value, N_P_ratio_excr, N_P_ratio_urine, N_P_ratio_feces) %>%
+  filter(is.na(ratio_value)==F) %>%
+  mutate(
+    ratio_type = case_when(
+      ratio_type == "N_P_ratio_excr" ~ "urine + feces",
+      ratio_type == "N_P_ratio_urine" ~ "urine",
+      ratio_type == "N_P_ratio_feces" ~ "feces"
+    )
+  )
+temp$ratio_type <- factor(temp$ratio_type, levels=c("feces", "urine", "urine + feces"))
+colors_fill <- scale_fill_manual(
+    limits = c("urine", "feces", "urine + feces"),
+    values=c("#e3dc00", "#591000", "black")
+  )
+
+
+#ratio graph review
+g1 <- ggplot(temp) +
+  geom_col(
+    aes(ratio_value, study, fill=ratio_type), 
+    position="dodge"
+    ) +
+  geom_text(
+    aes(x=ratio_value, y=study, label=ratio_value),
+    hjust=0, fontface="italic"
+    ) +
+  colors_fill + 
+  theme(
+    legend.position = "none",
+    axis.text.x = element_blank(),
+    plot.subtitle = ggtext::element_markdown()  #for colored title
+    ) +
+  facet_wrap(vars(ratio_type), nrow=3) +
+  labs(
+    y="",  x="", 
+    subtitle = "in<span style='color:#e3dc00;'> urine,</span><span style='color:#591000;'> feces,</span> and urine+feces",
+    ) +
+  xlim(0, 18) 
+
+
+g2 <- 
+  ggplot(
+    data = 
+      data_frame(
+        study="Our value, 2017, France\n(from INCA3 study)", 
+        value = N_P_ratio_excr
+        )
+    ) +
+  geom_col(
+    aes(value, study), 
+    fill="black"
+      ) +
+  geom_label(
+    aes(value, study, label=value),
+    hjust=-0.2, fontface="italic"
+    ) +
+  labs(
+    y="", x=""
+    ) +
+  xlim(0, 18)
+
+plot_grid(g1, g2, nrow=2, align="v", rel_heights = c(0.85, 0.15))
+
+ggsave(#svg
+  "graphs/ratio_excretions_review.svg",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/ratio_excretions_review.pdf",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/ratio_excretions_review.png",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+```
+
+## Comparison with crops needs
+
+
+```{r}
+path_source <- "source_data/crop_N_P_content/"
+crop_N_P_content <- read_csv(paste0(path_source, "crop_N_P_content.csv")) %>%
+  #0.8 factor to consider 80% NUE
+  mutate(N_P_ratio = (perc_N/0.8)/perc_P)
+
+crop_N_P_content <- crop_N_P_content %>%
+  #remove "protein crops" (=legumes), because they can fix N
+  filter(group != "Protein crops") %>%
+  #remove remaining legumes, and also citrus (outlier with very high N need)
+  filter(
+    !crop %in% c("Soybean", "Green beans", "Dry beans", "Green peas", "Alfalfa and clover", "Natural meadow", "Citrus")
+  )
+                             
+ggplot(crop_N_P_content) +
+  #urine N:P ratio
+  annotate("rect", xmin = -Inf, xmax=Inf, ymin = 8, ymax=14, fill="#e3dc00", alpha=.7) +
+  #feces/sludge N:P ratio
+  annotate("rect",xmin = -Inf, xmax=Inf, ymin = 1.5, ymax=3, fill="#591000", alpha=.7) +
+  #urine + feces N:P ratio
+  annotate("rect",xmin = -Inf, xmax=Inf, ymin = 6, ymax=10, fill="grey", alpha=.7) +
+  #crop composition points
+  geom_point(aes(reorder(crop, N_P_ratio), N_P_ratio)) +
+  coord_flip() +
+  scale_y_continuous(breaks = seq(0, 16, by=2), limits=c(0, 16)) +
+  facet_grid(vars(group), scales="free_y", space="free_y") +
+  theme(
+    strip.text.y.right = element_text(angle = 0),
+    plot.subtitle = ggtext::element_markdown()  #for colored title) 
+  ) +
+  labs(
+    y="N:P crop needs", x="",
+    subtitle = "N:P in <span style='color:#e3dc00;'>urine</span>, <span style='color:#591000;'>feces (similar to WWTP sludge)</span> and <span style='color:grey;'>urine+feces</span>",
+    )
+
+#save
+ggsave(#svg
+  "graphs/ratio_crops_urine.svg",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/ratio_crops_urine.pdf",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/ratio_crops_urine.png",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+```
+
+:::
+
+# Sankey 
+
+```{r}
+library(networkD3) #for sankey
+library(htmlwidgets) #for sankey
+```
+
+::: panel-tabset
+
+## P 
+
+```{r}
+f_sankey <- function(sankey){
+  # nodes names for the sankey 
+  nodes <- data.frame(
+    name=c(as.character(sankey$source), as.character(sankey$target)) %>% 
+      unique())
+  
+  # With networkD3, connection must be provided using id, not using real name like in the links dataframe. So we need to add it.
+  sankey$IDsource <- match(sankey$source, nodes$name)-1
+  sankey$IDtarget <- match(sankey$target, nodes$name)-1
+  
+  # Colors groups (for nodes and flow links)
+  nodes$group <- as.factor(c("nodes_group"))
+  my_color <-
+  'd3.scaleOrdinal()
+  .domain(["excretion","large industries" ,"lost", "water", "sludge", "nodes_group"])
+  .range(["#7d6608" , "grey" , "#5e5e5e", "#2e86c1", "#6e2c00", "black"])'
+
+  #to ba able to show decimales on the snkey graph
+  # see here https://stackoverflow.com/questions/72129768/r-networkd3-issues
+  # see also https://stackoverflow.com/questions/74259905/network-d3-sankey-node-value-too-precise-using-htmlwidgets
+customJS <- '
+  function(el,x) { 
+      var link = d3.selectAll(".link");
+  
+      var format = d3.formatLocale({"decimal": ".", "thousands": ",", "grouping": [3], "currency": ["", "\u00a0€"]}).format(",.1f");
+  
+      link.select("title").select("body")
+          .html(function(d) { return "<pre>" + d.source.name + " \u2192 " + d.target.name +
+              "\\n" + format(d.value) + " " + "<pre>"; });
+              
+      d3.select(el).selectAll(".node text")
+          .html(function(d) { return d.name + " " + format(d.value) + " "; });
+              
+  }
+  '
+  
+  # Make the sankey
+  p <- 
+    sankeyNetwork(
+      Links = sankey, Nodes = nodes, Source = "IDsource", Target = "IDtarget",
+      Value = "value", NodeID = "name", colourScale=my_color,
+      fontSize=25, units = "", nodePadding = 50,
+      sinksRight = T, margin = c(top = 0, right = 0, bottom = 0, left = 0),
+      LinkGroup="flow_group", NodeGroup="group"
+      )
+  
+onRender(p, customJS)
+}
+```
+
+::: panel-tabset
+
+### Complete
+
+all values in ktP per year
+
+```{r out.width = '100%', results = T}
+temp <- read_csv("output_data/sankey_flows/phosphorus/sankey_P_flows_France.csv")
+f_sankey(temp)
+```
+
+### Simplified, per cap
+
+all values in gP per capita per year
+
+```{r out.width = '100%', results = T}
+temp <- read_csv("output_data/sankey_flows/phosphorus/simplified/sankey_P_France_per_cap.csv")
+f_sankey(temp)
+```
+
+### Simplified, percent
+
+all values in %
+
+```{r out.width = '100%', results = T}
+temp <- read_csv("output_data/sankey_flows/phosphorus/simplified/sankey_P_France_percent.csv")
+f_sankey(temp)
+```
+
+
+:::
+
+## N 
+
+```{r out.width = '100%', results = T}
+f_sankey <- function(sankey){
+  # nodes names for the sankey 
+  nodes <- data.frame(
+    name=c(as.character(sankey$source), as.character(sankey$target)) %>% 
+      unique())
+  
+  # With networkD3, connection must be provided using id, not using real name like in the links dataframe. So we need to add it.
+  sankey$IDsource <- match(sankey$source, nodes$name)-1
+  sankey$IDtarget <- match(sankey$target, nodes$name)-1
+  
+  # Colors groups (for nodes and flow links)
+  nodes$group <- as.factor(c("nodes_group"))
+  my_color <-
+  'd3.scaleOrdinal()
+  .domain(["excretion", "large industries", "lost", "water", "sludge", "air", "nodes_group"])
+  .range(["#7d6608", "grey", "#5e5e5e", "#2e86c1", "#6e2c00", "#3ab02a", "black"])'
+
+  #to ba able to show decimales on the snkey graph
+  # see here https://stackoverflow.com/questions/72129768/r-networkd3-issues
+  # see also https://stackoverflow.com/questions/74259905/network-d3-sankey-node-value-too-precise-using-htmlwidgets
+customJS <- '
+  function(el,x) { 
+      var link = d3.selectAll(".link");
+  
+      var format = d3.formatLocale({"decimal": ".", "thousands": ",", "grouping": [3], "currency": ["", "\u00a0€"]}).format(",.1f");
+  
+      link.select("title").select("body")
+          .html(function(d) { return "<pre>" + d.source.name + " \u2192 " + d.target.name +
+              "\\n" + format(d.value) + " " + "<pre>"; });
+              
+      d3.select(el).selectAll(".node text")
+          .html(function(d) { return d.name + " " + format(d.value) + " "; });
+              
+  }
+  '
+  
+  # Make the sankey
+  p <- 
+    sankeyNetwork(
+      Links = sankey, Nodes = nodes, Source = "IDsource", Target = "IDtarget",
+      Value = "value", NodeID = "name", colourScale=my_color,
+      fontSize=25, units = "", nodePadding = 50,
+      sinksRight = T, margin = c(top = 0, right = 0, bottom = 0, left = 0),
+      LinkGroup="flow_group", NodeGroup="group"
+      )
+  
+onRender(p, customJS)
+}
+```
+
+::: panel-tabset
+
+### Complete
+
+all values in ktP per year
+
+```{r out.width = '100%', results = T}
+temp <- read_csv("output_data/sankey_flows/nitrogen/sankey_N_flows_France.csv")
+f_sankey(temp)
+```
+
+### Simplified, per cap
+
+all values in kgN per capita per year
+
+```{r out.width = '100%', results = T}
+temp <- read_csv("output_data/sankey_flows/nitrogen/simplified/sankey_N_France_per_cap.csv")
+f_sankey(temp)
+```
+
+
+### Simplified, percent
+
+all values in %
+
+```{r out.width = '100%', results = T}
+temp <- read_csv("output_data/sankey_flows/nitrogen/simplified/sankey_N_France_percent.csv")
+f_sankey(temp)
+```
+
+:::
+
+:::
+
+# Appendix 
+
+::: panel-tabset
+
+## WWTP flows 
+
+```{r}
+#prepare graphs
+f_graph_flows <- function(dataset, nutrient, g_title, g_unit){
+  
+  g1 <- ggplot(dataset) +
+    geom_area(
+      aes(Year, !!as.symbol(nutrient), fill=basin), 
+      alpha=.6
+      ) +
+    scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+      ) +
+    theme(
+      legend.position="none",
+      axis.text.x = element_text(angle = 60, hjust=1)
+      ) +
+    xlim(2015, 2020) +
+    labs(
+      subtitle ="Metropolitan France (2015-2020)",
+      title = g_title,
+      x="", y=g_unit
+      ) 
+  
+  g2 <- ggplot(dataset) +
+    geom_area(
+      aes(Year, !!as.symbol(nutrient), fill=basin), 
+      alpha=.6
+      ) +
+    scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+      ) +
+    facet_wrap(vars(basin), scales="free_y") +
+    theme(
+      legend.position="none",
+      axis.text.x = element_text(angle = 60, hjust=1)
+      ) +
+    labs(
+      x="", y="",
+      subtitle = "", title=""
+      ) 
+  
+  g <- plot_grid(
+    g1, g2, rel_widths = c(.3, .7)
+  )
+  
+  return(g)
+}
+
+#order following color gradient
+file_basin$basin <- 
+  factor(
+    file_basin$basin, 
+    levels = 
+      c("Seine-Normandie",
+        "Loire-Bretagne",
+        "Artois-Picardie",
+        "Rhin-Meuse",
+        "Adour-Garonne", 
+        "Rhône-Méditerranée"
+        )
+      )
+```
+
+::: panel-tabset
+
+### P 
+
+::: panel-tabset
+
+#### in
+
+```{r}
+f_graph_flows(file_basin, "Pt_in_adj", "Incoming Pt into WWTPs", "ktP per year")
+
+#save
+ggsave(#svg
+  "graphs/appendix/P_flow_in.svg",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/appendix/P_flow_in.pdf",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/appendix/P_flow_in.png",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+```
+
+#### out
+
+```{r}
+f_graph_flows(file_basin, "Pt_out_adj", "Pt discharged by WWTPs", "ktP per year")
+
+#save
+ggsave(#svg
+  "graphs/appendix/P_flow_out.svg",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/appendix/P_flow_out.pdf",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/appendix/P_flow_out.png",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+```
+
+:::
+
+### N 
+
+::: panel-tabset
+
+#### in
+
+```{r}
+f_graph_flows(file_basin, "NGL_in_adj", "Incoming N into WWTPs", "ktN per year")
+
+#save
+ggsave(#svg
+  "graphs/appendix/N_flow_in.svg",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/appendix/N_flow_in.pdf",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/appendix/N_flow_in.png",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+```
+
+#### out
+
+```{r}
+f_graph_flows(file_basin, "NGL_out_adj", "N discharged by WWTPs", "ktN per year")
+
+#save
+ggsave(#svg
+  "graphs/appendix/N_flow_out.svg",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/appendix/N_flow_out.pdf",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/appendix/N_flow_out.png",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+```
+
+:::
+
+### Uncertainties
+
+```{r}
+#uncertainty file
+uncertainties_WWTP_basins <- file_basin %>%
+  filter(Year>2014 & Year<2021) %>%
+  select(Year, basin, Pt_in_adj, Pt_out_adj, NGL_in_adj, NGL_out_adj) %>%
+  group_by(basin) %>%
+  mutate(
+    abs_perc_error_P_in = 
+      round(
+        100*abs(mean(Pt_in_adj, na.rm=T)-Pt_in_adj)/mean(Pt_in_adj, na.rm=T)
+      ),
+    abs_perc_error_P_out = 
+      round(
+        100*abs(mean(Pt_out_adj, na.rm=T)-Pt_out_adj)/mean(Pt_out_adj, na.rm=T)
+      ),
+    abs_perc_error_N_in = 
+      round(
+        100*abs(mean(NGL_in_adj, na.rm=T)-NGL_in_adj)/mean(NGL_in_adj, na.rm=T)
+      ),
+    abs_perc_error_N_out = 
+      round(
+        100*abs(mean(NGL_out_adj, na.rm=T)-NGL_out_adj)/mean(NGL_out_adj, na.rm=T)
+      )
+    )
+```
+
+```{r}
+#summarize at the national scale for years 2015-2020
+temp <- uncertainties_WWTP_basins %>%
+  # Seine-Normandie not included in coefficient of variation computation because this basin is incomplete in 2016, 2017 and 2019
+  filter(
+    basin != "Seine-Normandie"
+    ) %>%
+  select(
+    Year, Pt_in_adj, Pt_out_adj, NGL_in_adj, NGL_out_adj
+    ) %>%
+  # Compute total nutrient flow (in and out) of remaining basins
+  group_by(
+    Year
+    ) %>%
+  summarise(
+    Pt_in_adj = sum(Pt_in_adj, na.rm=T),
+    Pt_out_adj = sum(Pt_out_adj, na.rm=T),
+    NGL_in_adj = sum(NGL_in_adj, na.rm=T),
+    NGL_out_adj = sum(NGL_out_adj, na.rm=T)
+    )
+
+#coefficient of variation over 2015-2020
+CV_WWTP_flows_france <- temp %>%
+  #compute coefficient of variation
+  summarise(
+    Pt_in = round(sd(Pt_in_adj)/mean(Pt_in_adj)*100, 1),
+    Pt_out = round(sd(Pt_out_adj)/mean(Pt_out_adj)*100, 1),
+    NGL_in = round(sd(NGL_in_adj)/mean(NGL_in_adj)*100, 1),
+    NGL_out = round(sd(NGL_out_adj)/mean(NGL_out_adj)*100, 1)
+    ) %>%
+  mutate(
+    type = "coefficient of\nvariation"
+    )
+
+#max variation (% of the mean) over 2015-2020
+max_var_WWTP_flows_france <- temp %>%
+  #compute coefficient of variation
+  summarise(
+    Pt_in = round(max(abs(1-Pt_in_adj/mean(Pt_in_adj))*100), 1),
+    Pt_out = round(max(abs(1-Pt_out_adj/mean(Pt_out_adj))*100), 1),
+    NGL_in = round(max(abs(1-NGL_in_adj/mean(NGL_in_adj))*100), 1),
+    NGL_out = round(max(abs(1-NGL_out_adj/mean(NGL_out_adj))*100), 1)
+    ) %>%
+  mutate(
+    type = "maximum variation\nover 2015-2020"
+    )
+
+uncertainties_WWTP_france <- bind_rows(CV_WWTP_flows_france, max_var_WWTP_flows_france) %>%
+  gather(nutrient, value, -type)
+
+
+
+ggplot(uncertainties_WWTP_france) +
+  geom_col(aes(nutrient, value, fill=type), position="dodge", alpha=.7) +
+  theme(legend.position = "top") +
+  labs(fill="", y="%", x="") +
+  labs(title = "Nutrient flows variations in WWTP", subtitle = "over 2015-2020, metropolitan France")
+
+f_save_csv_files(
+  uncertainties_WWTP_france, "output_data/uncertainties",
+  "WWTP_uncertainties.csv"
+)
+
+
+rm(temp, max_var_WWTP_flows_france, CV_WWTP_flows_france, uncertainties_WWTP_france)
+```
+
+
+```{r}
+ggplot(uncertainties_WWTP_basins) +
+  geom_col(aes(Year, abs_perc_error_P_in, fill=basin), alpha=.7) +
+  facet_wrap(vars(basin)) +
+  scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+  theme(legend.position="none") +
+  labs(x="", y="absolute difference to the mean (%)", title="Uncertainty on incoming P")
+```
+
+```{r}
+ggplot(uncertainties_WWTP_basins) +
+  geom_col(aes(Year, abs_perc_error_P_out, fill=basin), alpha=.7) +
+  facet_wrap(vars(basin)) +
+  scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+  theme(legend.position="none") +
+  labs(x="", y="absolute difference to the mean (%)", title="Uncertainty on discharged P")
+```
+
+```{r}
+ggplot(uncertainties_WWTP_basins) +
+  geom_col(aes(Year, abs_perc_error_N_in, fill=basin), alpha=.7) +
+  facet_wrap(vars(basin)) +
+  scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+  theme(legend.position="none") +
+  labs(x="", y="absolute difference to the mean (%)", title="Uncertainty on incoming N")
+```
+
+```{r}
+ggplot(uncertainties_WWTP_basins) +
+  geom_col(aes(Year, abs_perc_error_N_out, fill=basin), alpha=.7) +
+  facet_wrap(vars(basin)) +
+  scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+  theme(legend.position="none") +
+  labs(x="", y="absolute difference to the mean (%)", title="Uncertainty on discharged P")
+```
+
+
+:::
+
+## Large industries flows 
+
+```{r}
+path_source <- "output_data/industry_sewers_network_discharge/"
+file_industry_discharge <- read_csv(paste0(path_source, "industry_sewers_network_discharge_GEREP_basins.csv")) %>%
+  filter(basin != "Metropolitan France"
+         )
+
+#prepare graphs
+f_graph_industry <- function(dataset, nutrient, g_title, g_unit){
+  g1 <- ggplot(dataset) +
+    geom_area(aes(Year, !!as.symbol(nutrient), fill=basin), alpha=.6) +
+    scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+    theme(
+      legend.position="none",
+      axis.text.x = element_text(angle = 60, hjust=1)
+      ) +
+    xlim(2015, 2020) +
+    labs(
+      subtitle ="Metropolitan France (2015-2020)",
+      title = g_title,
+      x="", y=g_unit
+      ) 
+  
+  g2 <- ggplot(dataset) +
+    geom_area(aes(Year, !!as.symbol(nutrient), fill=basin), alpha=.6) +
+    scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+      ) +
+    facet_wrap(vars(basin), scales="free_y") +
+    theme(
+      legend.position="none",
+      axis.text.x = element_text(angle = 60, hjust=1)
+      ) +
+    scale_x_continuous(
+      breaks = c(2012, 2016, 2020),
+      limits = c(2012, 2020)
+    ) +
+    labs(
+      x="", y="",
+      subtitle = "", title=""
+      ) 
+  
+  g <- plot_grid(
+    g1, g2, rel_widths = c(.3, .7)
+  )
+  
+  return(g)
+}
+
+
+#order following color gradient
+file_industry_discharge$basin <- 
+  factor(
+    file_industry_discharge$basin, 
+    levels = 
+      c("Seine-Normandie",
+        "Loire-Bretagne",
+        "Artois-Picardie",
+        "Rhin-Meuse",
+        "Adour-Garonne", 
+        "Rhône-Méditerranée"
+        )
+      )
+```
+
+::: panel-tabset
+
+### P 
+
+```{r}
+f_graph_industry(file_industry_discharge, "Pt_in", "Large industries P discharge in sewers", "ktP per year")
+
+#save
+ggsave(#svg
+  "graphs/appendix/P_industry.svg",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/appendix/P_industry.pdf",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/appendix/P_industry.png",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+```
+
+### N 
+
+```{r}
+f_graph_industry(file_industry_discharge, "NGL_in", "Large industries N discharge in sewers", "ktN per year")
+
+#save
+ggsave(#svg
+  "graphs/appendix/N_industry.svg",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/appendix/N_industry.pdf",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/appendix/N_industry.png",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+```
+
+### Uncertainties
+
+```{r}
+#uncertainty file
+uncertainties_industries_basins <- file_industry_discharge %>%
+  filter(Year>2014 & Year<2021) %>%
+  select(Year, basin, Pt_in, NGL_in) %>%
+  group_by(basin) %>%
+  mutate(
+    abs_perc_error_P_in = 
+      round(
+        100*abs(mean(Pt_in, na.rm=T)-Pt_in)/mean(Pt_in, na.rm=T)
+      ),
+    abs_perc_error_N_in = 
+      round(
+        100*abs(mean(NGL_in, na.rm=T)-NGL_in)/mean(NGL_in, na.rm=T)
+      )
+    )
+```
+
+
+```{r}
+#summarize at the national scale for years 2015-2020
+temp <- uncertainties_industries_basins %>%
+  select(
+    Year, Pt_in, NGL_in
+    ) %>%
+  # Compute total incoming nutrient flow all basins together
+  group_by(
+    Year
+    ) %>%
+  summarise(
+    Pt_in = sum(Pt_in, na.rm=T),
+    NGL_in = sum(NGL_in, na.rm=T),
+    )
+
+#coefficient of variation over 2015-2020
+CV_industries_flows_france <- temp %>%
+  #compute coefficient of variation
+  summarise(
+    Pt_in = round(sd(Pt_in)/mean(Pt_in)*100, 1),
+    NGL_in = round(sd(NGL_in)/mean(NGL_in)*100, 1),
+    ) %>%
+  mutate(
+    type = "coefficient of\nvariation"
+    )
+
+#max variation (% of the mean) over 2015-2020
+max_var_industries_flows_france <- temp %>%
+  #compute coefficient of variation
+  summarise(
+    Pt_in = round(max(abs(1-Pt_in/mean(Pt_in))*100), 1),
+    NGL_in = round(max(abs(1-NGL_in/mean(NGL_in))*100), 1)
+    ) %>%
+  mutate(
+    type = "maximum variation\nover 2015-2020"
+    )
+
+uncertainties_industries_france <- bind_rows(CV_industries_flows_france, max_var_industries_flows_france) %>%
+  gather(nutrient, value, -type)
+
+ggplot(uncertainties_industries_france) +
+  geom_col(aes(nutrient, value, fill=type), position="dodge", alpha=.7) +
+  theme(legend.position = "top") +
+  labs(fill="", y="%", x="") +
+  labs(title = "Nutrient flows variations of industries discharge to sewers", subtitle = "over 2015-2020, metropolitan France")
+
+
+f_save_csv_files(
+  uncertainties_industries_france, "output_data/uncertainties",
+  "industries_uncertainties.csv"
+)
+
+
+rm(temp, max_var_industries_flows_france, CV_industries_flows_france, uncertainties_industries_france)
+```
+
+
+```{r}
+ggplot(uncertainties_industries_basins) +
+  geom_col(aes(Year, abs_perc_error_P_in, fill=basin), alpha=.7) +
+  facet_wrap(vars(basin)) +
+  scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+  theme(legend.position="none") +
+  labs(x="", y="absolute difference to the mean (%)", title="Uncertainty on industry discharged P")
+```
+
+```{r}
+ggplot(uncertainties_industries_basins) +
+  geom_col(aes(Year, abs_perc_error_N_in, fill=basin), alpha=.7) +
+  facet_wrap(vars(basin)) +
+  scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+  theme(legend.position="none") +
+  labs(x="", y="absolute difference to the mean (%)", title="Uncertainty on industry discharged N")
+```
+
+:::
+
+## Sludge 
+
+::: panel-tabset
+
+### Production
+
+```{r}
+file_sludge <- read_csv("output_data/basins/basin_sanitation_portal.csv") %>%
+  filter(
+    basin != "Metropolitan France",
+    Year>2014
+    )
+
+f_graph_sludge_production <- function(dataset, nutrient, g_title, g_unit){
+  g1 <- ggplot(dataset) +
+    geom_area(aes(Year, !!as.symbol(nutrient), fill=basin), alpha=.6) +
+    scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+    ) +
+    theme(
+      legend.position="none",
+      axis.text.x = element_text(angle = 60, hjust=1)
+      ) +
+    xlim(2015, 2020) +
+    labs(
+      subtitle ="Metropolitan France (2015-2020)",
+      title = g_title,
+      x="", y=g_unit
+      ) 
+  
+  g2 <- ggplot(dataset) +
+    geom_area(aes(Year, !!as.symbol(nutrient), fill=basin), alpha=.6) +
+    scale_fill_manual(
+      values = basin_colors, labels=basin_names, breaks=basin_names
+      ) +
+    facet_wrap(vars(basin), scales="free_y") +
+    theme(
+      legend.position="none",
+      axis.text.x = element_text(angle = 60, hjust=1)
+      ) +
+    scale_x_continuous(
+      breaks = c(2015, 2017, 2019, 2021),
+      limits = c(2015, 2021)
+    ) +
+    labs(
+      x="", y="",
+      subtitle = "", title=""
+      ) 
+  
+  g <- plot_grid(
+    g1, g2, rel_widths = c(.3, .7)
+  )
+  
+  return(g)
+}
+
+#order following color gradient
+file_sludge$basin <- 
+  factor(
+    file_sludge$basin, 
+    levels = 
+      c("Seine-Normandie",
+        "Loire-Bretagne",
+        "Artois-Picardie",
+        "Rhin-Meuse",
+        "Adour-Garonne", 
+        "Rhône-Méditerranée"
+        )
+      )
+
+
+```
+
+```{r}
+f_graph_sludge_production(file_sludge, "sludge_production", "Sludge Production", "Mt of dry matter per year")
+
+#save
+ggsave(#svg
+  "graphs/appendix/sludge_production.svg",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/appendix/sludge_production.pdf",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/appendix/sludge_production.png",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+```
+
+
+### Destinations
+
+```{r}
+#prepare destinations file for plot
+temp <- file_sludge %>%
+  filter(Year>2017 & Year<2022) %>%
+  select(-sludge_production, -capacity, -nb_WWTP) %>%
+  gather(
+    destination, value, sludge_spread, sludge_incinerated, 
+    sludge_compost, sludge_landfill,
+    sludge_industrial_valorisation,
+    sludge_to_other_WWTP
+  ) %>%
+  mutate(
+    destination = case_when(
+      destination == "sludge_spread" ~ "spread",
+      destination == "sludge_incinerated" ~ "incinerated",
+      destination == "sludge_compost" ~ "composted",
+      destination == "sludge_landfill" ~ "landfilled",
+      destination == "sludge_industrial_valorisation" ~ "other",
+      destination == "sludge_to_other_WWTP" ~ "other"
+    )
+  )
+
+#order factors fro graph
+temp$destination <- 
+  factor(
+    temp$destination, 
+    levels = 
+      c("other",
+        "landfilled",
+        "incinerated",
+        "spread",
+        "composted"
+        )
+      )
+
+#basins graph
+g2 <- ggplot(temp) +
+  geom_col(
+    aes(Year, value, fill=destination),
+    position = "fill",
+    alpha=.6
+  ) +
+  facet_wrap(vars(basin), scales = "free_y") +
+  labs(y="", x="", title = "") + 
+  theme(
+    legend.position="none",
+    axis.text.x = element_text(angle = 60, hjust=1)
+    )
+
+
+
+#metropolitan France graph
+temp <- temp %>%
+  group_by(Year, destination) %>%
+  summarise(value = sum(value, na.rm=T))
+g1 <- ggplot(temp) +
+  geom_col(
+    aes(Year, value, fill=destination),
+    position = "fill",
+    alpha=.6
+  ) +
+  labs(
+    y="proportion", x="",
+    title = "Relative destination of WWTP sludge",
+    subtitle = "Metropolitan France"
+    ) +
+  theme(
+    legend.position = "bottom", 
+    legend.title = element_blank(),
+    axis.text.x = element_text(angle = 60, hjust=1)
+    )
+
+#legend
+p <- get_plot_component(g1, "guide-box", return_all = TRUE)
+```
+
+```{r}
+#total graph
+plot_grid(
+  plot_grid(
+    g1 + theme(legend.position="none"), g2, rel_widths = c(.3, .7)
+  ),
+  p[[3]], rel_heights = c(.9, .1), nrow = 2
+)
+
+#save
+ggsave(#svg
+  "graphs/appendix/sludge_destination.svg",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/appendix/sludge_destination.pdf",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/appendix/sludge_destination.png",
+  dpi=500, width=7, height=4, bg="white", create.dir = T
+  )
+```
+
+### slidge recycling uncertainty
+
+```{r}
+uncertainties_sludge_recycling <- temp %>%
+  spread(destination, value) %>%
+  mutate(
+    `sludge recycling` = spread + composted
+    ) %>%
+  select(`sludge recycling`)
+
+#coefficient of variation over 2015-2020
+CV_sludge_recycle_france <- uncertainties_sludge_recycling %>%
+  ungroup() %>%
+  #compute coefficient of variation
+  summarise(
+    `sludge recycling` = round(sd(`sludge recycling`)/mean(`sludge recycling`)*100, 1),
+    ) %>%
+  mutate(
+    type = "coefficient of\nvariation"
+    )
+
+#max variation (% of the mean) over 2015-2020
+max_var_sludge_recycle_france <- uncertainties_sludge_recycling %>%
+  ungroup() %>%
+  #compute coefficient of variation
+  summarise(
+    `sludge recycling` = round(max(abs(1-`sludge recycling`/mean(`sludge recycling`))*100), 1)
+    ) %>%
+  mutate(
+    type = "maximum variation\nover 2015-2020"
+    )
+
+uncertainties_sludge_recycling <- bind_rows(CV_sludge_recycle_france, max_var_sludge_recycle_france) 
+
+ggplot(uncertainties_sludge_recycling) +
+  geom_col(aes(as.factor(""), `sludge recycling`, fill=type), position="dodge", alpha=.7) +
+  theme(legend.position = "top") +
+  labs(fill="", y="%", x="") +
+  labs(title = "Variation of WWTP sludge recycling in France", subtitle = "over 2015-2020, metropolitan France")
+
+
+f_save_csv_files(
+  uncertainties_sludge_recycling, "output_data/uncertainties",
+  "sludge_recycling_uncertainties.csv"
+)
+
+
+rm(temp, max_var_sludge_recycle_france, CV_sludge_recycle_france, uncertainties_sludge_recycling)
+```
+
+
+### Sludge composition 
+
+```{r}
+path_source <- "source_data/0_sludge_composition/"
+#review values
+review_sludge_composition <- read_csv(paste0(path_source, "sludge_composition_ESCO_MAFOR.csv")) 
+review_sludge_composition$compost <- factor(
+  review_sludge_composition$compost,
+  c("not composted", "composted")
+)
+review_sludge_composition <- review_sludge_composition %>%
+  mutate(
+    P = round(P, 0), 
+    N= round(N, 0)
+  )
+
+#To assess our sludge composition, we use the sludge production data for each basin, and take the mean over 2015-2020. We then combine this with the N and P flows computed in the Sankey diagram to deduce the sludge compositions at the basin scales.
+sludge_production <- read_csv("output_data/basins/basin_sanitation_portal.csv")
+sludge_production <- sludge_production %>%
+  select(basin, Year, sludge_production) %>%
+  filter(Year>2014)
+sludge_production <- sludge_production %>%
+  group_by(basin) %>%
+  summarise(
+    sludge_production = round(mean(sludge_production, na.rm=T), 3)
+    )
+
+# P in sludge
+path_source <- "output_data/sankey_flows/phosphorus/"
+sankey_P <- bind_rows(
+  read_csv(paste0(path_source, "sankey_P_flows_Adour_Garonne.csv")) %>% mutate(basin = "Adour-Garonne"),
+  read_csv(paste0(path_source, "sankey_P_flows_Artois_Picardie.csv")) %>% mutate(basin = "Artois-Picardie"),
+  read_csv(paste0(path_source, "sankey_P_flows_Loire_Bretagne.csv")) %>% mutate(basin = "Loire-Bretagne"),
+  read_csv(paste0(path_source, "sankey_P_flows_Rhin_Meuse.csv")) %>% mutate(basin = "Rhin-Meuse"),
+  read_csv(paste0(path_source, "sankey_P_flows_Rhone_Mediterranee.csv")) %>% mutate(basin = "Rhône-Méditerranée"),
+  read_csv(paste0(path_source, "sankey_P_flows_Seine_Normandie.csv")) %>% mutate(basin = "Seine-Normandie"),
+  read_csv(paste0(path_source, "sankey_P_flows_France.csv")) %>% mutate(basin = "Metropolitan France")
+)
+temp <- sankey_P %>% 
+  filter(target=="sludge") %>%
+  select(basin, sludge_P = value) %>%
+  left_join(sludge_production) %>%
+  mutate(
+    P = round(sludge_P/sludge_production)
+    )
+
+# N in sludge
+path_source <- "output_data/sankey_flows/nitrogen/"
+sankey_N <- bind_rows(
+  read_csv(paste0(path_source, "sankey_N_flows_Adour_Garonne.csv")) %>% mutate(basin = "Adour-Garonne"),
+  read_csv(paste0(path_source, "sankey_N_flows_Artois_Picardie.csv")) %>% mutate(basin = "Artois-Picardie"),
+  read_csv(paste0(path_source, "sankey_N_flows_Loire_Bretagne.csv")) %>% mutate(basin = "Loire-Bretagne"),
+  read_csv(paste0(path_source, "sankey_N_flows_Rhin_Meuse.csv")) %>% mutate(basin = "Rhin-Meuse"),
+  read_csv(paste0(path_source, "sankey_N_flows_Rhone_Mediterranee.csv")) %>% mutate(basin = "Rhône-Méditerranée"),
+  read_csv(paste0(path_source, "sankey_N_flows_Seine_Normandie.csv")) %>% mutate(basin = "Seine-Normandie"),
+  read_csv(paste0(path_source, "sankey_N_flows_France.csv")) %>% mutate(basin = "Metropolitan France")
+)
+temp2 <- sankey_N %>% 
+  filter(target=="sludge") %>%
+  select(basin, sludge_N = value) %>%
+  left_join(sludge_production) %>%
+  mutate(
+    N = round(sludge_N/sludge_production)
+    )
+
+#combine both, computes N:P ratio
+temp <- left_join(temp , temp2)
+
+temp <- bind_rows(
+  review_sludge_composition %>% 
+    filter(compost=="not composted") %>%
+    select(Study, P, N) %>%
+    mutate(source = "French review"),
+  temp %>%
+    select(Study = basin, P, N) %>%
+    mutate(source = "This study")
+)
+```
+
+```{r}
+#function for graph
+g_composition <- function(dataset, select_variable){
+  #order studies by increasing value
+  dataset$Study <- reorder(dataset$Study, dataset %>% pull(!!as.symbol(select_variable)))
+  #remove empty values
+  dataset <- dataset %>% filter(is.na(!!as.symbol(select_variable))==F)
+  
+  ggplot(dataset) +
+    geom_col(aes(Study, !!as.symbol(select_variable), fill=source)) +
+    geom_text(
+      aes(Study, !!as.symbol(select_variable), label=!!as.symbol(select_variable)),
+      hjust=0, fontface="italic"
+      ) +
+    coord_flip() +
+    labs(
+      x="", y="", 
+      fill = ""
+    ) 
+}
+```
+
+::: panel-tabset
+
+#### N
+
+```{r}
+g_composition(temp, "N") +
+  labs(
+    y = "gN per kg of Dry Matter"
+  ) +
+  ylim(0, 60)
+
+ggsave(#svg
+  "graphs/appendix/sludge_compo_N.svg",
+  dpi=500, width=5, height=2.8, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/appendix/sludge_compo_N.pdf",
+  dpi=500, width=5, height=2.8, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/appendix/sludge_compo_N.png",
+  dpi=500, width=5, height=2.8, bg="white", create.dir = T
+  )
+```
+
+
+#### P
+
+```{r}
+g_composition(temp, "P") +
+  labs(
+    y = "gP per kg of Dry Matter"
+  ) +
+  ylim(0, 40)
+
+ggsave(#svg
+  "graphs/appendix/sludge_compo_P.svg",
+  dpi=500, width=5, height=2.8, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/appendix/sludge_compo_P.pdf",
+  dpi=500, width=5, height=2.8, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/appendix/sludge_compo_P.png",
+  dpi=500, width=5, height=2.8, bg="white", create.dir = T
+  )
+```
+
+:::
+
+:::
+
+## Decrease P discharge
+
+```{r}
+all_WWTP_adour_garonne <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_05_adour_garonne.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Adour-Garonne"
+  )
+all_WWTP_rhin_meuse <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_02_rhin_meuse.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Rhin-Meuse"
+  )
+all_WWTP_loire_bretagne <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_04_loire_bretagne.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Loire-Bretagne"
+  )
+all_WWTP_seine_normandie <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_03_seine_normandie.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Seine-Normandie"
+  )
+all_WWTP_rhone_mediterranee <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_06_rhone_mediterranee.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Rhône-Méditerranée"
+  )
+all_WWTP_artois_picardie <- 
+  read_csv(
+    "output_data/all_WWTP/all_WWTP_01_artois_picardie.csv", 
+    #we have to specify the columns types, otherwise problems to combine basins
+    col_types = cols(INSEE_COM="numeric")
+    ) %>%
+  mutate(
+    basin = "Artois-Picardie"
+  )
+
+all_WWTP <- 
+  bind_rows(
+    all_WWTP_adour_garonne, all_WWTP_rhin_meuse, 
+    all_WWTP_loire_bretagne, all_WWTP_seine_normandie,
+    all_WWTP_rhone_mediterranee, all_WWTP_artois_picardie
+    ) %>%
+  mutate(
+    NGL_yield = NGL_yield/100,
+    Pt_yield = Pt_yield/100
+  )
+
+
+rm(all_WWTP_adour_garonne, all_WWTP_artois_picardie, all_WWTP_loire_bretagne, all_WWTP_rhin_meuse,
+   all_WWTP_rhone_mediterranee, all_WWTP_seine_normandie)
+
+#order size categories for graph disposition
+all_WWTP$PE_bin <- 
+    factor(
+      all_WWTP$PE_bin, 
+      levels = 
+        c("0 - 200 PE", 
+          "200 - 2 000 PE", 
+          "2 000 - 10 000 PE",
+          "10 000 - 100 000 PE", 
+          "> 100 000 PE"
+          )
+        )
+#order the basins for graph disposition
+all_WWTP$basin <- 
+  factor(
+    all_WWTP$basin, 
+    levels = 
+      c("Loire-Bretagne",
+        "Rhin-Meuse",
+        "Adour-Garonne", 
+        "Artois-Picardie"
+        )
+      )
+```
+
+
+```{r}
+WWTP_2000_Pt_out <- all_WWTP %>% 
+  filter(Year==2000, is.na(Pt_out)==F) %>%
+  select(code_WWTP, Pt_out_2000=Pt_out) %>%
+  distinct()
+
+WWTP_2020_Pt_in <- all_WWTP %>% 
+  filter(Year==2020, is.na(Pt_out)==F) %>%
+  select(code_WWTP, Pt_out_2020=Pt_out, basin, capacity, PE_bin) %>%
+  distinct()
+
+WWTP_Pt_change <- inner_join(WWTP_2000_Pt_out, WWTP_2020_Pt_in, by="code_WWTP") %>%
+  mutate(Pt_change=(Pt_out_2000-Pt_out_2020)/Pt_out_2000*100) %>%
+  filter(is.na(code_WWTP)==F)
+
+
+ggplot(WWTP_Pt_change %>% filter(capacity>200)) +
+  ggbeeswarm::geom_quasirandom(aes(PE_bin, Pt_change, color=basin, size=capacity), alpha=.5) +
+  geom_boxplot(aes(PE_bin, Pt_change), width=.1) +
+  facet_wrap(vars(basin), nrow = 3) +
+  labs(
+    y="% decrease in P discharge from 2000 to 2020", 
+    x="WWTP capacity"
+    ) +
+  scale_size_continuous(range = c(0, 15)) + 
+  theme(
+    legend.position = "none"
+    ) +
+  ylim(0, NA)
+```
+
+:::
+
+```{r remove_all_objects_in_environment}
+rm(list = ls())
+```
+
+

@@ -1,0 +1,2177 @@
+---
+title: "Seine-Normandie and SIAAP"
+---
+
+```{r setup, include=T, warning=F, message=F, results=F}
+knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
+
+library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
+
+#core tidyverse packages loaded:
+# ggplot2, for data visualisation. https://ggplot2.tidyverse.org/
+# dplyr, for data manipulation. https://dplyr.tidyverse.org/
+# tidyr, for data tidying. https://tidyr.tidyverse.org/
+# readr, for data import. https://readr.tidyverse.org/
+# purrr, for functional programming. https://purrr.tidyverse.org/
+# tibble, for tibbles, a modern re-imagining of data frames. https://tibble.tidyverse.org/
+# stringr, for strings. https://stringr.tidyverse.org/
+# forcats, for factors. https://forcats.tidyverse.org/
+# lubridate, for date/times. https://lubridate.tidyverse.org/
+
+#also loads the following packages (less frequently used):
+# Working with specific types of vectors:
+#     hms, for times. https://hms.tidyverse.org/
+# Importing other types of data:
+#     feather, for sharing with Python and other languages. https://github.com/wesm/feather
+#     haven, for SPSS, SAS and Stata files. https://haven.tidyverse.org/
+#     httr, for web apis. https://httr.r-lib.org/
+#     jsonlite for JSON. https://arxiv.org/abs/1403.2805
+#     readxl, for .xls and .xlsx files. https://readxl.tidyverse.org/
+#     rvest, for web scraping. https://rvest.tidyverse.org/
+#     xml2, for XML. https://xml2.r-lib.org/
+# Modelling
+#     modelr, for modelling within a pipeline. https://modelr.tidyverse.org/
+#     broom, for turning models into tidy data. https://broom.tidymodels.org/
+
+# Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+#loading additional relevant packages
+library(cowplot) #for plot_grid()
+library(readxl) #to read excel file
+
+#setting graphs theme
+theme_set(
+  theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold")
+      )
+  )
+
+#setting viridis theme for colors
+scale_colour_continuous <- scale_colour_viridis_c
+scale_colour_discrete   <- scale_colour_viridis_d
+scale_colour_binned     <- scale_colour_viridis_b
+#setting viridis theme for fill
+scale_fill_continuous <- scale_fill_viridis_c
+scale_fill_discrete   <- scale_fill_viridis_d
+scale_fill_binned     <- scale_fill_viridis_b
+
+Source <- "SIAAP and Seine-Normandie Water Agency\nComputation by Thomas Starck"
+
+Year_analysis <- 2015
+
+# Load the function file
+source("functions.R")
+```
+
+
+# Sources and data 
+
+::: panel-tabset
+## Basin Description
+
+Basin description in Seine-Normandie *Etat des lieux* for [2019](https://www.eau-seine-normandie.fr/sites/public_file/inline-files/AESN_etat_lieux_janvier20.pdf) and [2013](https://www.observatoire-poissons-seine-normandie.fr/wp-content/uploads/2018/03/etat-des-lieux-complet.pdf). There are 18.7 million inhabitants, and in 2019 1.2 are not connected to sewers.
+
+More description in the “Guide de l’eau” (water guide) [here](https://www.guide-eau.com/fichiers/donnees/seine_normandie.pdf) et [here](https://www.guide-eau.com/fichiers/donnees/seine_normandie1.pdf) 
+
+## Sources
+
+For this basin, we only have complete data of all WWTP for some particuliar years (2014, 2015, 2016, 2018 and 2020), provided by mail. 2015 is from *Etat des lieux* report, and have more extensive WWTP description and pollution description. The other data are exctractions from the water agencies following our demand and are less detailed.
+
+We also have data for the 6 SIAAP (Syndicat Interdépartemental pour l'Assainissement de l'Agglomération Parisienne) WWTPs during 2001-2020, which handle half fo the basin flows (also provided by mail).
+
+## Load basin data 
+
+For 2015, where NO2 and NO3 are also reported, we use the following approximation when NGL is not reported :
+
+  -    for incoming flow, if NTK is reported, we use it in lieu of NGL
+  -    for outgoing flow, if NTK and NO3 are reported, we use their sum in lieu of NGL 
+  
+For 2016, only NTK is reported and not NGL. For incoming low, we approximate NGL by NTK. The approximation does not hold for outgoing flow.
+
+We load the data from all the years
+
+```{r}
+path_source <- "source_data/03_seine_normandie/"
+file_seine_normandie_2015 <- read_excel(
+  paste0(path_source, "pression macropolluants_STEU collectivités_2015.xlsx"), sheet ="flux et rdts "
+) %>%
+  mutate(
+    Year = 2015
+  )
+file_seine_normandie_2015 <- file_seine_normandie_2015 %>%
+  select(
+    code_WWTP = `code STEU`,
+    name_WWTP = `nom STEU`,
+    name_commune = `nom de la commune d'implantion`,
+    capacity = `capacité nominale steu (EH)`,
+    Pt_in = `Ptot entrée (kg/an)`,
+    NGL_in = `NGL entrée (kg/an)`,
+    NTK_in = `NR entrée (kg/an)`,
+    NO2_in = `NNO2 entrée (kg/an)`,
+    NO3_in = `NNO3 entrée(kg/an)`,
+    DBO5_in = `DBO5 entrée (kg/an)`,
+    DCO_in = `DCO entrée (kg/an)`,
+    MES_in = `MES entrée (kg/an)`,
+    Pt_out = `Ptot sortie (kg/an)`,
+    NGL_out = `NGL sortie (kg/an)`,
+    NTK_out = `NR sortie (kg/an)`,
+    NO2_out = `NNO2 sortie (kg/an)`,
+    NO3_out = `NNO3 sortie (kg/an)`,
+    DBO5_out = `DBO5 sortie (kg/an)`,
+    DCO_out = `DCO sortie (kg/an)`,
+    MES_out = `MES sortie (kg/an)`,
+    treatment_type = `Filière eau principale (ROSEAU)`,
+    N_treatment = `traitement en N poussé (ROSEAU)`,
+    P_treatment = `traitement en P poussé (ROSEAU)`,
+    flow_in = `débit entrant (ROSEAU)  (m3/j)`,
+    flow_nominal = `débit de référence (ROSEAU) (m3/j)`
+  ) %>%
+  mutate(Year=2015) %>%
+  #transform flows from kg/year to kg/day
+  mutate(
+    across(
+      c(NGL_in, NTK_in, NO2_in, NO3_in, Pt_in, DBO5_in, DCO_in, MES_in,
+        NGL_out, NTK_out, NO2_in, NO3_in, Pt_out, DBO5_out, DCO_out, MES_out), 
+      ~signif(.x/365, 3)
+      )
+  ) %>%
+  ungroup() %>%
+  # we need to be "row wise" to use "sum(., na.rm=T) : 
+  # just summing the columns A+B would return NA when at least 1 columns as NA in the row
+  rowwise() %>%
+  mutate(
+    NGL_in = 
+      case_when(
+        #when NGL in is not reported, if NTK_in reported we accept to not consider unreported NO2_in and NO2_in as 0 (because NO in negligible)
+        #if NTK_in unreported, NGL_in is unreported
+        is.na(NGL_in) ~ sum(NTK_in, NO2_in, NO3_in, na.rm=!is.na(NTK_in)),
+        T ~ NGL_in
+    ),
+    NGL_out = 
+      case_when(
+        #when NGL out is not reported, NO3 and NTK must be reported, and we accept to neglect NO2 when it is unreported.
+        is.na(NGL_out) ~ sum(NTK_out, NO2_out, NO3_out, na.rm=!((is.na(NTK_out)|is.na(NO3_out)))),
+        T ~ NGL_out
+      )
+    )
+
+
+file_seine_normandie_2014 <- read_excel(
+  paste0(path_source, "DonnéesSTEU2014-2020.xlsx"), sheet ="données2014", 
+  col_types = c("text", "text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric")
+) %>% 
+  select(
+    code_WWTP = CODE_SANDRE,
+    name_WWTP = `Nom step`,
+    capacity = `Capacité Nominale\r\n(EH)`,
+    MES_in = `FLUX ENTRANT\r\nKg/an\r\n(MES )` ,
+    MES_out = `FLUX SORTANT\r\nKg/an\r\n(MES )`,
+    DBO5_in = `FLUX\r\nENTRANT\r\nKg/an\r\n(DBO5)`,
+    DBO5_out = `FLUX\r\nSORTANT\r\nKg/an\r\n(DBO5)`,
+    DCO_in = `FLUX\r\nENTRANT\r\nKg/an\r\n(DCO)`,
+    DCO_out = `FLUX\r\nSORTANT\r\nKg/an\r\n(DCO)`,
+    NTK_in = `FLUX\r\nENTRANT\r\nKg/an\r\n(NTK)`,
+    NTK_out = `FLUX\r\nSORTANT\r\nKg/an\r\n(NTK)`,
+    Pt_in = `FLUX\r\nENTRANT\r\nKg/an\r\n(PT)`,
+    Pt_out = `FLUX\r\nSORTANT\r\nKg/an\r\n(PT)`,
+    NGL_in = `FLUX\r\nENTRANT\r\nKg/an\r\n(NGL)`,
+    NGL_out = `FLUX\r\nSORTANT\r\nKg/an\r\n(NGL)`,
+    DBO5_yield = `Rdt DBO5`,
+    DCO_yield = `Rdt DCO`,
+    MES_yield = `Rdt MES`,
+    NTK_yield = `Rdt NTK`,
+    Pt_yield = `Rdt PT`,
+    NGL_yield = `Rdt NGL`
+  ) %>%
+  mutate(
+    Year = 2014
+  ) %>%
+  #transform flows from kg/year to kg/day
+  mutate(
+    across(
+      c(NGL_in, NTK_in, Pt_in, DBO5_in, DCO_in, MES_in,
+        NGL_out, NTK_out, Pt_out, DBO5_out, DCO_out, MES_out), 
+      ~signif(.x/365, 3)
+      )
+  ) 
+
+file_seine_normandie_2016 <- read_excel(
+  paste0(path_source, "DonnéesSTEU2014-2020.xlsx"), sheet ="données2016"
+)  %>%
+  rename(
+    code_WWTP = `code steu` ,
+    name_WWTP = `nom de la steu`
+  ) %>%
+  mutate(
+    Year = 2016,
+    NGL_in = NTK_in
+  )  %>%
+  #transform flows from kg/year to kg/day
+  mutate(
+    across(
+      c(NGL_in, NTK_in, Pt_in, DBO5_in, DCO_in, MES_in,
+        NTK_out, Pt_out, DBO5_out, DCO_out, MES_out), 
+      ~signif(.x/365, 3)
+      )
+  ) 
+
+file_seine_normandie_2018 <- read_excel(
+  paste0(path_source, "DonnéesSTEU2014-2020.xlsx"), sheet ="données2018"
+)  %>%
+  select(
+    code_WWTP = `Code Sandre STEU` ,
+    name_WWTP = `Nom STEU`  ,
+    capacity = `Capacité STEU ROSEAU (EH)`,
+    DBO5_in = `Entrée DBO5 (kg/an)` ,
+    DBO5_out = `Sortie DBO5 (kg/an)`,
+    DCO_in = `Entrée DCO (kg/an)` ,
+    DCO_out = `Sortie DCO (kg/an)`,
+    MES_in = `Entrée MES (kg/an)` ,
+    MES_out = `Sortie MES (kg/an)`,
+    NGL_in = `Entrée NGL (kg/an)` ,
+    NGL_out = `Sortie NGL (kg/an)`,
+    NH4_in = `Entrée NH4 (kg/an)` ,
+    NH4_out = `Sortie NH4 (kg/an)`,
+    NTK_in = `Entrée NTK (kg/an)` ,
+    NTK_out = `Sortie NTK (kg/an)`,
+    Pt_in = `Entrée PT (kg/an)` ,
+    Pt_out = `Sortie PT (kg/an)`,
+    flow_in = `Volume entrée (m3/an)`,
+    flow_out = `Volume sortie (m3/an)`  
+  ) %>%
+  mutate(
+    Year = 2018
+  )  %>%
+  #transform flows from kg/year to kg/day
+  mutate(
+    across(
+      c(NGL_in, NH4_in, NTK_in, Pt_in, DBO5_in, DCO_in, MES_in,
+        NGL_out, NH4_out, NTK_out, Pt_out, DBO5_out, DCO_out, MES_out), 
+      ~signif(.x/365, 3)
+      )
+  ) 
+
+file_seine_normandie_2020 <- read_excel(
+  paste0(path_source, "DonnéesSTEU2014-2020.xlsx"), sheet ="données2020"
+)  %>%
+  select(
+    code_WWTP = `Code Sandre STEU` ,
+    name_WWTP = `Nom STEU`  ,
+    capacity = `Capacité STEU ROSEAU (EH)`,
+    DBO5_in = `Entrée DBO5 (kg/an)` ,
+    DBO5_out = `Sortie DBO5 (kg/an)`,
+    DCO_in = `Entrée DCO (kg/an)` ,
+    DCO_out = `Sortie DCO (kg/an)`,
+    MES_in = `Entrée MES (kg/an)` ,
+    MES_out = `Sortie MES (kg/an)`,
+    NGL_in = `Entrée NGL (kg/an)` ,
+    NGL_out = `Sortie NGL (kg/an)`,
+    NH4_in = `Entrée NH4 (kg/an)` ,
+    NH4_out = `Sortie NH4 (kg/an)`,
+    NTK_in = `Entrée NTK (kg/an)` ,
+    NTK_out = `Sortie NTK (kg/an)`,
+    Pt_in = `Entrée PT (kg/an)` ,
+    Pt_out = `Sortie PT (kg/an)`,
+    flow_in = `Volume entrée (m3/an)`,
+    flow_out = `Volume sortie (m3/an)`  
+  ) %>%
+  mutate(
+    Year = 2020
+  )  %>%
+  #transform flows from kg/year to kg/day
+  mutate(
+    across(
+      c(NGL_in, NH4_in, NTK_in, Pt_in, DBO5_in, DCO_in, MES_in,
+        NGL_out, NH4_out, NTK_out, Pt_out, DBO5_out, DCO_out, MES_out), 
+      ~signif(.x/365, 3)
+      )
+  ) 
+
+
+#2016 dose not have WWTP capacity, we add it from the other files
+file_seine_normandie_2016 <- left_join(
+  file_seine_normandie_2016,
+  file_seine_normandie_2015 %>% select(code_WWTP, capacity),
+  by = "code_WWTP"
+)
+#some WWTP still have no capactiy reporting
+temp <- file_seine_normandie_2016 %>% filter(is.na(capacity)) #to see them (just 6)
+#we remove these WWTPs
+file_seine_normandie_2016 <- file_seine_normandie_2016 %>%
+  filter(is.na(capacity)==F)
+
+N_P_seine_normandie <- bind_rows(
+  file_seine_normandie_2014,
+  file_seine_normandie_2015,
+  file_seine_normandie_2016,
+  file_seine_normandie_2018,
+  file_seine_normandie_2020
+)
+rm(file_seine_normandie_2014, file_seine_normandie_2015, file_seine_normandie_2016, file_seine_normandie_2018, file_seine_normandie_2020)
+```
+
+We create the WWTP capacity categories in terms of population equivalent.
+
+```{r f_PE_bin_categories}
+#function to create capacity categories
+f_PE_bin_categories <- function(dataset){
+  #Creating size categories
+  dataset <- 
+    dataset %>%
+    mutate(
+      PE_bin = case_when(
+        capacity < 200 ~ "0 - 200 PE",
+        (capacity >= 200) & (capacity <2000) ~ "200 - 2 000 PE",
+        (capacity >= 2000) & (capacity <10000) ~ "2 000 - 10 000 PE",
+        (capacity >= 10000) & (capacity <100000) ~ "10 000 - 100 000 PE",
+        capacity >= 100000 ~ "> 100 000 PE"
+      )
+    )
+  
+  #reorders treatment by their share of total capacity
+  dataset$PE_bin <- 
+    factor(
+      dataset$PE_bin, 
+      levels = 
+        c("0 - 200 PE", 
+          "200 - 2 000 PE", 
+          "2 000 - 10 000 PE",
+          "10 000 - 100 000 PE", 
+          "> 100 000 PE"
+          )
+        )
+  return(dataset)
+}
+N_P_seine_normandie <- f_PE_bin_categories(N_P_seine_normandie)
+```
+
+We create the file with aggregated flows at the basin scale, and also by capacity categories.
+
+```{r f_basin_flows}
+f_basin_flows <- function(dataset){
+  basin <- dataset %>%
+    group_by(Year) %>%
+    summarise(
+      across(
+        c(
+          #incoming_flow
+          NGL_in, NTK_in, NO2_in, NO3_in,
+          Pt_in, DBO5_in, DCO_in, MES_in,
+          #outgoing_flow
+          NGL_out, NTK_out, NO2_out, NO3_out,
+          Pt_out, DBO5_out, DCO_out, MES_out
+        ),
+        ~round(sum(.x, na.rm = T)*365/10^6, digits=1)
+      ),
+    #nb of waste water treatment plant
+    nb_WWTP = n(),
+    #capacity converted in million Population Equivalent
+    capacity = round(sum(capacity, na.rm = T)/10^6, digits=3)
+    )
+  return(basin)
+}
+basin_N_P_seine_normandie <- f_basin_flows(N_P_seine_normandie)
+
+
+f_basin_PE_flows <- function(dataset){
+  basin <- dataset %>%
+    group_by(Year, PE_bin) %>%
+    summarise(
+      across(
+        c(
+          #incoming_flow
+          NGL_in, NTK_in, NO2_in, NO3_in,
+          Pt_in, DBO5_in, DCO_in, MES_in,
+          #outgoing_flow
+          NGL_out, NTK_out, NO2_out, NO3_out,
+          Pt_out, DBO5_out, DCO_out, MES_out
+        ),
+        ~signif(sum(.x, na.rm = T)*365/10^6, digits=3)
+      ),
+    #nb of waste water treatment plant
+    nb_WWTP = n(),
+    #capacity converted in million Population Equivalent
+    capacity = signif(sum(capacity, na.rm = T)/10^6, digits=3),
+    )
+  return(basin)
+}
+basin_PE_N_P_seine_normandie <- f_basin_PE_flows(N_P_seine_normandie)
+```
+
+We compute the nutrient ratios at the basin scale, and also by capacity categories.
+
+```{r f_nutrient_ratio_basin}
+#have to do this in case 1 nutrient is more reported than the other, which would create a bia if we took the ratio of the already aggregated flows
+f_nutrient_ratio_basin <- function(basin, dataset, nutrient1, nutrient2){
+  temp <- dataset %>% 
+    filter(
+      is.na(!!as.symbol(nutrient1))==F & is.na(!!as.symbol(nutrient2))==F
+      ) %>%
+    group_by(Year) %>%
+    summarise(
+      nutrient_1 = sum(!!as.symbol(nutrient1), na.rm=T),
+      nutrient_2 = sum(!!as.symbol(nutrient2), na.rm=T),
+      ratio = signif(nutrient_1/nutrient_2, digits=3)
+    ) %>%
+    select(-nutrient_1, -nutrient_2)
+  basin <- left_join(
+    basin, temp, by="Year"
+  )
+  return(basin)
+}
+
+f_nutrient_ratio_basin_PE <- function(basin_PE, dataset, nutrient1, nutrient2){
+  temp <- dataset %>% 
+    filter(
+      is.na(!!as.symbol(nutrient1))==F & is.na(!!as.symbol(nutrient2))==F
+      ) %>%
+    group_by(Year, PE_bin) %>%
+    summarise(
+      nutrient_1 = sum(!!as.symbol(nutrient1), na.rm=T),
+      nutrient_2 = sum(!!as.symbol(nutrient2), na.rm=T),
+      ratio = signif(nutrient_1/nutrient_2, digits=3)
+    ) %>%
+    select(-nutrient_1, -nutrient_2)
+  basin_PE <- left_join(
+    basin_PE, temp, by=c("Year", "PE_bin")
+  )
+  return(basin_PE)
+}
+
+f_all_nutrient_ratios_basin <- function(basin, dataset){
+  basin <- basin %>%
+    
+    #nutrient ratios
+    #N_P in
+    f_nutrient_ratio_basin(dataset, "NGL_in", "Pt_in") %>%
+    rename(N_P_ratio_in = ratio) %>%
+    #N_P out
+    f_nutrient_ratio_basin(dataset, "NGL_out", "Pt_out") %>%
+    rename(N_P_ratio_out = ratio) %>%
+    #DCO_DBO5 in
+    f_nutrient_ratio_basin(dataset, "DCO_in", "DBO5_in") %>%
+    rename(DCO_DBO5_ratio_in = ratio) %>%
+    #DCO_DBO5 out
+    f_nutrient_ratio_basin(dataset, "DCO_out", "DBO5_out") %>%
+    rename(DCO_DBO5_ratio_out = ratio) %>%
+    #DBO5_N in
+    f_nutrient_ratio_basin(dataset, "DBO5_in", "NGL_in") %>%
+    rename(DBO5_N_ratio_in = ratio) %>%
+    #DBO5_N out
+    f_nutrient_ratio_basin(dataset, "DBO5_out", "NGL_out") %>%
+    rename(DBO5_N_ratio_out = ratio) %>%
+    #DBO5_P in
+    f_nutrient_ratio_basin(dataset, "DBO5_in", "Pt_in") %>%
+    rename(DBO5_P_ratio_in = ratio) %>%
+    #DBO5_P out
+    f_nutrient_ratio_basin(dataset, "DBO5_out", "Pt_out") %>%
+    rename(DBO5_P_ratio_out = ratio) %>%
+    #DCO_N in
+    f_nutrient_ratio_basin(dataset, "DCO_in", "NGL_in") %>%
+    rename(DCO_N_ratio_in = ratio) %>%
+    #DCO_N out
+    f_nutrient_ratio_basin(dataset, "DCO_out", "NGL_out") %>%
+    rename(DCO_N_ratio_out = ratio) %>%
+    #DCO_P in
+    f_nutrient_ratio_basin(dataset, "DCO_in", "Pt_in") %>%
+    rename(DCO_P_ratio_in = ratio) %>%
+    #DCO_P out
+    f_nutrient_ratio_basin(dataset, "DCO_out", "Pt_out") %>%
+    rename(DCO_P_ratio_out = ratio) %>%
+    
+    #capacity ratios
+    #Pt_PE_in
+    f_nutrient_ratio_basin(dataset, "Pt_in", "capacity") %>%
+    rename(Pt_PE_ratio_in = ratio) %>%
+    #Pt_PE_out
+    f_nutrient_ratio_basin(dataset, "Pt_out", "capacity") %>%
+    rename(Pt_PE_ratio_out = ratio) %>%
+    #NGL_PE_in
+    f_nutrient_ratio_basin(dataset, "NGL_in", "capacity") %>%
+    rename(NGL_PE_ratio_in = ratio) %>%
+    #NGL_PE_out
+    f_nutrient_ratio_basin(dataset, "NGL_out", "capacity") %>%
+    rename(NGL_PE_ratio_out = ratio) %>%
+    #DBO5_PE_in
+    f_nutrient_ratio_basin(dataset, "DBO5_in", "capacity") %>%
+    rename(DBO5_PE_ratio_in = ratio) %>%
+    #DBO5_PE_out
+    f_nutrient_ratio_basin(dataset, "DBO5_out", "capacity") %>%
+    rename(DBO5_PE_ratio_out = ratio) %>%
+    #DCO_PE_in
+    f_nutrient_ratio_basin(dataset, "DCO_in", "capacity") %>%
+    rename(DCO_PE_ratio_in = ratio) %>%
+    #DCO_PE_out
+    f_nutrient_ratio_basin(dataset, "DCO_out", "capacity") %>%
+    rename(DCO_PE_ratio_out = ratio) %>%
+    #MES_PE_in
+    f_nutrient_ratio_basin(dataset, "MES_in", "capacity") %>%
+    rename(MES_PE_ratio_in = ratio) %>%
+    #MES_PE_out
+    f_nutrient_ratio_basin(dataset, "MES_out", "capacity") %>%
+    rename(MES_PE_ratio_out = ratio) %>%
+    
+    #convert from kg per PE per day to g per PE per day
+    mutate(
+      across(
+        c(
+          Pt_PE_ratio_in, Pt_PE_ratio_out, NGL_PE_ratio_in, NGL_PE_ratio_out, DBO5_PE_ratio_in, DBO5_PE_ratio_out,
+          DCO_PE_ratio_in, DCO_PE_ratio_out, MES_PE_ratio_in, MES_PE_ratio_out
+        ), ~.x*1000 
+      )
+    )
+  return(basin)
+}
+
+f_all_nutrient_ratios_basin_PE <- function(basin_PE, dataset){
+  basin_PE <- basin_PE %>%
+    
+    #nutrient ratios
+    #N_P in
+    f_nutrient_ratio_basin_PE(dataset, "NGL_in", "Pt_in") %>%
+    rename(N_P_ratio_in = ratio) %>%
+    #N_P out
+    f_nutrient_ratio_basin_PE(dataset, "NGL_out", "Pt_out") %>%
+    rename(N_P_ratio_out = ratio) %>%
+    #DCO_DBO5 in
+    f_nutrient_ratio_basin_PE(dataset, "DCO_in", "DBO5_in") %>%
+    rename(DCO_DBO5_ratio_in = ratio) %>%
+    #DCO_DBO5 out
+    f_nutrient_ratio_basin_PE(dataset, "DCO_out", "DBO5_out") %>%
+    rename(DCO_DBO5_ratio_out = ratio) %>%
+    #DBO5_N in
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_in", "NGL_in") %>%
+    rename(DBO5_N_ratio_in = ratio) %>%
+    #DBO5_N out
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_out", "NGL_out") %>%
+    rename(DBO5_N_ratio_out = ratio) %>%
+    #DBO5_P in
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_in", "Pt_in") %>%
+    rename(DBO5_P_ratio_in = ratio) %>%
+    #DBO5_P out
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_out", "Pt_out") %>%
+    rename(DBO5_P_ratio_out = ratio) %>%
+    #DCO_N in
+    f_nutrient_ratio_basin_PE(dataset, "DCO_in", "NGL_in") %>%
+    rename(DCO_N_ratio_in = ratio) %>%
+    #DCO_N out
+    f_nutrient_ratio_basin_PE(dataset, "DCO_out", "NGL_out") %>%
+    rename(DCO_N_ratio_out = ratio) %>%
+    #DCO_P in
+    f_nutrient_ratio_basin_PE(dataset, "DCO_in", "Pt_in") %>%
+    rename(DCO_P_ratio_in = ratio) %>%
+    #DCO_P out
+    f_nutrient_ratio_basin_PE(dataset, "DCO_out", "Pt_out") %>%
+    rename(DCO_P_ratio_out = ratio) %>%
+    
+    #capacity ratios
+    #Pt_PE_in
+    f_nutrient_ratio_basin_PE(dataset, "Pt_in", "capacity") %>%
+    rename(Pt_PE_ratio_in = ratio) %>%
+    #Pt_PE_out
+    f_nutrient_ratio_basin_PE(dataset, "Pt_out", "capacity") %>%
+    rename(Pt_PE_ratio_out = ratio) %>%
+    #NGL_PE_in
+    f_nutrient_ratio_basin_PE(dataset, "NGL_in", "capacity") %>%
+    rename(NGL_PE_ratio_in = ratio) %>%
+    #NGL_PE_out
+    f_nutrient_ratio_basin_PE(dataset, "NGL_out", "capacity") %>%
+    rename(NGL_PE_ratio_out = ratio) %>%
+    #DBO5_PE_in
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_in", "capacity") %>%
+    rename(DBO5_PE_ratio_in = ratio) %>%
+    #DBO5_PE_out
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_out", "capacity") %>%
+    rename(DBO5_PE_ratio_out = ratio) %>%
+    #DCO_PE_in
+    f_nutrient_ratio_basin_PE(dataset, "DCO_in", "capacity") %>%
+    rename(DCO_PE_ratio_in = ratio) %>%
+    #DCO_PE_out
+    f_nutrient_ratio_basin_PE(dataset, "DCO_out", "capacity") %>%
+    rename(DCO_PE_ratio_out = ratio) %>%
+    #MES_PE_in
+    f_nutrient_ratio_basin_PE(dataset, "MES_in", "capacity") %>%
+    rename(MES_PE_ratio_in = ratio) %>%
+    #MES_PE_out
+    f_nutrient_ratio_basin_PE(dataset, "MES_out", "capacity") %>%
+    rename(MES_PE_ratio_out = ratio) %>%
+    
+    #convert from kg per PE per day to g per PE per day
+    mutate(
+      across(
+        c(
+          Pt_PE_ratio_in, Pt_PE_ratio_out, NGL_PE_ratio_in, NGL_PE_ratio_out, DBO5_PE_ratio_in, DBO5_PE_ratio_out,
+          DCO_PE_ratio_in, DCO_PE_ratio_out, MES_PE_ratio_in, MES_PE_ratio_out
+        ), ~.x*1000 
+      )
+    )
+  return(basin_PE)
+}
+
+basin_N_P_seine_normandie <- f_all_nutrient_ratios_basin(basin_N_P_seine_normandie, N_P_seine_normandie)
+
+basin_PE_N_P_seine_normandie <- f_all_nutrient_ratios_basin_PE(basin_PE_N_P_seine_normandie, N_P_seine_normandie)
+```
+
+We compute the yields at the basin scale
+
+```{r f_basin_yield}
+#have to do this in case inflow or outflow is more reported than the other one, which would create a bias if we took the ratio of the already aggregated flows
+f_yield_basin <- function(basin, dataset, nutrientIN, nutrientOUT){
+  temp <- dataset %>% 
+    filter(
+      is.na(!!as.symbol(nutrientIN))==F & is.na(!!as.symbol(nutrientOUT))==F
+      ) %>%
+    group_by(Year) %>%
+    summarise(
+      nutrient_in = sum(!!as.symbol(nutrientIN), na.rm=T),
+      nutrient_out = sum(!!as.symbol(nutrientOUT), na.rm=T),
+      yield = round((1-nutrient_out/nutrient_in)*100, digits = 0)
+    ) %>%
+    select(-nutrient_in, -nutrient_out)
+  basin <- left_join(
+    basin, temp, by="Year"
+  )
+  return(basin)
+}
+
+f_yield_basin_PE <- function(basin_PE, dataset, nutrientIN, nutrientOUT){
+  temp <- dataset %>% 
+    filter(
+      is.na(!!as.symbol(nutrientIN))==F & is.na(!!as.symbol(nutrientOUT))==F
+      ) %>%
+    group_by(Year, PE_bin) %>%
+    summarise(
+      nutrient_in = sum(!!as.symbol(nutrientIN), na.rm=T),
+      nutrient_out = sum(!!as.symbol(nutrientOUT), na.rm=T),
+      yield = round((1-nutrient_out/nutrient_in)*100, digits = 0)
+    ) %>%
+    select(-nutrient_in, -nutrient_out)
+  basin_PE <- left_join(
+    basin_PE, temp, by=c("Year", "PE_bin")
+  )
+  return(basin_PE)
+}
+
+f_all_yields_basin <- function(basin, dataset){
+  basin <- basin %>%
+    #NGL yield
+    f_yield_basin(dataset, "NGL_in", "NGL_out") %>%
+    rename(NGL_yield = yield) %>%
+    #Pt yield
+    f_yield_basin(dataset, "Pt_in", "Pt_out") %>%
+    rename(Pt_yield = yield) %>%
+    #DBO5 yield
+    f_yield_basin(dataset, "DBO5_in", "DBO5_out") %>%
+    rename(DBO5_yield = yield) %>%
+    #DCO yield
+    f_yield_basin(dataset, "DCO_in", "DCO_out") %>%
+    rename(DCO_yield = yield) %>%
+    #MES yield
+    f_yield_basin(dataset, "MES_in", "MES_out") %>%
+    rename(MES_yield = yield) 
+  return(basin)
+}
+
+f_all_yields_basin_PE <- function(basin_PE, dataset){
+  basin_PE <- basin_PE %>%
+    #NGL yield
+    f_yield_basin_PE(dataset, "NGL_in", "NGL_out") %>%
+    rename(NGL_yield = yield) %>%
+    #Pt yield
+    f_yield_basin_PE(dataset, "Pt_in", "Pt_out") %>%
+    rename(Pt_yield = yield) %>%
+    #DBO5 yield
+    f_yield_basin_PE(dataset, "DBO5_in", "DBO5_out") %>%
+    rename(DBO5_yield = yield) %>%
+    #DCO yield
+    f_yield_basin_PE(dataset, "DCO_in", "DCO_out") %>%
+    rename(DCO_yield = yield) %>%
+    #MES yield
+    f_yield_basin_PE(dataset, "MES_in", "MES_out") %>%
+    rename(MES_yield = yield) 
+  return(basin_PE)
+}
+
+basin_N_P_seine_normandie <- f_all_yields_basin(basin_N_P_seine_normandie, N_P_seine_normandie)
+
+basin_PE_N_P_seine_normandie <- f_all_yields_basin_PE(basin_PE_N_P_seine_normandie, N_P_seine_normandie)
+```
+
+We create the years categories (every 5 years).
+
+```{r f_year_categories}
+
+f_year_categories <- function(dataset){
+  dataset <- dataset %>%
+    mutate(
+      Year_category = case_when(
+        Year %in% c(1991, 1992, 1993, 1994, 1995) ~ "1991-1995",
+        Year %in% c(1996, 1997, 1998, 1999, 2000) ~ "1996-2000",
+        Year %in% c(2001, 2002, 2003, 2004, 2005) ~ "2001-2005",
+        Year %in% c(2006, 2007, 2008, 2009, 2010) ~ "2006-2010",
+        Year %in% c(2011, 2012, 2013, 2014, 2015) ~ "2011-2015",
+        Year %in% c(2016, 2017, 2018, 2019, 2020) ~ "2016-2020",
+      )
+    )
+  return(dataset)
+}
+
+N_P_seine_normandie <- f_year_categories(N_P_seine_normandie)
+basin_N_P_seine_normandie <- f_year_categories(basin_N_P_seine_normandie)
+basin_PE_N_P_seine_normandie <- f_year_categories(basin_PE_N_P_seine_normandie)
+
+#change 0 in empty values for basins files
+
+basin_N_P_seine_normandie[basin_N_P_seine_normandie == 0] <- NA
+basin_PE_N_P_seine_normandie[basin_PE_N_P_seine_normandie == 0] <- NA
+```
+
+We compute the yields and ratios for each WWTP.
+
+```{r ratios_and_yields}
+N_P_seine_normandie <- N_P_seine_normandie %>%
+  mutate(
+    #yields
+    Pt_yield = (1-Pt_out/Pt_in)*100,
+    NGL_yield = (1-NGL_out/NGL_in)*100,
+    DBO5_yield =(1-DBO5_out/DBO5_in)*100, 
+    DCO_yield =(1-DCO_out/DCO_in)*100,
+    MES_yield =(1-MES_out/MES_in)*100,
+    #ratios
+    N_P_ratio_in = NGL_in/Pt_in,
+    N_P_ratio_out = NGL_in/Pt_out,
+    DCO_DBO5_ratio_in = DCO_in/DBO5_in,
+    DCO_DBO5_ratio_out = DCO_out/DBO5_out,
+    DBO5_NGL_ratio_in = DBO5_in/NGL_in,
+    DBO5_NGL_ratio_out = DBO5_out/NGL_out,
+    DBO5_Pt_ratio_in = DBO5_in/Pt_in,
+    DBO5_Pt_ratio_out = DBO5_out/Pt_out
+  )
+```
+
+
+
+## Load SIAAP data
+
+In the SIAAP files, we do not have the inflows of NO2 and NO3. This is not really important, since the oxidised forms of N are negligible in the sewer network.
+
+Incoming flows are made of A2 and A3 points, but A2 is generally negligible (~1% of A3). Outgoing flow is the A4 point. More info on this points [here](https://id.eaufrance.fr/nsa/47).
+
+Before 2007, NGL is not reported. We could yet compute the inflow P/N ratio, since in the inflow NGL is almost equal to NTK. This approximation can not be done for the outflow where NO3 and NO2 are not negligible.
+
+We load the file with the aggregated values of SIAAP for 2001-2014. Careful, the flows are in tons per day in the original file.
+
+```{r}
+path_source <- "source_data/03_seine_normandie/SIAAP/"
+file_basin_SIAAP_2001_2015 <- readxl::read_excel(paste(path_source, "SIAAP_bilan_annuel_basin.xlsx", sep=""))
+#we convert the basin flows from t/d to kt/y
+basin_N_P_SIAAP_2001_2015 <- file_basin_SIAAP_2001_2015 %>%
+  mutate(
+    #convert into kt per year
+    across(
+      c(NGL_in, NTK_in, Pt_in, DBO5_in, DCO_in, MES_in,
+        NGL_out, NTK_out, Pt_out, DBO5_out, DCO_out, MES_out), 
+      ~signif(.x*365/10^3, 3) #now in kt per year
+    ),
+    #when unavailable approximate NGL_in by NTK_in
+    NGL_in = case_when(
+      is.na(NGL_in) ~ NTK_in,
+      T ~ NGL_in
+    )
+  ) %>%
+  #capacity
+  mutate(
+    capacity = case_when(
+      Year>=2018~(7500000 + 3600000 + 1212000 + 900000 + 550000 + 320000)/10^6, #seine grésillons at 1212000
+      Year<2018 & Year >=2014~(7500000 + 3600000 + 371666 + 900000 + 550000 + 320000)/10^6, #seine grésillons at 371666
+      Year<2014 & Year >=2007~(7500000 + 3600000 + 371666 + 900000 + 550000)/10^6, #seine morée does not exist
+      Year <2007~(7500000 + 3600000 + 900000 + 550000)/10^6 #seine morée and seine grésillon do not exist
+      #see here the dates https://www.siaap.fr/former-transmettre/mieux-comprendre-lassainissement/initiation/en-ile-de-france/
+    ),
+    capacity = signif(capacity, 3),
+    nb_WWTP = case_when(
+      Year>=2014~6,
+      Year<2014 & Year >=2007~5, #seine morée does not exist
+      Year <2007~4 #seine morée and seine grésillon do not exist
+    )
+  ) %>%
+  #round yields
+  mutate(
+    across(
+      c(NGL_yield, Pt_yield, DBO5_yield, DCO_yield, MES_yield),
+      ~round(.x, 0)
+    )
+  ) %>%
+  mutate(
+    #nutrient ratios
+    N_P_ratio_in = signif(NGL_in/Pt_in, 3),
+    N_P_ratio_out = signif(NGL_out/Pt_out, 3),
+    DCO_DBO5_ratio_in = signif(DCO_in/DBO5_in, 3),
+    DCO_DBO5_ratio_out = signif(DCO_out/DBO5_out, 3),
+    DBO5_N_ratio_in = signif(DBO5_in/NGL_in, 3),
+    DBO5_N_ratio_out = signif(DBO5_out/NGL_out, 3),
+    DBO5_P_ratio_in = signif(DBO5_in/Pt_in, 3),
+    DBO5_P_ratio_out = signif(DBO5_out/Pt_out, 3),
+    DCO_N_ratio_in = signif(DCO_in/NGL_in, 3),
+    DCO_N_ratio_out = signif(DCO_out/NGL_out, 3),
+    DCO_P_ratio_in = signif(DCO_in/Pt_in, 3),
+    DCO_P_ratio_out = signif(DCO_out/Pt_out, 3),
+    #nutrient capacity ratios (converted from kg/y/PE to g/day/PE)
+    Pt_PE_ratio_in = signif(Pt_in/capacity*1000/365, 3),
+    Pt_PE_ratio_out = signif(Pt_out/capacity*1000/365, 3),
+    NGL_PE_ratio_in = signif(NGL_in/capacity*1000/365, 3),
+    NGL_PE_ratio_out = signif(NGL_out/capacity*1000/365, 3),
+    DBO5_PE_ratio_in = signif(DBO5_in/capacity*1000/365, 3),
+    DBO5_PE_ratio_out = signif(DBO5_out/capacity*1000/365, 3),
+    DCO_PE_ratio_in = signif(DCO_in/capacity*1000/365, 3),
+    DCO_PE_ratio_out = signif(DCO_out/capacity*1000/365, 3),
+    MES_PE_ratio_in = signif(MES_in/capacity*1000/365, 3),
+    MES_PE_ratio_out = signif(MES_out/capacity*1000/365, 3)
+  )
+```
+
+We load the file with individual station values for 2015-2021, and agregate the flows at the SIAAP scale.
+
+```{r}
+file_SIAAP_2015_2021 <- readxl::read_excel(paste(path_source, "Synthese 2015-2021 copy.xlsx", sep=""), sheet = "Exctracted A181 T237")
+N_P_SIAAP_2015_2021 <- file_SIAAP_2015_2021 %>% 
+  select(
+    name_WWTP = STEU,
+    Year = Date, 
+    water_flow = `A2+A3.Volume journalier m3/j`,
+    NTK_in = `A2+A3.NTK t/j`,
+    NH4_in = `A2+A3.NH4 t/j`,
+    PO4_in = `A2+A3.PO4 t/j`,
+    Pt_in = `A2+A3.Ptot t/j`,
+    DBO5_in = `A2+A3.DBO5 t/j` ,
+    DCO_in = `A2+A3.DCO t/j`,
+    MES_in = `A2+A3.MES t/j`,
+    NGL_out = `A4.NGL t/j`,
+    NTK_out = `A4.NTK t/j`,
+    NH4_out = `A4.NH4 t/j`,
+    PO4_out = `A4.PO4 t/j`,
+    Pt_out = `A4.Ptot t/j`,
+    NO2_out = `A4.NO2 t/j`,
+    NO3_out = `A4.NO3 t/j`,
+    DBO5_out = `A4.DBO5 t/j`,
+    DCO_out = `A4.DCO t/j`,
+    MES_out = `A4.MES t/j`,
+  ) %>%
+  mutate(
+    #we add the ID code of the WWTP
+    code_WWTP = case_when(
+      name_WWTP == "SAV" ~ "037800501000", #seine aval
+      name_WWTP == "SEV" ~ "039407401000", #seine amont 
+      name_WWTP == "SEC" ~ "039202501000", #seine-centre
+      name_WWTP == "SEG" ~ "037862401000", #seine grésillons
+      name_WWTP == "MAV" ~ "039305101000", #marne aval
+      name_WWTP == "SEM" ~ "039300701000" #seine morée
+    ),
+    #we add the capacities
+    capacity = case_when(
+      name_WWTP == "SAV" ~ 7500000, #seine aval
+      name_WWTP == "SEV" ~ 3600000, #seine amont
+      name_WWTP == "SEG" ~ 1212000, #seine grésillons
+      name_WWTP == "SEC" ~ 900000, #seine-centre
+      name_WWTP == "MAV" ~ 550000, #marne aval
+      name_WWTP == "SEM" ~ 320000 #seine morée
+    )
+  ) %>%
+  mutate(
+    #NGL
+    NGL_in = NTK_in, # approximation because NO negligible
+    #yields
+    NGL_yield = round((1-NGL_out/NGL_in)*100, 0),
+    Pt_yield = round((1-Pt_out/Pt_in)*100, 0),
+    DBO5_yield = round((1-DBO5_out/DBO5_in)*100, 0),
+    DCO_yield = round((1-DCO_out/DCO_in)*100, 0),
+    MES_yield = round((1-MES_out/MES_in)*100, 0),
+    #ratios
+    N_P_ratio_in = signif(NGL_in/Pt_in, 3),
+    N_P_ratio_out = signif(NGL_out/Pt_out, 3),
+    DCO_DBO5_ratio_in = signif(DCO_in/DBO5_in, 3),
+    DCO_DBO5_ratio_out = signif(DCO_out/DBO5_out, 3),
+    DBO5_N_ratio_in = signif(DBO5_in/NGL_in, 3),
+    DBO5_N_ratio_out = signif(DBO5_out/NGL_out, 3),
+    DBO5_P_ratio_in = signif(DBO5_in/Pt_in, 3),
+    DBO5_P_ratio_out = signif(DBO5_out/Pt_out, 3),
+    DCO_N_ratio_in = signif(DCO_in/NGL_in, 3),
+    DCO_N_ratio_out = signif(DCO_out/NGL_out, 3),
+    DCO_P_ratio_in = signif(DCO_in/Pt_in, 3),
+    DCO_P_ratio_out = signif(DCO_out/Pt_out, 3),
+    #nutrient capacity ratios
+    Pt_PE_ratio_in = signif(Pt_in/capacity*1000/365, 3),
+    Pt_PE_ratio_out = signif(Pt_out/capacity*1000/365, 3),
+    NGL_PE_ratio_in = signif(NGL_in/capacity*1000/365, 3),
+    NGL_PE_ratio_out = signif(NGL_out/capacity*1000/365, 3),
+    DBO5_PE_ratio_in = signif(DBO5_in/capacity*1000/365, 3),
+    DBO5_PE_ratio_out = signif(DBO5_out/capacity*1000/365, 3),
+    DCO_PE_ratio_in = signif(DCO_in/capacity*1000/365, 3),
+    DCO_PE_ratio_out = signif(DCO_out/capacity*1000/365, 3),
+    MES_PE_ratio_in = signif(MES_in/capacity*1000/365, 3),
+    MES_PE_ratio_out = signif(MES_out/capacity*1000/365, 3)
+  ) %>%
+  #we convert the flows of the WWTP in kg/day, in order to have same format as the other basins
+  mutate(
+    across(
+      c(
+        NGL_in, NTK_in, NH4_in, PO4_in, Pt_in, DBO5_in, DCO_in, MES_in, 
+        NGL_out, NTK_out, NH4_out, NO2_out, NO3_out, PO4_out, Pt_out, DBO5_out, DCO_out, MES_out
+      )
+      , ~round(.x*10^3, 0)
+    )
+  )
+```
+
+We merge the 2 files
+
+```{r}
+# summarising the 5 plants, and converting in kt/y
+basin_N_P_SIAAP_2015_2021 <- N_P_SIAAP_2015_2021 %>%
+  group_by(Year) %>%
+  summarise(
+    across(
+      c(NGL_in, NTK_in, NH4_in, 
+        PO4_in, Pt_in, DBO5_in, DCO_in, MES_in,
+        NGL_out, NTK_out, NH4_out, NO2_out, NO3_out, 
+        PO4_out, Pt_out, DBO5_out, DCO_out, MES_out), 
+      ~ sum(.x, na.rm=T)*365/10^6
+    ),
+    capacity = sum(capacity, na.rm=T)/10^6
+  ) %>%
+  mutate(
+    #yields
+    NGL_yield = round((1-NGL_out/NGL_in)*100, 0),
+    Pt_yield = round((1-Pt_out/Pt_in)*100, 0),
+    DBO5_yield = round((1-DBO5_out/DBO5_in)*100, 0),
+    DCO_yield = round((1-DCO_out/DCO_in)*100, 0),
+    MES_yield = round((1-MES_out/MES_in)*100, 0),
+    #ratios
+    N_P_ratio_in = signif(NGL_in/Pt_in, 3),
+    N_P_ratio_out = signif(NGL_out/Pt_out, 3),
+    DCO_DBO5_ratio_in = signif(DCO_in/DBO5_in, 3),
+    DCO_DBO5_ratio_out = signif(DCO_out/DBO5_out, 3),
+    DBO5_N_ratio_in = signif(DBO5_in/NGL_in, 3),
+    DBO5_N_ratio_out = signif(DBO5_out/NGL_out, 3),
+    DBO5_P_ratio_in = signif(DBO5_in/Pt_in, 3),
+    DBO5_P_ratio_out = signif(DBO5_out/Pt_out, 3),
+    DCO_N_ratio_in = signif(DCO_in/NGL_in, 3),
+    DCO_N_ratio_out = signif(DCO_out/NGL_out, 3),
+    DCO_P_ratio_in = signif(DCO_in/Pt_in, 3),
+    DCO_P_ratio_out = signif(DCO_out/Pt_out, 3),
+    #nutrient capacity ratios
+    Pt_PE_ratio_in = signif(Pt_in/capacity*1000/365, 3),
+    Pt_PE_ratio_out = signif(Pt_out/capacity*1000/365, 3),
+    NGL_PE_ratio_in = signif(NGL_in/capacity*1000/365, 3),
+    NGL_PE_ratio_out = signif(NGL_out/capacity*1000/365, 3),
+    DBO5_PE_ratio_in = signif(DBO5_in/capacity*1000/365, 3),
+    DBO5_PE_ratio_out = signif(DBO5_out/capacity*1000/365, 3),
+    DCO_PE_ratio_in = signif(DCO_in/capacity*1000/365, 3),
+    DCO_PE_ratio_out = signif(DCO_out/capacity*1000/365, 3),
+    MES_PE_ratio_in = signif(MES_in/capacity*1000/365, 3),
+    MES_PE_ratio_out = signif(MES_out/capacity*1000/365, 3)
+  )
+
+basin_N_P_SIAAP <- 
+  bind_rows(
+    basin_N_P_SIAAP_2015_2021, 
+    basin_N_P_SIAAP_2001_2015
+    )
+rm(basin_N_P_SIAAP_2001_2015)
+rm(basin_N_P_SIAAP_2015_2021)
+basin_N_P_SIAAP$NO2_in <- NA
+
+# All SIAAP WWTTP capacity are > 100 000 PE
+basin_PE_N_P_SIAAP <- basin_N_P_SIAAP %>%
+  mutate(PE_bin = "> 100 000 PE")
+N_P_SIAAP_2015_2021$PE_bin <- "> 100 000 PE"
+
+
+```
+
+We add the years categories
+
+```{r}
+N_P_SIAAP_2015_2021 <- f_year_categories(N_P_SIAAP_2015_2021)
+basin_N_P_SIAAP <- f_year_categories(basin_N_P_SIAAP)
+basin_PE_N_P_SIAAP <- f_year_categories(basin_PE_N_P_SIAAP)
+```
+
+The data before 2015 comprises only 5 stations ; after 2015 there are 6. But the unreported station before 2015 is negligible. Before 2015 we only have aggregated flows of the 5 stations.
+
+```{r}
+N_P_SIAAP_2015_2021$name_WWTP <- 
+  reorder(N_P_SIAAP_2015_2021$name_WWTP, N_P_SIAAP_2015_2021$DBO5_in)
+
+ggplot(N_P_SIAAP_2015_2021) + 
+  geom_line(
+    data=basin_N_P_SIAAP, 
+    aes(
+      Year, NGL_in
+      ),
+    linetype="dashed"
+    ) +
+  geom_area(
+    aes(
+      Year, NGL_in*365/10^6, fill=name_WWTP
+      ),
+    alpha=.8
+    ) +
+  labs(
+    x="", y="incoming NGL (kt per year)",
+    title = "Incoming NGL flows for the 6 SIAAP WWTPs",
+    subtitle = "before 2015, SEM (Seine-Morée) is not reported\nbut it is negligible",
+    caption = Source
+  ) +
+  xlim(2000, 2021)
+```
+
+:::
+
+# Comparison basin and SIAAP flows 
+
+For Pt, NGL, NTK, DBO5, DCO and MES we are able to compare the SIAAP data to the punctual Years data of the Seine-Normandie basin. SIAAP typically treats about half of the basin incoming pollution. The 2 datasets are coherent, except on year 2014, which we remove.
+
+```{r}
+#changing the graph function to change the subtitle (before data cleaning => after data cleaning)
+f_graph_nutrient <- function(dataset, nutrient_in, nutrient_out, label, legend_x, legend_y){
+  p <- ggplot(dataset) + 
+    #nutrient inflow
+    geom_line(
+      aes(
+        Year, 
+        !!as.symbol(nutrient_in), 
+        color=nutrient_in
+        )
+      ) + 
+    #nutrient outflow
+    geom_line(
+      aes(
+        Year,
+        !!as.symbol(nutrient_out), 
+        color = nutrient_out
+        )
+      ) +
+    ylim(0, NA) +
+    theme(
+      legend.position = c(legend_x, legend_y), 
+      legend.title = element_blank()
+      ) +
+    labs(
+      x="", y=paste("kt of", label) , 
+      title = paste("Reported", label, "flows in SIAAP WWTPs") ,
+      subtitle = "reported, not necessarily actual ; here after data cleaning", 
+      caption = Source
+      ) 
+  return(p)
+}
+```
+
+
+```{r}
+N_P_seine_normandie <- N_P_seine_normandie %>%
+  mutate(
+    is_SIAAP = case_when(
+      code_WWTP %in% c("037800501000", "039407401000","039202501000", "037862401000", "039305101000", "039300701000") ~ "SIAAP",
+      T ~ "not SIAAP"
+    )
+  )
+```
+
+
+```{r}
+f_graph_comparison <- function(dataset_basin, dataset_SIAAP, nutrient_in, nutrient_out, label_nutrient, y_max){
+  g <- plot_grid(
+    ggplot(dataset_SIAAP) + 
+      geom_col(
+        data = dataset_basin, 
+        aes(Year, !!as.symbol(nutrient_in)*365/10^6, fill=is_SIAAP),
+        alpha = .8
+        ) +
+      geom_line(aes(Year, !!as.symbol(nutrient_in))) +
+      theme(
+        legend.position = "none"
+      ) +
+      ylim(0, y_max) +
+      labs(
+        x="", y="kt per year",
+        title = paste(label_nutrient, "flows in Seine-Normandie WWTP"),
+        subtitle = "comparison of SIAAP data (line) and basin data for 2015",
+        fill="",
+        caption = ""
+      ),
+    ggplot(dataset_SIAAP) + 
+      geom_col(
+        data = dataset_basin, 
+        aes(Year, !!as.symbol(nutrient_out)*365/10^6, fill=is_SIAAP),
+        alpha = .8
+        ) +
+      geom_line(aes(Year, !!as.symbol(nutrient_out))) +
+      theme(
+        legend.position = c(0.5, 0.8)
+      ) +
+      ylim(0, y_max) +
+      labs(
+        x="", y="",
+        title = "",
+        subtitle = "",
+        fill="",
+        caption = ""
+      )
+  )
+  return(g)
+}
+```
+
+::: panel-tabset
+## NGL
+
+```{r}
+f_graph_comparison(N_P_seine_normandie, basin_N_P_SIAAP, "NGL_in", "NGL_out", "NGL", 80)
+```
+
+## NTK
+
+```{r}
+f_graph_comparison(N_P_seine_normandie, basin_N_P_SIAAP, "NTK_in", "NTK_out", "NTK", 80)
+```
+
+## Pt
+
+```{r}
+f_graph_comparison(N_P_seine_normandie, basin_N_P_SIAAP, "Pt_in", "Pt_out", "Pt", 10)
+```
+
+## DBO5
+
+```{r}
+f_graph_comparison(N_P_seine_normandie, basin_N_P_SIAAP, "DBO5_in", "DBO5_out", "DBO5", 350)
+```
+
+## DCO
+
+```{r}
+f_graph_comparison(N_P_seine_normandie, basin_N_P_SIAAP, "DCO_in", "DCO_out", "DCO", 800)
+```
+
+## MES
+
+```{r}
+f_graph_comparison(N_P_seine_normandie, basin_N_P_SIAAP, "MES_in", "MES_out", "MES", 450)
+```
+
+## PO4
+
+```{r}
+f_graph_nutrient(basin_N_P_SIAAP, "PO4_in", "PO4_out", "PO4", 0.7, 0.5) +
+  xlim(2015, 2020)
+```
+
+## NH4
+Not ravailable before 2015.
+
+```{r}
+f_graph_nutrient(basin_N_P_SIAAP, "NH4_in", "NH4_out", "NH4", 0.7, 0.5) +
+  xlim(2015, 2020)
+```
+
+## NO2 out
+
+```{r}
+ggplot(basin_N_P_SIAAP) +
+  geom_line(aes(Year, NO2_out)) + 
+  ylim(0, NA) +
+  labs(
+    x="", y="kt per year", 
+    title = paste("Reported outflows in SIAAP WWTPs") ,
+    subtitle = "reported, not necessarily actual ; here after data cleaning", 
+    caption = Source
+    ) 
+```
+
+## NO3 out
+
+```{r}
+ggplot(basin_N_P_SIAAP) +
+  geom_line(aes(Year, NO3_out)) + 
+  ylim(0, NA) +
+  labs(
+    x="", y="kt per year", 
+    title = paste("Reported outflows in SIAAP WWTPs") ,
+    subtitle = "reported, not necessarily actual ; here after data cleaning", 
+    caption = Source
+    ) 
+```
+
+## % NH4 / NTK
+
+```{r}
+ggplot(basin_N_P_SIAAP) +
+  geom_line(aes(Year, NH4_in/NTK_in*100, color="inflow")) +
+  geom_line(aes(Year, NH4_out/NTK_out*100, color="outflow")) +
+  xlim(2015, 2020) +
+  ylim(0, 100) +
+  labs(
+    x="", y="%", caption = Source,
+    title = "% of NH4 in NTK",
+    color=""
+  ) +
+  theme(
+    legend.position = c(0.8, 0.6)
+  )
+```
+
+## % PO4 / Pt
+
+vérifier qu'on en garde que ceux qui ont les 2
+
+```{r}
+ggplot(basin_N_P_SIAAP) +
+  geom_line(aes(Year, PO4_in/Pt_in*100, color="inflow")) +
+  geom_line(aes(Year, PO4_out/Pt_out*100, color="outflow")) +
+  xlim(2015, 2020) +
+  ylim(0, 100) +
+  labs(
+    x="", y="%", caption = Source,
+    title = "% of PO4 in Pt",
+    color=""
+  ) +
+  theme(
+    legend.position = c(0.8, 0.6)
+  )
+```
+
+## All N
+
+```{r}
+# N in data preparation
+temp <- basin_N_P_SIAAP %>% select(Year, NTK = NTK_in) %>%
+  mutate(NO2 = 0, NO3 = 0) %>%
+  gather(key = N_type, value = kt, NTK, NO2, NO3)
+# N out preaparation
+temp2 <- basin_N_P_SIAAP %>% 
+  #renaming for the legend
+  select(Year, NTK=NTK_out, NO2=NO2_out, NO3=NO3_out) %>%
+  gather(key = N_type, value = kt, NTK, NO2, NO3)
+
+#graphs
+plot_grid(
+  ggplot(temp) +
+    geom_area(
+      aes(
+        Year, kt, 
+        fill = N_type
+        )
+      ) +
+    geom_line(
+      data = basin_N_P_SIAAP, 
+      aes(
+        Year, NH4_in
+        ),
+      linetype="dashed"
+      ) +
+    geom_line(
+      data = basin_N_P_SIAAP, 
+      aes(
+        Year, NGL_in
+        )
+      ) +
+    theme(legend.position = "none") +
+    annotate("text", x=2013, y=27, label="NH4") +
+    labs(
+      x="", y="kt of N", 
+      title = "Reported N flows in SIAAP WWTPs",
+      subtitle = "Inflows",
+      caption=""
+    ) +
+    ylim(0, 50),
+  ggplot(temp2) +
+    geom_area(
+      aes(
+        Year, kt, 
+        fill = N_type
+        )
+      ) +
+    geom_line(
+      data = basin_N_P_SIAAP, 
+      aes(
+        Year, NH4_out
+        ),
+      linetype="dashed"
+      ) +
+    geom_line(
+      data = basin_N_P_SIAAP, 
+      aes(
+        Year, NGL_out
+        )
+      ) +
+    theme(
+      legend.position = c(0.6, 0.8), 
+      legend.title = element_blank()
+      ) +
+    annotate(
+      "text", label="NH4", 
+      x=2013, y=4
+      ) +
+    labs(
+      x="", y="", 
+      title = "",
+      subtitle = "Outflows",
+      caption=Source
+    ) + 
+    ylim(0, 50),
+  align = "hv"
+)
+```
+
+## Correction
+
+We remove the year 2014.
+
+```{r}
+N_P_seine_normandie <- N_P_seine_normandie %>%
+  filter(Year!=2014)
+basin_N_P_seine_normandie <- basin_N_P_seine_normandie %>%
+  filter(Year!=2014)
+basin_PE_N_P_seine_normandie <- basin_PE_N_P_seine_normandie %>%
+  filter(Year!=2014)
+```
+
+
+:::
+
+# Capacity  
+
+```{r}
+test <- N_P_seine_normandie %>%
+  filter(is_SIAAP=="SIAAP")
+```
+
+::: panel-tabset
+## SIAAP and basin comparison
+
+```{r}
+plot_grid(
+  ggplot(basin_N_P_SIAAP) +
+    geom_line(aes(Year, capacity)) +
+    geom_col(data = N_P_seine_normandie, aes(Year, capacity/10^6, fill = is_SIAAP)) +
+    theme(legend.position = c(0.3, 0.8)) +
+    labs(
+      x="", y="million PE",
+      title = "Comparison of SIAAP and Seine-Normandie",
+      subtitle = "capacity. line: SIAAP ; column: whole basin",
+      caption = "\n",
+      fill=""
+    ),
+  ggplot(basin_N_P_SIAAP) +
+    geom_bar(aes(as.factor(Year))) +
+    geom_bar(data = N_P_seine_normandie, aes(as.factor(Year), fill = is_SIAAP)) +
+    theme(legend.position = "none") +
+    labs(
+      x="", y="number of facilities: only 6 in SIAAP",
+      title = "",
+      subtitle = "",
+      caption = Source,
+      fill=""
+    )
+)
+
+```
+
+
+## Large categories  
+
+About half of the total capacity is from WWTP larger than 100 000 population equivalent. About 80-90% is dut to WWTP larger than 10 000 population equivalent.
+
+```{r}
+temp <- N_P_seine_normandie %>%
+  filter(is.na(capacity)==F) %>%
+  select(Year, capacity, PE_bin) %>%
+  group_by(Year, PE_bin) %>%
+  summarise(
+    `capacity (million PE)` = sum(capacity)/10^6,
+    `number of stations` = n()
+  ) %>% 
+  gather(key=capacity_or_n, value = value, `capacity (million PE)`, `number of stations`)
+```
+
+::: panel-tabset
+### Absolute
+
+```{r}
+ggplot(temp) + 
+  geom_col(aes(as.factor(Year), value, fill=PE_bin), alpha=.8) + 
+  facet_wrap(vars(capacity_or_n), scales="free") + 
+  labs(
+    title="Reporting in the database",
+    subtitle = "For each capacity category",
+    x="", y="", fill="nominal capacity \n(Population Equivalent)",
+    caption = Source
+  )
+```
+
+
+### Relative
+
+```{r}
+ggplot(temp) + 
+  geom_col(aes(as.factor(Year), value, fill=PE_bin), position = "fill", alpha=.8) + 
+  facet_wrap(vars(capacity_or_n), scales="free") + 
+  labs(
+    title="Reporting in the database",
+    subtitle = "Proportion of each capacity category",
+    x="", y="", fill="nominal capacity \n(Population Equivalent)",
+    caption = Source
+  )
+```
+
+:::
+
+## Histogram
+
+```{r}
+temp <- N_P_seine_normandie %>% filter(Year==Year_analysis)
+ggplot(temp) + 
+  geom_histogram(
+    aes(
+      capacity, 
+      fill = "Nb of facilities"
+      ), 
+    n=100, alpha=.4, stat="density"
+    ) +
+  geom_histogram(
+    aes(
+      capacity, weight = capacity, 
+      fill="Nb of facilities weighted by capacity"
+      ), 
+    n=100, alpha=.4, stat="density"
+    ) +
+  theme(
+    legend.position = c(0.7,0.8),
+  ) +
+  labs(
+    x="Waste Water Treatment Plant Capacity \n(Population Equivalent)",
+    y="Distribution density",
+    fill="Distribution of",
+    title = paste("WWTP capacities distribution", as.character(Year_analysis)),
+    subtitle = "raw or weighted by capacity"
+  ) +
+  scale_x_log10(
+    labels = scales::label_number(drop0trailing = TRUE)
+    )
+```
+
+## Cumulative distribution  
+
+About 1% of the WWTP represent 25% of the total capacity ; 4% represent 50% of the capacity ; 10% represent 75%%
+
+```{r}
+temp <- N_P_seine_normandie %>% 
+  ungroup() %>%
+  filter(Year==Year_analysis) %>% 
+  select(code_WWTP, name_WWTP, capacity) %>%
+  filter(is.na(capacity) == F) %>%
+  arrange(desc(capacity)) %>%
+  mutate( 
+    cumulative_capacity = cumsum(capacity)/10^6,
+    rank_STEU = rank(-capacity, ties.method = "first"),
+    percent_cumulative_capacity = round(cumulative_capacity/sum(capacity/10^6)*100, digits = 1),
+    percent_rank = round(rank_STEU/n()*100, digits = 1)
+    ) 
+f_save_csv_files(
+  temp %>% mutate(basin = "Seine-Normandie"),
+  "output_data/zipf_law/",
+  "zipf_law_03_seine_normandie.csv"
+)
+coef <- max(temp$rank_STEU)/100
+coef2 <- max(temp$cumulative_capacity)/100
+```
+
+::: panel-tabset
+
+### Nb of WWTPs vs Capacity (linear scale)
+
+```{r}
+ggplot(temp) +
+  geom_step(
+    aes(
+      x = percent_rank, y = percent_cumulative_capacity
+      )
+    ) + 
+  labs(
+    title = paste("Cumulative distribution,", Year_analysis),
+    subtitle="nb of WWTP vs total capacity",
+    x="% of WWTP", y="% of total capacity",
+    caption = Source
+  ) +
+  scale_x_continuous(
+    sec.axis = 
+      sec_axis(
+        trans=~.*coef, name="nb of WWTP",
+        labels = scales::label_number(drop0trailing = TRUE)
+        )
+    ) + 
+  scale_y_continuous(
+    sec.axis = 
+      sec_axis(
+        trans=~.*coef2, 
+        name="cumulative capacity \n(millions PE)"
+        )
+    ) + 
+    theme(legend.position = "none")
+```
+
+### Nb of WWTPs vs Capacity (log scale)
+
+```{r}
+ggplot(temp) +
+  geom_step(
+    aes(
+      x = percent_rank, y = percent_cumulative_capacity
+      )
+    ) + 
+  labs(
+    title = paste("Cumulative distribution,", Year_analysis),
+    subtitle="nb of WWTP vs total capacity",
+    x="% of WWTP", y="% of total capacity",
+    caption = Source
+  ) +
+  scale_x_log10(
+    labels = scales::label_number(drop0trailing = TRUE),
+    sec.axis = 
+      sec_axis(
+        trans=~.*coef, 
+        name="nb of WWTP",
+        labels = scales::label_number(drop0trailing = TRUE)
+        )
+    ) + 
+  scale_y_continuous(
+    sec.axis = 
+      sec_axis(
+        trans=~.*coef2, 
+        name="cumulative capacity \n(millions Population Equivalent)"
+        )
+    ) + 
+    theme(legend.position = "none")
+```
+
+### Zipf law
+
+```{r}
+ggplot(temp) +
+  geom_point(
+    aes(
+      x = rank_STEU, y = capacity
+      )
+    ) + 
+  labs(
+    title = paste("WWTP capacity vs rank,", Year_analysis),
+    subtitle = "looking for a Zipf law",
+    x="Waste Water Treatment Plant \n(ranked by capacity)",
+    y=" Waste Water Treatment Plant capacity\n(Population Equivalent)"
+    ) +
+  scale_x_log10(
+    labels = scales::label_number(drop0trailing = TRUE)
+    ) + 
+  scale_y_log10(
+    labels = scales::label_number(drop0trailing = TRUE)
+    )
+```
+
+
+:::
+
+:::
+
+# Pollution Flows 
+
+::: panel-tabset
+## Data Quality : reporting rates 
+
+```{r f_graph_reporting_nutrients}
+#function for plots : to be finished
+f_graph_reporting_nutrients <- function(pollution_in, pollution_out){
+  temp <- N_P_seine_normandie %>%
+    select(
+      Year, capacity, 
+      !!as.symbol(pollution_in), !!as.symbol(pollution_out)
+      ) %>%
+    mutate(
+      nutrient_in = is.na(!!as.symbol(pollution_in))==F,
+      nutrient_out = is.na(!!as.symbol(pollution_out))==F
+      ) %>%
+    gather(
+      key=in_out_flow, 
+      value = `reported pollution`, 
+      nutrient_in, nutrient_out
+      ) %>%
+    group_by(
+      Year, in_out_flow, `reported pollution`
+      ) %>%
+    summarise(
+      `number of WWTP`=n(), 
+      `capacity (million PE)` = sum(capacity, na.rm=T)/10^6
+      ) %>%
+    gather(
+      key=n_or_capacity, 
+      value = value, 
+      `number of WWTP`, `capacity (million PE)`
+      ) %>%
+    #renaming labels
+    mutate(
+      in_out_flow = case_when(
+        in_out_flow == "nutrient_in" ~ pollution_in,
+        in_out_flow == "nutrient_out" ~ pollution_out,
+      )
+    )
+
+  g <- ggplot(temp) +
+    geom_col(aes(as.factor(Year), value, fill=`reported pollution`)) +
+    facet_grid(
+      n_or_capacity~in_out_flow, 
+      scales="free_y", switch = "y") +
+    labs(
+      y="", x="",
+      title = "Reporting of nutrient inflows (left) and outflows (right)",
+      subtitle = "In terms of total capacity (top) and nb of WWTP (bottom)",
+      caption = Source
+      ) 
+
+  return(g)
+}
+```
+
+Pt, NTK, DBO5, DCO and  MES pollution are reported for virtually all the capacity Ony NGL is not always reportedin 2015. When NGL in was not reported we approximate it with NTK in, so there is no problem. The only remaining issue is for NGL out, when both NTK out and NO3 out are not reported, which is the case for most WWTP but only for a small portion of the total capacity.
+
+::: panel-tabset
+### NGL
+
+```{r}
+f_graph_reporting_nutrients("NGL_in", "NGL_out") 
+```
+
+### NTK
+
+```{r}
+f_graph_reporting_nutrients("NTK_in", "NTK_out")
+```
+
+### NO2
+
+```{r}
+f_graph_reporting_nutrients("NO2_in", "NO2_out")
+```
+
+### NO3
+
+```{r}
+f_graph_reporting_nutrients("NO3_in", "NO3_out")
+```
+
+### Pt
+
+```{r}
+f_graph_reporting_nutrients("Pt_in", "Pt_out")
+```
+
+### DBO5
+
+```{r}
+f_graph_reporting_nutrients("DBO5_in", "DBO5_out")
+```
+
+### DCO
+
+```{r}
+f_graph_reporting_nutrients("DCO_in", "DCO_out")
+```
+
+### MES
+
+```{r}
+f_graph_reporting_nutrients("MES_in", "MES_out")
+```
+
+
+:::
+
+## Real flow extrapolation  
+
+::: panel-tabset
+### Coefficient calculation
+
+For Pt, NTK, DBO5, DCO and  MES we do not adjust the flows. Same for incoming NGL.
+
+We compute in terms of installed capacity the reported and unreported flows for NGL out. We do this for each capacity category.
+
+```{r}
+#create file of reported 
+temp <- N_P_seine_normandie %>%
+  select(
+    Year, PE_bin, capacity, NGL_out
+    ) %>%
+  #spots unreported values for each nutrient flow
+  mutate(NGL_out = is.na(NGL_out)==F) %>%
+  #gather to ba able to then group by flow and count capacity
+  gather(key=nutrient_flow, value = reported_pollution, NGL_out)  %>%
+  #count reported capacity and unreported capacity for each (Year, capacity category, nutrient flow)
+  group_by(Year, PE_bin, nutrient_flow, reported_pollution) %>%
+  summarise(capacity = sum(capacity, na.rm=T)/10^6) %>%
+  #creates reported/unreported names for each nutrient flow and spreads into columns
+  mutate(
+    nutrient_flow = case_when(
+      reported_pollution == T ~ paste0(nutrient_flow, "_reported"),
+      reported_pollution == F ~ paste0(nutrient_flow, "_unreported")
+    )
+  ) %>%
+  select(-reported_pollution) %>%
+  spread(nutrient_flow, capacity)
+
+# NA values replaced by 0 for future coeff computation
+temp[is.na(temp)] <- 0
+```
+
+From this we compute proportionate coefficient to extrapolate real flows.
+
+```{r}
+temp <- temp %>%
+  mutate(NGL_out_coeff = (NGL_out_reported + NGL_out_unreported)/NGL_out_reported,) %>%
+  select(-c(NGL_out_reported, NGL_out_unreported))
+
+#replace Inf values by 1 (check if it does not create problems)
+temp[temp == Inf] <- 1
+temp[is.na(temp)] <- 1
+```
+
+With these coefficients we compute the adjusted flows
+
+```{r}
+#file with reported flows and adjustment coefficient
+temp2 <- left_join(
+  basin_PE_N_P_seine_normandie %>%
+    #selects only flows and not yields or ratios
+    select(Year, PE_bin, NGL_out),
+  temp, by=c("Year", "PE_bin")
+)
+
+#computes adjusted flows
+temp2 <- temp2 %>%
+  mutate(NGL_out_adj = round(NGL_out_coeff*NGL_out, 5)) %>%
+  #we remove coefficients and unajusted flows
+  select(-c(NGL_out, NGL_out_coeff))
+```
+
+We add these adjusted flows to the main files reporting flows at the basin scale
+
+```{r}
+#adding adjusted flows to the basin x capacity files
+basin_PE_N_P_seine_normandie <- left_join(
+  basin_PE_N_P_seine_normandie, temp2, by=c("Year", "PE_bin")
+)
+
+#aggregating adjusted flows at the basin scale without the capacity categories
+temp <- temp2 %>%
+  select(-PE_bin) %>%
+  group_by(Year) %>%
+  summarise_all(~signif(sum(.x, na.rm=T), 3))
+
+#adding adjusted flows to the basin files
+basin_N_P_seine_normandie <- left_join(
+  basin_N_P_seine_normandie, temp, by="Year"
+)
+
+# for all other flows adjusted flows are the same as reported flows.
+basin_PE_N_P_seine_normandie <- basin_PE_N_P_seine_normandie %>%
+  mutate(
+    Pt_in_adj = Pt_in, 
+    Pt_out_adj = Pt_out, 
+    NGL_in_adj = NGL_in, 
+    DBO5_in_adj = DBO5_in, 
+    DBO5_out_adj = DBO5_out, 
+    DCO_in_adj = DCO_in, 
+    DCO_out_adj = DCO_out, 
+    MES_in_adj = MES_in, 
+    MES_out_adj = MES_out
+  )
+
+basin_N_P_seine_normandie <- basin_N_P_seine_normandie %>%
+  mutate(
+    Pt_in_adj = Pt_in, 
+    Pt_out_adj = Pt_out, 
+    NGL_in_adj = NGL_in, 
+    DBO5_in_adj = DBO5_in, 
+    DBO5_out_adj = DBO5_out, 
+    DCO_in_adj = DCO_in, 
+    DCO_out_adj = DCO_out, 
+    MES_in_adj = MES_in, 
+    MES_out_adj = MES_out
+  )
+```
+
+We plot the comparison reported / adjusted in the following graphs. The difference is marginal, only a few percents.
+
+```{r}
+f_graph_adjusted <- function(basin_file, basin_PE_file, nutrient_adjusted, nutrient_reported, nutrient_label){
+  g <- plot_grid(
+    ggplot(basin_PE_file) +
+      geom_point(
+        data = basin_file,
+        aes(Year, !!as.symbol(nutrient_adjusted)), 
+        color="black", size=1
+        ) + 
+      geom_col(
+        aes(Year, !!as.symbol(nutrient_reported), fill=PE_bin), 
+        alpha=.7
+        ) + 
+      theme(legend.position = "none") +
+      labs(
+        x="", y="kt per year",
+        caption = "\n",
+        title = paste("Adjusted", nutrient_label, "flows")
+    ),
+    ggplot(basin_PE_file) +
+      geom_point(
+        aes(Year, !!as.symbol(nutrient_adjusted), color=PE_bin), 
+        size=1
+        ) + 
+      geom_col(
+        aes(Year, !!as.symbol(nutrient_reported), fill=PE_bin), 
+        alpha=.7
+        ) + 
+      theme(legend.position = "none") +
+      facet_wrap(vars(PE_bin), scales="free") +
+      labs(
+        x="", y="",
+        caption = Source,
+        title = "",
+        subtitle = "point: adjusted flow ; area: reported flow"
+      ),
+    rel_widths = c(0.3, 0.7)
+  )
+  return(g)
+}
+```
+
+### NGL out
+
+```{r}
+f_graph_adjusted(
+  basin_N_P_seine_normandie, 
+  basin_PE_N_P_seine_normandie,
+  "NGL_out_adj", "NGL_out", "discharged NGL"
+  )
+```
+
+:::
+
+:::
+
+# Ratios 
+
+::: panel-tabset
+## Basin scale 
+
+::: panel-tabset
+### N:P ratio
+
+```{r}
+ggplot(basin_N_P_SIAAP) + 
+  geom_line(aes(Year, N_P_ratio_in, color="N:P in")) + 
+  geom_line(aes(Year, N_P_ratio_out, color = "N:P out")) + 
+  geom_point(data = basin_N_P_seine_normandie, aes(Year, N_P_ratio_in, color="N:P in")) +
+  geom_point(data = basin_N_P_seine_normandie, aes(Year, N_P_ratio_out, color="N:P out")) +
+  ylim(0, NA) +
+  theme(
+    legend.position = c(0.2, 0.6)
+  ) +
+  labs(
+    x="", y="N:P ratio",
+    title = "N:P ratio in Seine-Normandie and SIAAP
+    ",
+    subtitle = "comparison of SIAAP data (line) and basin data (point)",
+    caption=Source, color=""
+  )
+```
+
+### DCO:DBO5
+
+```{r}
+ggplot(basin_N_P_SIAAP) + 
+  geom_line(aes(Year, DCO_DBO5_ratio_in, color="DCO:DBO5 in")) + 
+  geom_line(aes(Year, DCO_DBO5_ratio_out, color = "DCO:DBO5 out")) + 
+  geom_point(data = basin_N_P_seine_normandie, aes(Year, DCO_DBO5_ratio_in, color="DCO:DBO5 in")) + 
+  geom_point(data = basin_N_P_seine_normandie, aes(Year, DCO_DBO5_ratio_out, color = "DCO:DBO5 out")) + 
+  ylim(0, NA) +
+  theme(
+    legend.position = c(0.7, 0.6)
+  ) +
+  labs(
+    x="", y="DCO:DBO5 ratio",
+    title = "DCO:DBO5 ratio in Seine-Normandie and SIAAP",
+    subtitle = "comparison of SIAAP data (line) and basin data (point)",
+    caption=Source, color=""
+  )
+```
+
+### DBO5:N vs DBO5:P
+
+```{r}
+ggplot(basin_N_P_SIAAP) +
+  geom_point(
+    aes(
+      DBO5_N_ratio_in, DBO5_P_ratio_in,
+      color=Year_category
+      )
+    ) +
+  geom_point(
+    aes(
+      DBO5_N_ratio_out, DBO5_P_ratio_out,
+      color=Year_category
+        )
+    ) +
+  ylim(0, NA) +
+  annotate(
+    geom="text", label ="inflow",
+    x=4, y=25
+  ) +
+  annotate(
+    geom="text", label ="outflow",
+    x=1.3, y=8
+  ) +
+  labs(
+    x="DBO5:Pt ratio", y="DBO5:NGL ratio",
+    title = "DBO5:NGL vs DBO5:Pt ratio in SIAAP",
+    subtitle = "",
+    caption=Source, color=""
+  )
+```
+
+
+
+
+
+:::
+
+:::
+
+# Yield 
+
+::: panel-tabset
+## Basin scale
+
+```{r}
+#temporal yield N and P
+ggplot(basin_N_P_SIAAP) + 
+  # SIAAP
+  geom_line(aes(Year, Pt_yield, color="P")) + 
+  geom_line(aes(Year, NGL_yield, color = "N")) + 
+  geom_line(aes(Year, DBO5_yield, color = "DBO5")) +
+  geom_line(aes(Year, DCO_yield, color = "DCO")) +
+  geom_line(aes(Year, MES_yield, color = "MES")) +
+  #Seine-Normandie
+  geom_point(data=basin_N_P_seine_normandie, aes(Year, Pt_yield, color="P")) + 
+  geom_point(data=basin_N_P_seine_normandie, aes(Year, NGL_yield, color = "N")) + 
+  geom_point(data=basin_N_P_seine_normandie, aes(Year, DBO5_yield, color = "DBO5")) +
+  geom_point(data=basin_N_P_seine_normandie, aes(Year, DCO_yield, color = "DCO")) +
+  geom_point(data=basin_N_P_seine_normandie, aes(Year, MES_yield, color = "MES")) +
+  ylim(0,100) +
+  theme(legend.position = c(0.7, 0.3)) +
+  labs(
+    title = "Global abatement rate of SIAAP WWTPs", 
+    x="", y="Yield (%)", color="",
+    subtitle = "comparison of SIAAP data (line) and basin data for 2015",
+    caption = Source
+    )
+```
+
+
+
+
+
+
+
+:::
+
+# Save data
+
+We save the Seine-Normandie basin data (only for 2015, 2016, 2018 and 2020).
+
+```{r saving_data_seine_normandie}
+#all WWTP file
+path_output <- "output_data/all_WWTP/"
+temp <- N_P_seine_normandie %>%
+  select(
+    code_WWTP, name_WWTP, Year, capacity, name_commune, PE_bin,
+    DBO5_in, DCO_in, MES_in, NGL_in, NTK_in, NO3_in, NO2_in, Pt_in,
+    DBO5_out, DCO_out, MES_out, NGL_out, NTK_out, NO3_out, NO2_out, Pt_out,
+    DBO5_yield, DCO_yield, MES_yield, NGL_yield, Pt_yield,
+  )
+f_save_csv_files(
+  temp,
+  path_output,
+  "all_WWTP_03_seine_normandie.csv"
+)
+
+#basin aggregated file
+path_output <- "output_data/basins/"
+temp <- basin_N_P_seine_normandie %>%
+  select(
+    Year, capacity, nb_WWTP,
+    #flows reported and adjusted
+    Pt_in, Pt_in_adj, NGL_in, NGL_in_adj, 
+    DBO5_in, DBO5_in_adj, DCO_in, DCO_in_adj, MES_in, MES_in_adj,
+    Pt_out, Pt_out_adj, NGL_out, NGL_out_adj,
+    DBO5_out, DBO5_out_adj, DCO_out, DCO_out_adj, MES_out, MES_out_adj,
+    #yields
+    NGL_yield, Pt_yield, DBO5_yield, DCO_yield, MES_yield, 
+    #nutrient ratios
+    N_P_ratio_in, N_P_ratio_out,
+    DBO5_N_ratio_in, DBO5_N_ratio_out, DBO5_P_ratio_in, DBO5_P_ratio_out,
+    DCO_N_ratio_in, DCO_N_ratio_out, DCO_P_ratio_in, DCO_P_ratio_out,
+    DCO_DBO5_ratio_in, DCO_DBO5_ratio_out,
+    #PE ratios
+    Pt_PE_ratio_in, Pt_PE_ratio_out, NGL_PE_ratio_in, NGL_PE_ratio_out, 
+    DBO5_PE_ratio_in, DBO5_PE_ratio_out, DCO_PE_ratio_in, DCO_PE_ratio_out, MES_PE_ratio_in, MES_PE_ratio_out
+  )
+temp[temp==0] <- NA #change 0 in unreported value
+
+f_save_csv_files(
+  temp,
+  path_output,
+  "basin_03_seine_normandie.csv"
+)
+
+#basin x PE agregated file
+path_output <- "output_data/basins_PE/"
+temp <- basin_PE_N_P_seine_normandie %>%
+  select(
+    Year, capacity, nb_WWTP, PE_bin, 
+    #flows reported and adjusted
+    Pt_in, Pt_in_adj, NGL_in, NGL_in_adj, 
+    DBO5_in, DBO5_in_adj, DCO_in, DCO_in_adj, MES_in, MES_in_adj,
+    Pt_out, Pt_out_adj, NGL_out, NGL_out_adj,
+    DBO5_out, DBO5_out_adj, DCO_out, DCO_out_adj, MES_out, MES_out_adj,
+    #yields
+    NGL_yield, Pt_yield, DBO5_yield, DCO_yield, MES_yield, 
+    #nutrient ratios
+    N_P_ratio_in, N_P_ratio_out,
+    DBO5_N_ratio_in, DBO5_N_ratio_out, DBO5_P_ratio_in, DBO5_P_ratio_out,
+    DCO_N_ratio_in, DCO_N_ratio_out, DCO_P_ratio_in, DCO_P_ratio_out,
+    DCO_DBO5_ratio_in, DCO_DBO5_ratio_out,
+    #PE ratios
+    Pt_PE_ratio_in, Pt_PE_ratio_out, NGL_PE_ratio_in, NGL_PE_ratio_out, 
+    DBO5_PE_ratio_in, DBO5_PE_ratio_out, DCO_PE_ratio_in, DCO_PE_ratio_out, MES_PE_ratio_in, MES_PE_ratio_out
+  )
+temp[temp==0] <- NA #change 0 in unreported value
+
+f_save_csv_files(
+  temp,
+  path_output,
+  "basin_PE_03_seine_normandie.csv"
+)
+```
+
+
+We save the SIAAP data over the 2000-2020 period.
+
+```{r saving_data_SIAAP}
+#In this case their is no need to adjust the flows, since all 6 WWTP are reported.
+basin_N_P_SIAAP <- basin_N_P_SIAAP %>%
+  mutate(
+    Pt_in_adj = Pt_in, 
+    Pt_out_adj = Pt_out, 
+    NGL_in_adj = NGL_in,
+    NGL_out_adj = NGL_out,
+    DBO5_in_adj = DBO5_in, 
+    DBO5_out_adj = DBO5_out, 
+    DCO_in_adj = DCO_in, 
+    DCO_out_adj = DCO_out, 
+    MES_in_adj = MES_in, 
+    MES_out_adj = MES_out
+  )
+
+basin_PE_N_P_SIAAP <- basin_PE_N_P_SIAAP %>%
+  mutate(
+    Pt_in_adj = Pt_in, 
+    Pt_out_adj = Pt_out, 
+    NGL_in_adj = NGL_in,
+    NGL_out_adj = NGL_out,
+    DBO5_in_adj = DBO5_in, 
+    DBO5_out_adj = DBO5_out, 
+    DCO_in_adj = DCO_in, 
+    DCO_out_adj = DCO_out, 
+    MES_in_adj = MES_in, 
+    MES_out_adj = MES_out
+  )
+
+#basin aggregated file
+path_output <- "output_data/basins/"
+temp <- basin_N_P_SIAAP %>%
+  select(
+    Year, capacity, nb_WWTP,
+    #flows reported and adjusted
+    Pt_in, Pt_in_adj, NGL_in, NGL_in_adj, 
+    DBO5_in, DBO5_in_adj, DCO_in, DCO_in_adj, MES_in, MES_in_adj,
+    Pt_out, Pt_out_adj, NGL_out, NGL_out_adj,
+    DBO5_out, DBO5_out_adj, DCO_out, DCO_out_adj, MES_out, MES_out_adj,
+    #yields
+    NGL_yield, Pt_yield, DBO5_yield, DCO_yield, MES_yield, 
+    #nutrient ratios
+    N_P_ratio_in, N_P_ratio_out,
+    DBO5_N_ratio_in, DBO5_N_ratio_out, DBO5_P_ratio_in, DBO5_P_ratio_out,
+    DCO_N_ratio_in, DCO_N_ratio_out, DCO_P_ratio_in, DCO_P_ratio_out,
+    DCO_DBO5_ratio_in, DCO_DBO5_ratio_out,
+    #PE ratios
+    Pt_PE_ratio_in, Pt_PE_ratio_out, NGL_PE_ratio_in, NGL_PE_ratio_out, 
+    DBO5_PE_ratio_in, DBO5_PE_ratio_out, DCO_PE_ratio_in, DCO_PE_ratio_out, MES_PE_ratio_in, MES_PE_ratio_out
+  )
+
+f_save_csv_files(
+  temp,
+  path_output,
+  "basin_03_SIAAP.csv"
+)
+
+#basin x PE agregated file
+path_output <- "output_data/basins_PE/"
+temp <- basin_PE_N_P_SIAAP %>%
+  select(
+    Year, capacity, nb_WWTP, PE_bin, 
+    #flows reported and adjusted
+    Pt_in, Pt_in_adj, NGL_in, NGL_in_adj, 
+    DBO5_in, DBO5_in_adj, DCO_in, DCO_in_adj, MES_in, MES_in_adj,
+    Pt_out, Pt_out_adj, NGL_out, NGL_out_adj,
+    DBO5_out, DBO5_out_adj, DCO_out, DCO_out_adj, MES_out, MES_out_adj,
+    #yields
+    NGL_yield, Pt_yield, DBO5_yield, DCO_yield, MES_yield, 
+    #nutrient ratios
+    N_P_ratio_in, N_P_ratio_out,
+    DBO5_N_ratio_in, DBO5_N_ratio_out, DBO5_P_ratio_in, DBO5_P_ratio_out,
+    DCO_N_ratio_in, DCO_N_ratio_out, DCO_P_ratio_in, DCO_P_ratio_out,
+    DCO_DBO5_ratio_in, DCO_DBO5_ratio_out,
+    #PE ratios
+    Pt_PE_ratio_in, Pt_PE_ratio_out, NGL_PE_ratio_in, NGL_PE_ratio_out, 
+    DBO5_PE_ratio_in, DBO5_PE_ratio_out, DCO_PE_ratio_in, DCO_PE_ratio_out, MES_PE_ratio_in, MES_PE_ratio_out
+  )
+
+f_save_csv_files(
+  temp,
+  path_output,
+  "basin_PE_03_SIAAP.csv"
+)
+```
+
+
+
+
+```{r remove_all_objects_in_environment}
+rm(list = ls())
+```
+
+
+
+
+
+

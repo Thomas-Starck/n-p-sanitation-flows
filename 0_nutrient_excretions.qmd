@@ -1,0 +1,1500 @@
+---
+title: "Nutrient Excretions"
+---
+
+This page describes the data used to estimate nitrogend and phosphorus excretions by French people.
+
+```{r setup, include=T, warning=F, message=F, results=F}
+knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
+
+library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
+
+#core tidyverse packages loaded:
+# ggplot2, for data visualisation. https://ggplot2.tidyverse.org/
+# dplyr, for data manipulation. https://dplyr.tidyverse.org/
+# tidyr, for data tidying. https://tidyr.tidyverse.org/
+# readr, for data import. https://readr.tidyverse.org/
+# purrr, for functional programming. https://purrr.tidyverse.org/
+# tibble, for tibbles, a modern re-imagining of data frames. https://tibble.tidyverse.org/
+# stringr, for strings. https://stringr.tidyverse.org/
+# forcats, for factors. https://forcats.tidyverse.org/
+# lubridate, for date/times. https://lubridate.tidyverse.org/
+
+#also loads the following packages (less frequently used):
+# Working with specific types of vectors:
+#     hms, for times. https://hms.tidyverse.org/
+# Importing other types of data:
+#     feather, for sharing with Python and other languages. https://github.com/wesm/feather
+#     haven, for SPSS, SAS and Stata files. https://haven.tidyverse.org/
+#     httr, for web apis. https://httr.r-lib.org/
+#     jsonlite for JSON. https://arxiv.org/abs/1403.2805
+#     readxl, for .xls and .xlsx files. https://readxl.tidyverse.org/
+#     rvest, for web scraping. https://rvest.tidyverse.org/
+#     xml2, for XML. https://xml2.r-lib.org/
+# Modelling
+#     modelr, for modelling within a pipeline. https://modelr.tidyverse.org/
+#     broom, for turning models into tidy data. https://broom.tidymodels.org/
+
+# Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+#loading additional relevant packages
+library(cowplot) #for plot_grid(), multiple plots
+library(DT) #for interactive tables
+
+#path for data 
+path_output <- "output_data/nutrient_ingestion_excretion/"
+path_source <- "source_data/0_nutrient_excretion/0_INCA3/"
+
+#setting graphs theme
+theme_set(
+  theme_minimal() +
+    theme(plot.title = element_text(face="bold"))
+  )
+
+#setting viridis theme for colors
+scale_colour_continuous <- scale_colour_viridis_c
+scale_colour_discrete   <- scale_colour_viridis_d
+scale_colour_binned     <- scale_colour_viridis_b
+#setting viridis theme for fill
+scale_fill_continuous <- scale_fill_viridis_c
+scale_fill_discrete   <- scale_fill_viridis_d
+scale_fill_binned     <- scale_fill_viridis_b
+
+Source <- "Source: INCA3\nComputation Thomas Starck"
+
+# Load the function file
+source("functions.R")
+```
+
+# Nutrient ingestion survey
+
+::: panel-tabset
+## Source
+
+Data are from a survey and [report by ANSES](https://www.anses.fr/fr/content/inca-3-evolution-des-habitudes-et-modes-de-consommation-de-nouveaux-enjeux-en-mati%C3%A8re-de){target="_blank"}. All data and documentation are available on [data.gouv](https://www.data.gouv.fr/fr/datasets/donnees-de-consommations-et-habitudes-alimentaires-de-letude-inca-3/){target="_blank"}. Three files describe the data : [User guide](https://static.data.gouv.fr/resources/donnees-de-consommations-et-habitudes-alimentaires-de-letude-inca-3/20210128-192017/notice-utilisateurs-donnees-inca3-data.gouvjanv21.pdf){target="_blank"} ([english](https://static.data.gouv.fr/resources/donnees-de-consommations-et-habitudes-alimentaires-de-letude-inca-3/20210128-192916/notice-utilisateurs-donnees-inca3-data.gouv-english.pdf){target="_blank"}), [Nomenclature](https://static.data.gouv.fr/resources/donnees-de-consommations-et-habitudes-alimentaires-de-letude-inca-3/20210128-192229/nomenclature-inca3-janv2021.pdf){target="_blank"}, [Thesaurus](https://static.data.gouv.fr/resources/donnees-de-consommations-et-habitudes-alimentaires-de-letude-inca-3/20191217-185016/thesaurus-inca3-data.gouv.pdf){target="_blank"}. See also its publication in the [scientific literature](https://doi.org/10.1017/S1368980018002896){target="_blank"}.
+
+There is a R package reporting in details the data of this INCA3 survey (see [here](https://rdrr.io/github/ThinkR-open/inca3/f/README.Rmd){target="_blank"} and [here](https://www.data.gouv.fr/en/reuses/package-r-donnees-inca3/){target="_blank"})
+
+
+```{r}
+#normally the INCA3 package should be installed in renv/library/R-4.3/aarch64-apple-darwin20/inca3
+#if this is not the case, you can uncomment the following line to install package from the internet
+#remotes::install_github("thinkr-open/inca3", build_vignettes = FALSE)
+
+library(inca3) #package inca with data on food ingestion
+```
+
+
+Here are the data files available in the package (in user guide document) :
+
+used for our analysis
+
+-   DESCRIPTION_INDIV : used for age and sex of each individual. Also includes data on weight, height, BMI (not used)...
+-   APPORTS_NUT_ALIM : used, reports synthetized daily nutrients intakes for each individuals (about 4000).
+
+not used
+
+-   HABITUDES_INDIV, HABITUDES_MEN, ACTPHYS_SEDENT, FPQ : not used, describes individuals and households habits.
+-   CONSO_CA_PROD, CONSO_CA_INDIV : not used, tables about food supplements consumption.
+-   OCCASIONS : not used (day of consumption, location...).
+-   CONSO_COMPO_ALIM : very complete (250k obs, each individual, each aliment), not used because we do not need this level of precision.
+-   NOMENCLATURE : possibly to convert in different food groups, could be a key table
+-   GloboDiet_gpe_name ?
+-   CONSO_GPE_INCA3 : no used, food group names
+
+## Loading data
+
+We load a file we produced ourselves, to translate nutrients as reported by INCA3 data (nutriment1, nutriment2...) into plain language (see in the user guide p78).
+
+```{r load_INCA3_nutrients_keys}
+#my files for foodstuff group names and nutrient keys
+nutriments_contrib_INCA3 <- read_csv(paste(path_source, "nutriments_contrib_INCA3.csv", sep=""))
+```
+
+Then we load the file reporting, for each individual, the nutrient intakes per day (40 000 observations). We only keep a few of them (K, P, protein, energy, carbohydrates, lipids)
+
+```{r loading_main_data_file}
+#quick glimpse at apports_nut_alim: nutriments for each individual
+glimpse(apports_nut_alim)
+#report individual ID, nutriments 1-54 (quantity/j), contribution 3-45 (%AESA, or for 100 kcal nutriment), 4114 individuals
+
+#load data of interest from apports_nut_alim
+file_apports_nut_alim <- 
+  apports_nut_alim %>% 
+  # we only focus on individuals ID and nutrients: remove POPULATION column
+  select(-POPULATION) %>%
+  #gather nutriments in 1 column
+  gather(
+    key = nutriment_contrib_nb, value = value_nutriment, nutriment1:contrib54
+    ) %>%
+  #we join the nutriment column with our simplified nutrient names
+  left_join(
+    nutriments_contrib_INCA3, by="nutriment_contrib_nb"
+    ) %>%
+  #only select data on energy, carbohydrates, lipids, proteins, phosphorus, and potassium
+  filter(
+    nutriment_contrib_name %in% c(
+    "Energie-Apport énergétique total (AET) (kcal/j)", 
+    "Energie-Apport énergétique sans alcool (AESA) (kcal/j)",
+    "Protéines (g/j)", 
+    "Glucides (g/j)", 
+    "Lipides (g/j)", 
+    "Phosphore (mg/j)", 
+    "Potassium (mg/j)", 
+    "Contribution des Protéines à l'AESA (%)", 
+    "Contribution des Glucides à l'AESA (%)", 
+    "Contribution des Lipides à l'AESA (%)")
+    )
+
+
+#simplified file easier to handle: spread nutrients into columns
+file_apports_nut_alim_simple <- 
+  file_apports_nut_alim %>% 
+  select(
+    ID = NOIND, 
+    nutriment_contrib_name_simple, 
+    value_nutriment
+    ) %>%
+  spread(
+    nutriment_contrib_name_simple, value_nutriment
+    ) %>%
+  #convert P and K intakes into g per day 
+  mutate(
+    phosphorus = phosphorus/1000,
+    potassium = potassium/1000
+  )
+```
+
+We load the file describing each individual in the survey. We modify it, to create age categories (more or less precise) to later merge it with the data we have about French population in each city, by age class.
+
+```{r load_and_prepare_file_individuals_description}
+#load file describing individuals
+file_individuals <- description_indiv %>% 
+  #select and rename variables of interest
+  select(
+    ID = NOIND, 
+    sex = sex_PS, 
+    age_class = tage_PS, 
+    height = taille, 
+    weight = poids, 
+    BMI = imc
+    ) %>% 
+  #create fine and large age categories
+  mutate(
+    age_class_large = case_when(
+      age_class %in% c(1,2,3,4)~"child (<10 yr)", 
+      age_class %in% c(5,6)~"adolescent (11-18 yr)", 
+      age_class %in% c(7,8,9)~"adult (>18 yr)"),
+    age_class = case_when(
+      age_class == 1~"<1", age_class == 2~"1-3", age_class == 3~"4-6", age_class == 4~"7-10", 
+      age_class == 5~"11-14", age_class == 6~"15-17", 
+      age_class == 7~"18-44", age_class == 8~"45-64", age_class == 9~"65-79")
+    ) %>%
+  #male or female made more explicit
+    mutate(
+      sex = case_when(
+      sex == 1~"M", sex == 2~"F")
+      )
+
+#transform ages intervals into factors
+file_individuals$age_class <- 
+  factor(file_individuals$age_class, levels = c("<1", "1-3", "4-6", "7-10", "11-14", "15-17", "18-44", "45-64", "65-79"))
+
+#transform large age categories into factors
+file_individuals$age_class_large <- 
+  factor(
+    file_individuals$age_class_large, 
+    levels = 
+      c(
+        "child (<10 yr)", 
+        "adolescent (11-18 yr)", 
+        "adult (>18 yr)"
+        )
+    )
+
+#create and age median variable from ages intervals, used for our plots of intakes vs age
+file_individuals <- file_individuals %>% mutate(
+  age_median = case_when(
+    age_class == "<1" ~ 1,
+    age_class == "1-3" ~ 2,
+    age_class == "4-6" ~ 5,
+    age_class == "7-10" ~ 8.5,
+    age_class == "11-14" ~ 12.5,
+    age_class == "15-17" ~ 16,
+    age_class == "18-44" ~ 31,
+    age_class == "45-64" ~ 54.5,
+    age_class == "65-79" ~ 72)
+  )
+```
+
+We gather the nutrient intakes file and the individual description file, based on individuals IDs.
+
+```{r gather_intake_file_and_individuals_file}
+#joining tables
+ID_intakes_day <- inner_join(file_individuals, file_apports_nut_alim_simple, by = "ID") %>%
+  rename(energy = AET)
+```
+
+To convert proteins intake to nitrogen, we use Jone's factor of 6.25.
+
+```{r}
+#jone's factor
+N_factor <- 6.25
+#transform protein intakes to N intakes
+ID_intakes_day <- ID_intakes_day %>%
+  mutate(nitrogen = proteins/N_factor)
+```
+:::
+
+# Nutrient intakes by age and sex
+
+Here are presented micro and macronutrients intakes by age and sex.
+
+```{r temporary_file_nutrient_intakes_by_age_and_sex}
+# temporary file summarizing nutrients intakes by (median) age and sex
+temp <- 
+  # gather together the 2 following files
+  bind_rows(
+  # summarize data for both sexes together, precise age categories
+    ID_intakes_day %>% 
+      select(
+        sex, age_class, age_median, 
+        energy, proteins, lipids, carbohydrates, 
+        nitrogen, phosphorus, potassium
+        ) %>%
+      mutate(
+        sex="both"
+        ) %>%
+      group_by(
+        sex, age_class, age_median
+        ) %>%
+      summarise_all(
+        mean, na.rm=T
+        ),
+    # summarize data with discriminated sex (male/ffemale) and precise age categories
+    ID_intakes_day %>% 
+      select(
+        sex, age_class, age_median, 
+        energy, proteins, lipids, carbohydrates, 
+        nitrogen, phosphorus, potassium
+        ) %>%
+      group_by(
+        sex, age_class, age_median
+        ) %>%
+      summarise_all(
+        mean, na.rm=T
+        )
+    ) %>%
+  select(
+    #reordering columns of interest
+    sex, age_class, age_median, 
+    energy, carbohydrates, lipids, proteins, 
+    nitrogen, phosphorus, potassium
+  ) %>%
+  #3 significant digits
+  mutate(
+    across(
+      c(
+        energy, carbohydrates, lipids, proteins, 
+        nitrogen, phosphorus, potassium
+        ), ~ signif(.x, 3)
+    )
+  )
+```
+
+```{r function_graph_nutrient_intake_age}
+#function to plot evolution of nutrient intakes with age
+f_graph <- function(dataset, nutrient_select, nutrient_label){
+  g <- ggplot(dataset) + 
+    geom_line(
+      aes(age_median, !!as.symbol(nutrient_select), color=sex)
+      ) + 
+    scale_y_continuous(
+      limits = c(0, NA),
+      #second axis, intakes by year
+      sec.axis = 
+        sec_axis(
+          trans=~.*(365/1000), 
+          name="kg/year"
+          )
+      ) +
+    theme(
+      legend.position = c(.8, .2)
+      ) + 
+    labs(
+      title = paste(nutrient_label, "intakes by age and sex"), 
+      x="Age", y="g/day",
+      caption = Source,
+      color= "sex"
+      )
+  return(g)
+}
+```
+
+
+::: panel-tabset
+## Micronutrient
+
+::: panel-tabset
+### Nitrogen
+
+```{r graph_N_intake_by_age_and_sex}
+f_graph(temp, "nitrogen", "N") + 
+  labs(
+    subtitle = paste("conversion from protein to nitrogen with", N_factor, "factor")
+  )
+```
+
+### Phopshorus
+
+```{r graph_P_intake_by_age_and_sex}
+f_graph(temp, "phosphorus", "P")
+```
+
+### Potassium
+
+```{r graph_K_intake_by_age_and_sex}
+f_graph(temp, "potassium", "K")
+```
+:::
+
+## Macronutrients
+
+::: panel-tabset
+### Energy
+
+```{r graph_energy_intake_by_age_and_sex}
+f_graph(temp, "energy", "Energy") +
+  labs(
+    y="kcal/day"
+  ) +
+  #second axis, intakes by year
+  scale_y_continuous(
+      limits = c(0, NA),
+      sec.axis = 
+        sec_axis(
+          trans=~.*(365/1000), 
+          name="Mcal/year"
+          )
+      )
+```
+
+### Carbohydrates
+
+```{r graph_carbohydrates_intake_by_age_and_sex}
+f_graph(temp, "carbohydrates", "Carbohydrates")
+```
+
+### Lipids
+
+```{r graph_lipids_intake_by_age_and_sex}
+f_graph(temp, "lipids", "Lipids")
+```
+
+### Proteins
+
+```{r graph_proteins_intake_by_age_and_sex}
+f_graph(temp, "proteins", "Proteins")
+```
+:::
+
+## Tables
+
+We do not yet give a mean value for whole France, because an unweighed mean would not consider the age distribution of the population and would give excessive weight to young population (which are less numerous). This issues is addressed in the next section *Nutrient excretion in France*, where you can see in the *France* tab the distribution of excretions by age categories. Our weighted national value can be seen in *Comparison with litterature review*
+
+::: panel-tabset
+### by Sex and Age large categories
+
+::: panel-tabset
+#### per day
+
+```{r table_sex_age_rough_cateogries_per_day, results = T}
+#nutrients x sex x large age category
+temp <- bind_rows(
+  #both sex together
+  ID_intakes_day %>% 
+    select(
+      sex, age_class_large, 
+      energy, carbohydrates, lipids, proteins,
+      nitrogen, phosphorus, potassium
+      ) %>%
+    mutate(sex="both") %>%
+    group_by(sex, age_class_large) %>%
+    summarise_all(funs(signif(mean(., na.rm=T), 3))),
+  #discriminated sex
+  ID_intakes_day %>% 
+    select(
+      sex, age_class_large, 
+      energy, carbohydrates, lipids, proteins,
+      nitrogen, phosphorus, potassium
+      ) %>%
+    group_by(sex, age_class_large) %>%
+    summarise_all(funs(signif(mean(., na.rm=T), 3)))
+  )
+
+#display table
+datatable(
+  temp, 
+  colnames = 
+    c("sex",
+      "age",
+      "energy\n(kcal/d)",
+      "carbohydrates\n(g/d)",
+      "lipids\n(g/d)",
+      "protein\n(g/d)",
+      "N\n(g/d)",
+      "P\n(g/d)",
+      "K\n(g/d)"
+      ),
+  options = list(scrollX = TRUE, responsive = TRUE)
+  )
+
+#save data
+f_save_csv_files(
+  temp,
+  path_output,
+  "nutrients_age_large_sex_g_per_day.csv"
+)
+```
+
+#### per year
+
+```{r table_sex_age_rough_cateogries_per_year, results=T}
+#change from per day to per year
+temp <- temp %>%
+  mutate(
+    across(
+      c(
+        energy, carbohydrates, lipids, proteins,
+        nitrogen, phosphorus, potassium
+        ), ~signif(.x*(365/1000),3)
+      )
+    )
+
+#display table
+datatable(
+  temp, 
+  colnames = 
+    c("sex",
+      "age",
+      "energy\n(Mcal/yr)",
+      "carbohydrates\n(kg/yr)",
+      "lipids\n(kg/yr)",
+      "protein\n(kg/yr)",
+      "N\n(kg/yr)",
+      "P\n(kg/yr)",
+      "K\n(kg/yr)"
+      ),
+  options = list(scrollX = TRUE, responsive = TRUE)
+  )
+
+f_save_csv_files(
+  temp,
+  path_output,
+  "nutrients_age_large_sex_kg_per_year.csv"
+)
+```
+:::
+
+### by Sex and Age detailed categories
+
+::: panel-tabset
+#### per day
+
+```{r table_sex_age_detailed_cateogries_per_day, results = T}
+#nutrients x sex x detailed age category
+temp <- bind_rows(
+  ID_intakes_day %>% 
+    select(
+      sex, age_class, 
+      energy, carbohydrates, lipids, proteins,
+      nitrogen, phosphorus, potassium
+      ) %>%
+    mutate(sex="both") %>%
+    group_by(sex, age_class) %>%
+    summarise_all(funs(signif(mean(., na.rm=T), 3))),
+  ID_intakes_day %>% 
+    select(
+      sex, age_class, 
+      energy, carbohydrates, lipids, proteins,
+      nitrogen, phosphorus, potassium
+      ) %>%
+    group_by(sex, age_class) %>%
+    summarise_all(funs(signif(mean(., na.rm=T), 3)))
+  )
+
+#display table
+datatable(
+  temp, 
+  colnames = 
+    c("sex",
+      "age",
+      "energy\n(kcal/d)",
+      "carbohydrates\n(g/d)",
+      "lipids\n(g/d)",
+      "protein\n(g/d)",
+      "N\n(g/d)",
+      "P\n(g/d)",
+      "K\n(g/d)"
+      ),
+  options = list(scrollX = TRUE, responsive = TRUE)
+  )
+
+f_save_csv_files(
+  temp,
+  path_output,
+  "nutrients_age_detailed_sex_g_per_day.csv"
+)
+```
+
+#### per year
+
+```{r table_sex_age_detailed_cateogries_per_year, results=T}
+#change from per day to per year
+temp <- temp %>%
+  mutate(
+    across(
+      c(
+        energy, carbohydrates, lipids, proteins,
+        nitrogen, phosphorus, potassium
+        ), ~signif(.x*(365/1000),3)
+      )
+    )
+
+#display table
+datatable(
+  temp, 
+  colnames = 
+    c("sex",
+      "age",
+      "energy\n(Mcal/yr)",
+      "carbohydrates\n(kg/yr)",
+      "lipids\n(kg/yr)",
+      "protein\n(kg/yr)",
+      "N\n(kg/yr)",
+      "P\n(kg/yr)",
+      "K\n(kg/yr)"
+      ),
+  options = list(scrollX = TRUE, responsive = TRUE)
+  )
+
+f_save_csv_files(
+  temp,
+  path_output,
+  "nutrients_age_detailed_sex_kg_per_year.csv"
+)
+```
+:::
+:::
+:::
+
+```{r relove_INCA3_temporary files}
+rm(file_individuals, file_apports_nut_alim, file_apports_nut_alim_simple, nutriments_contrib_INCA3, temp)
+```
+
+
+# Nutrient excretion in France
+
+We prepare the population data by cities and 5-year age categories, and transform it into age categories compatible with the INCA3 survey. The source of this data is INSEE, [here](https://www.insee.fr/fr/statistiques/1893204){target="_blank"}.
+
+```{r prepare_French_population_file}
+#path of population by city and by age file
+path_source <- "source_data/population/"
+
+#load file
+population_age_commune <- 
+  readxl::read_excel(
+    paste0(path_source, "pop-sexe-age-quinquennal6818.xls"), 
+    sheet = "COM_2018",skip=13
+    )
+#give explicit sex and age wording categories
+population_age_commune <- 
+  population_age_commune %>% select(
+  INSEE_REG = RR,
+  INSEE_DEP = DR,
+  INSEE_COM = CR,
+  NOM= LIBELLE,
+  #5-years age categories and sex
+  age_0_4_sex_H = ageq_rec01s1rpop2018,
+  age_0_4_sex_F = ageq_rec01s2rpop2018,
+  age_5_9_sex_H = ageq_rec02s1rpop2018,
+  age_5_9_sex_F = ageq_rec02s2rpop2018,
+  age_10_14_sex_H = ageq_rec03s1rpop2018,
+  age_10_14_sex_F = ageq_rec03s2rpop2018,
+  age_15_19_sex_H = ageq_rec04s1rpop2018,
+  age_15_19_sex_F = ageq_rec04s2rpop2018,
+  age_20_24_sex_H = ageq_rec05s1rpop2018,
+  age_20_24_sex_F = ageq_rec05s2rpop2018,
+  age_25_29_sex_H = ageq_rec06s1rpop2018,
+  age_25_29_sex_F = ageq_rec06s2rpop2018,
+  age_30_34_sex_H = ageq_rec07s1rpop2018,
+  age_30_34_sex_F = ageq_rec07s2rpop2018,
+  age_35_39_sex_H = ageq_rec08s1rpop2018,
+  age_35_39_sex_F = ageq_rec08s2rpop2018,
+  age_40_44_sex_H = ageq_rec09s1rpop2018,
+  age_40_44_sex_F = ageq_rec09s2rpop2018,
+  age_45_49_sex_H = ageq_rec10s1rpop2018,
+  age_45_49_sex_F = ageq_rec10s2rpop2018,
+  age_50_54_sex_H = ageq_rec11s1rpop2018,
+  age_50_54_sex_F = ageq_rec11s2rpop2018,
+  age_55_59_sex_H = ageq_rec12s1rpop2018,
+  age_55_59_sex_F = ageq_rec12s2rpop2018,
+  age_60_64_sex_H = ageq_rec13s1rpop2018,
+  age_60_64_sex_F = ageq_rec13s2rpop2018,
+  age_65_69_sex_H = ageq_rec14s1rpop2018,
+  age_65_69_sex_F = ageq_rec14s2rpop2018,
+  age_70_74_sex_H = ageq_rec15s1rpop2018,
+  age_70_74_sex_F = ageq_rec15s2rpop2018,
+  age_75_79_sex_H = ageq_rec16s1rpop2018,
+  age_75_79_sex_F = ageq_rec16s2rpop2018,
+  age_80_84_sex_H = ageq_rec17s1rpop2018,
+  age_80_84_sex_F = ageq_rec17s2rpop2018,
+  age_85_89_sex_H = ageq_rec18s1rpop2018,
+  age_85_89_sex_F = ageq_rec18s2rpop2018,
+  age_90_94_sex_H = ageq_rec19s1rpop2018,
+  age_90_94_sex_F = ageq_rec19s2rpop2018,
+  age_95_sex_H = ageq_rec20s1rpop2018,
+  age_95_sex_F = ageq_rec20s2rpop2018
+)
+
+#grouping in similar age and sex categories as INCA3 denomination
+population_age_commune <- population_age_commune %>% 
+  mutate(
+    INSEE_COM = paste0(INSEE_DEP, INSEE_COM),
+    age_0_9_H = age_0_4_sex_H + age_5_9_sex_H,
+    age_0_9_F = age_0_4_sex_F + age_5_9_sex_F,
+    age_10_18_H = age_10_14_sex_H + age_15_19_sex_H,
+    age_10_18_F = age_10_14_sex_F + age_15_19_sex_F,
+    age_19_44_H = age_20_24_sex_H + age_25_29_sex_H + age_30_34_sex_H + age_35_39_sex_H + age_40_44_sex_H,
+    age_19_44_F = age_20_24_sex_F + age_25_29_sex_F + age_30_34_sex_F + age_35_39_sex_F + age_40_44_sex_F,
+    age_45_64_H = age_45_49_sex_H + age_50_54_sex_H + age_55_59_sex_H + age_60_64_sex_H,
+    age_45_64_F = age_45_49_sex_F + age_50_54_sex_F + age_55_59_sex_F + age_60_64_sex_F,
+    age_65_H = age_65_69_sex_H + age_70_74_sex_H + age_75_79_sex_H + age_80_84_sex_H + age_85_89_sex_H + age_90_94_sex_H + age_95_sex_H,
+    age_65_F = age_65_69_sex_F + age_70_74_sex_F + age_75_79_sex_F + age_80_84_sex_F + age_85_89_sex_F + age_90_94_sex_F + age_95_sex_F,
+    ) %>% 
+  select(
+    INSEE_REG, INSEE_DEP, INSEE_COM, NOM, age_0_9_H, age_0_9_F, age_10_18_H, age_10_18_F, 
+    age_19_44_H, age_19_44_F, age_45_64_H, age_45_64_F, age_65_H, age_65_F
+    )
+
+#gathering age and sex
+population_age_commune <-  population_age_commune %>%
+  gather("age_sex", "capita" , age_0_9_H:age_65_F)
+population_age_commune <-  population_age_commune %>%
+  mutate(
+    sex = case_when(
+      grepl("H", age_sex, fixed = T) ~ "M",
+      T ~ "F"
+      ),
+    age_class = substring(age_sex, 1, nchar(age_sex)-2)
+    ) %>%
+  select(-age_sex)
+population_age_commune <-  population_age_commune %>%
+  mutate(
+    age_class = case_when(
+      age_class == "age_0_9" ~ "< 10",
+      age_class == "age_10_18" ~ "10 - 18",
+      age_class == "age_19_44" ~ "18 - 45",
+      age_class == "age_45_64" ~ "45 - 65",
+      age_class == "age_65" ~ "> 65"
+    )
+  )
+population_age_commune$age_class <- 
+  factor(
+    population_age_commune$age_class, 
+    levels = c(
+      "> 65",
+      "45 - 65",
+      "18 - 45",
+      "10 - 18",
+      "< 10"
+    )
+  )
+
+#have to merge Paris arrondissements in 1 unique commune
+#first we merge the arrondissements in one temporary file. 75056 is the code for Paris in the map file
+temp <- population_age_commune %>% filter(
+  INSEE_COM %in% c(
+    "75101", "75102", "75103", "75104", "75105", "75106", "75107", "75108", "75109", "75110",
+    "75111", "75112", "75113", "75114", "75115", "75116", "75117", "75118", "75119", "75120")) %>%
+  mutate(INSEE_COM = "75056", NOM = "Paris") %>%
+  group_by(INSEE_REG, INSEE_DEP, INSEE_COM, NOM, age_class, sex) %>%
+  summarise(capita = sum(capita, na.rm = T))
+#then we remove arrondissements from the main file
+population_age_commune <- population_age_commune %>% 
+  filter(!INSEE_COM %in% c(
+    "75101", "75102", "75103", "75104", "75105", "75106", "75107", "75108", "75109", "75110",
+    "75111", "75112", "75113", "75114", "75115", "75116", "75117", "75118", "75119", "75120"))
+#finally we merge the two files
+population_age_commune <- 
+  bind_rows(population_age_commune, temp)
+
+#we remove overseas territories
+population_age_commune <- population_age_commune %>% 
+  filter(!INSEE_DEP %in% c(
+    "971", "972", "973", "974"))
+
+#creating file summarized at departmental, regional and national scale
+#department
+population_age_department <- population_age_commune %>%
+  select(INSEE_DEP, age_class, sex, capita) %>%
+  group_by(INSEE_DEP, age_class, sex) %>%
+  summarise(capita = sum(capita, na.rm = T))
+#region
+population_age_region <- population_age_commune %>%
+  select(INSEE_REG, age_class, sex, capita) %>%
+  group_by(INSEE_REG, age_class, sex) %>%
+  summarise(capita = sum(capita, na.rm = T))
+#france
+population_age_france <- population_age_commune %>%
+  select(age_class, sex, capita) %>%
+  group_by(age_class, sex) %>%
+  summarise(capita = sum(capita, na.rm = T))
+```
+
+We also want the nutrient excetions by water agencies basins, which is an administrative category not present in our population dataset. We join the cities with our key file linking each cities to water agencies basins.
+
+```{r prepare_water_agency_basin_population}
+#for basin we use our key file city / basin
+path_source <- "source_data/maps/towns_basins/"
+
+#load key file attributing each city to a basin
+key_cities_basins <- bind_rows(
+  read_csv(paste0(path_source, "ADOUR-GARONNE.csv")) %>% mutate(basin = "Adour-Garonne"),
+  read_csv(paste0(path_source, "ARTOIS-PICARDIE.csv")) %>% mutate(basin = "Artois-Picardie"),
+  read_csv(paste0(path_source, "CORSE.csv")) %>% mutate(basin = "Rhône-Méditerranée"),
+  read_csv(paste0(path_source, "LOIRE-BRETAGNE.csv")) %>% mutate(basin = "Loire-Bretagne"),
+  read_csv(paste0(path_source, "RHIN-MEUSE.csv")) %>% mutate(basin = "Rhin-Meuse"),
+  read_csv(paste0(path_source, "RHONE-MEDITERRANEE.csv")) %>% mutate(basin = "Rhône-Méditerranée"),
+  read_csv(paste0(path_source, "SEINE-NORMANDIE.csv")) %>% mutate(basin = "Seine-Normandie")
+)
+key_cities_basins <- key_cities_basins %>%
+  select(basin, INSEE_COM = admin4)
+
+#join population commune data with basin key
+population_age_commune <- left_join(population_age_commune, key_cities_basins, by="INSEE_COM")
+
+#unmatched cities
+test <- population_age_commune %>% filter(is.na(basin))
+sum(test$capita/10^6, na.rm = T) #unmatched population represent 0.6 million individuals
+sum(population_age_commune$capita/10^6, na.rm = T) #over 64.8 million in Metropole
+sum(test$capita/10^6, na.rm = T)/sum(population_age_commune$capita/10^6, na.rm = T)*100 #so 0.1% lost
+rm(test)
+
+#we remove unmatched cities
+population_age_commune <- population_age_commune %>% filter(is.na(basin)==F)
+
+#summarize the sex/age categories by water agency basin
+population_age_basins <- population_age_commune %>%
+  select(basin, age_class, sex, capita) %>%
+  group_by(basin, age_class, sex) %>%
+  summarise(capita = sum(capita, na.rm = T))
+```
+
+We load the excretion data by age, and combine it with population age/sex data to have the quantities excreted in France, by basin, by region, by department and by commune.
+
+```{r couple_nutrient_excretions_with_population}
+path_source <- "output_data/nutrient_ingestion_excretion/"
+
+#creating the excretion file for 5 age categories
+children_excretion <- read_csv(paste(path_source, "nutrients_age_large_sex_kg_per_year.csv", sep="")) %>%
+  select(
+    sex, age_class = age_class_large, 
+    N_per_cap = nitrogen, P_per_cap = phosphorus, K_per_cap = potassium) %>%
+  filter(
+    sex != "both",
+    age_class != "adult (>18 yr)") %>%
+  mutate(#giving similar age name as population file
+    age_class = case_when(
+      age_class == "child (<10 yr)" ~ "< 10",
+      age_class == "adolescent (11-18 yr)" ~ "10 - 18"))
+
+adult_excretion <- read_csv(paste(path_source, "nutrients_age_detailed_sex_kg_per_year.csv", sep="")) %>%
+  select(sex, age_class, N_per_cap = nitrogen,  P_per_cap = phosphorus,  K_per_cap = potassium) %>%
+  filter(
+    sex != "both",
+    age_class %in% c("18-44", "45-64", "65-79")
+    ) %>%
+  mutate(#giving similar age name as population file
+    age_class = case_when(
+      age_class == "18-44" ~ "18 - 45",
+      age_class == "45-64" ~ "45 - 65",
+      age_class == "65-79" ~ "> 65")
+    )
+all_excretion <- bind_rows(children_excretion, adult_excretion) 
+
+all_excretion$age_class <- 
+  factor(
+    all_excretion$age_class, 
+    levels = c(
+      "> 65",
+      "45 - 65",
+      "18 - 45",
+      "10 - 18",
+      "< 10"
+    )
+  )
+
+
+#adding excretions to the populations files
+excretion_commune <- 
+  left_join(population_age_commune, all_excretion, by = c("sex", "age_class")) %>% 
+  mutate(
+    N_excretion = signif(capita*N_per_cap, 3),
+    P_excretion = signif(capita*P_per_cap, 3),
+    K_excretion = signif(capita*K_per_cap, 3)
+    )
+excretion_department <- 
+  left_join(population_age_department, all_excretion, by = c("sex", "age_class")) %>% 
+  mutate(
+    N_excretion = signif(capita*N_per_cap, 3),
+    P_excretion = signif(capita*P_per_cap, 3),
+    K_excretion = signif(capita*K_per_cap, 3) 
+    )
+#non existing region numbers : does not change anything, probably overseas territories
+excretion_region <- 
+  left_join(population_age_region, all_excretion, by = c("sex", "age_class")) %>% 
+  mutate(
+    N_excretion = signif(capita*N_per_cap, 3),
+    P_excretion = signif(capita*P_per_cap, 3),
+    K_excretion = signif(capita*K_per_cap, 3)
+    )
+excretion_basins <- 
+  left_join(population_age_basins, all_excretion, by = c("sex", "age_class")) %>% 
+  mutate(
+    N_excretion = signif(capita*N_per_cap, 3),
+    P_excretion = signif(capita*P_per_cap, 3),
+    K_excretion = signif(capita*K_per_cap, 3)
+    )
+excretion_france <- 
+  left_join(population_age_france, all_excretion, by = c("sex", "age_class")) %>% 
+  mutate(
+    N_excretion = signif(capita*N_per_cap/10^6, 3),
+    P_excretion = signif(capita*P_per_cap/10^6, 3),
+    K_excretion = signif(capita*K_per_cap/10^6, 3)
+    )
+
+#remove temporary excretion files and key cities / basins
+rm(adult_excretion, children_excretion, all_excretion, key_cities_basins, temp)
+
+#remove incomplete population files
+rm(population_age_basins, population_age_commune, population_age_department, population_age_region, population_age_france)
+```
+
+::: panel-tabset
+## France
+
+```{r}
+#temporary file to save France excretions
+temp <- excretion_france %>%
+  select(N_excretion, P_excretion, K_excretion, capita) %>%
+  mutate(basin = "Metropolitan France") %>%
+  group_by(basin) %>%
+  summarise(
+    capita = signif(sum(capita, na.rm=T)/10^6, 3),
+    N_excretion = signif(sum(N_excretion, na.rm=T), 3),
+    P_excretion = signif(sum(P_excretion, na.rm=T), 3),
+    K_excretion = signif(sum(K_excretion, na.rm=T), 3)
+    )
+#save file
+f_save_csv_files(
+  temp,
+  path_output,
+  "excretions_human_france_kt_year.csv"
+)
+
+#mean excretion values per capita, four our comparison with litterature review
+N_excr_kg_year <- round(temp$N_excretion/temp$capita, 1)
+N_excr_g_day <- round(temp$N_excretion/temp$capita*1000/365, 1)
+P_excr_kg_year <- round(temp$P_excretion/temp$capita, 2)
+P_excr_g_day <- round(temp$P_excretion/temp$capita*1000/365, 1)
+K_excr_kg_year <- round(temp$K_excretion/temp$capita, 1)
+K_excr_g_day <- round(temp$K_excretion/temp$capita*1000/365, 1)
+N_P_ratio_excr <- round(temp$N_excretion/temp$P_excretion, 1)
+
+#temporary file for our plot
+temp2 <- excretion_france %>%
+  select(age_class, N_excretion, P_excretion, K_excretion, capita) %>%
+  mutate(capita = signif(capita/10^6, 3)) %>%
+  gather(quantity, value, N_excretion, P_excretion, K_excretion, capita) %>%
+  mutate(
+    quantity = case_when(
+      quantity == "N_excretion" ~ paste("N excretion\n", temp$N_excretion, "ktN per year"),
+      quantity == "P_excretion" ~ paste("P excretion\n", temp$P_excretion, "ktP per year"),
+      quantity == "K_excretion" ~ paste("K excretion\n", temp$K_excretion, "ktK per year"),
+      quantity == "capita" ~ paste("population\n", temp$capita, "million"),
+    )
+  )
+
+#plot nutrient excretions in France by age categories
+ggplot(temp2) +
+  geom_col(aes("", value, fill=age_class), alpha=.9) +
+  facet_wrap(vars(quantity), nrow=1, scales="free_y") +
+  labs(
+    x="", y="",
+    caption = Source,
+    fill="age group"
+  )
+```
+
+## Water Agencies Basins
+
+```{r}
+#prepare basins temporayr file for plots
+temp <- excretion_basins %>% group_by(basin) %>%
+  summarise(
+    capita = signif(sum(capita, na.rm=T)/10^6, 2),
+    N_excretion = round(sum(N_excretion, na.rm=T)/10^6, 0),
+    P_excretion = round(sum(P_excretion, na.rm=T)/10^6, 1),
+    K_excretion = round(sum(K_excretion, na.rm=T)/10^6, 1)
+    )
+
+temp$basin <- 
+  factor(
+    temp$basin,
+    levels = c(
+      "Seine-Normandie",
+      "Rhône-Méditerranée",
+      "Loire-Bretagne",
+      "Adour-Garonne",
+      "Artois-Picardie",
+      "Rhin-Meuse"
+    )
+  )
+```
+
+::: panel-tabset
+### Population comparison
+
+We compare the basin population we estimated by attributing eahc city to a basin with values reported by the different water agencies. There is a rather good matching. We apply a correction coefficient to our computed excretions based on our estimation of population values to match the population figures reported by the water agencies.
+
+```{r basins_population_comparison}
+#reported population by basin
+temp2 <- read_csv("source_data/pop_sewage_connection/pop_basins_sewage_connection.csv") %>%
+  filter(basin!="Metropolitan France")
+
+#comparison between the 2 populations values
+ggplot(temp) +
+  geom_col(aes(basin, capita, fill = basin), alpha=.8) +
+  geom_point(
+    data=temp2, 
+    aes(basin, pop)
+    ) +
+  theme(
+    axis.text.x = element_text(angle = 20, vjust = 0.5, hjust=1),
+    legend.position = "none"
+    ) +
+  labs(
+    x="", y="",
+    title = "Basins population (million)",
+    subtitle = "bar: our estimation; point: reported by water agencies",
+    caption = Source
+  )
+
+#applying coefficient to our excretion values
+coeff <- left_join(
+  temp %>% select(basin, capita),
+  temp2 %>% select(basin, pop),
+  by="basin"
+) %>%
+  mutate(coeff = pop/capita)
+
+ temp <- left_join(temp, coeff %>% select(basin, coeff), by= "basin") %>%
+   mutate(
+     N_excretion = round(N_excretion*coeff, 0),
+     P_excretion = round(P_excretion*coeff, 1),
+     K_excretion = round(K_excretion*coeff, 1)
+   ) %>%
+   select(-coeff)
+ 
+#save excreted values
+f_save_csv_files(
+  temp,
+  path_output,
+  "excretions_human_basins_kt_year.csv"
+)
+```
+
+### Excretions
+
+```{r basins_nutrients_excretions}
+temp2 <- temp %>%
+  gather(
+    variable_study, value, N_excretion, P_excretion, K_excretion, capita
+  ) %>%
+  mutate(
+    variable_study = case_when(
+      variable_study == "N_excretion" ~ "N excretion\nktN per year",
+      variable_study == "P_excretion" ~ "P excretion\nktP per year",
+      variable_study == "K_excretion" ~ "K excretion\nktK per year",
+      variable_study == "capita" ~ "population\nmillion"
+      )
+    )
+
+temp2$basin <- 
+  factor(
+    temp2$basin,
+    levels = c(
+      "Seine-Normandie",
+      "Rhône-Méditerranée",
+      "Loire-Bretagne",
+      "Adour-Garonne",
+      "Artois-Picardie",
+      "Rhin-Meuse"
+    )
+  )
+
+ggplot(temp2) +
+  geom_col(aes(basin, value, fill = basin), alpha=.8) +
+  facet_wrap(vars(variable_study), scales = "free_y") +
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1),
+    legend.position = "none"
+    ) +
+  labs(
+    x="", y="",
+    title = "N, P and K excretions by basin (ktons)",
+    subtitle = "for population, the unit is million inhabitants",
+    caption = Source
+  )
+```
+
+### Connected to sewers
+
+We combine our excretion figures by basin with the share of population connected to sewers of to individual autonomous systems.
+
+```{r}
+#population connected to sewers
+temp2 <- read_csv("source_data/pop_sewage_connection/pop_basins_sewage_connection.csv") %>%
+  filter(basin!="Metropolitan France")
+temp <- temp %>%
+  gather(
+    variable_study, value, N_excretion, P_excretion, K_excretion, capita
+  ) %>%
+  mutate(
+    variable_study = case_when(
+      variable_study == "N_excretion" ~ "N excretion\nktN per year",
+      variable_study == "P_excretion" ~ "P excretion\nktP per year",
+      variable_study == "K_excretion" ~ "K excretion\nktK per year",
+      variable_study == "capita" ~ "population\nmillion"
+      )
+    )
+temp <- left_join(
+  temp, temp2 %>% select(basin, percent_sewage), by="basin" 
+)
+temp <- temp %>%
+  mutate(
+    to_sewers = value*percent_sewage,
+    to_IAS = value*(1-percent_sewage)
+  ) %>%
+  select(-value) %>%
+  gather(
+    destination, value, to_sewers, to_IAS
+  ) %>%
+  mutate(
+    destination = case_when(
+      destination=="to_sewers"~ "to sewers",
+      destination=="to_IAS"~ "to individual\nautonomous\nsystem"
+    )
+  )
+
+temp$basin <- 
+  factor(
+    temp$basin,
+    levels = c(
+      "Seine-Normandie",
+      "Rhône-Méditerranée",
+      "Loire-Bretagne",
+      "Adour-Garonne",
+      "Artois-Picardie",
+      "Rhin-Meuse"
+    )
+  )
+
+
+ggplot(temp) +
+  geom_col(aes(basin, value, fill = destination), alpha=.8, position = position_dodge()) +
+  facet_wrap(vars(variable_study), scales = "free_y") +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust=1),
+    ) +
+  labs(
+    x="", y="",
+    title = "N, P and K excretions by basin (ktons)",
+    subtitle = "for population, the unit is million inhabitants",
+    caption = Source,
+    fill="excretion desination"
+  )
+```
+:::
+:::
+
+# Comparison with litterature review
+
+```{r prepare_review_file_and_graphs}
+#Caption of our graphs
+Source <- "Source: INCA3 and litterature review by Tanguy Fardet\ncomputation by Thomas Starck"
+
+#path of the literature review
+path_source <- "source_data/0_nutrient_excretion/"
+
+#load literature review file
+review_excretion <- read_csv(paste0(path_source, "n_p_fractions.csv"))
+
+#change column names into more explicit
+review_excretion <- review_excretion %>%
+  select(
+    #total P and N excretions urine + feces (absolute values) and % in urine and feces
+    P_excr = `total P excretion (kg/y)`, 
+    perc_P_urine = `% urine P`, 
+    perc_P_feces = `% feces P`, 
+    N_excr = `total N excretion (kg/y)`, 
+    perc_N_urine = `% urine N`, 
+    perc_N_feces = `% feces N`, 
+    N_P_ratio = `N:P ratio`,
+    year, country, authors
+  ) %>%
+  mutate(
+    #study: name of authors, year, country
+    study = paste0(authors, ", ", year, ", ", country),
+    #P and N in urine and feces in absolute values, 2 significant digits
+    P_urine = round(P_excr*perc_P_urine/100, 2),
+    P_feces = round(P_excr*perc_P_feces/100, 2),
+    N_urine = round(N_excr*perc_N_urine/100, 2),
+    N_feces = round(N_excr*perc_N_feces/100, 2)
+    ) %>%
+  select(-c(year, country, authors)) 
+
+
+
+#function for graph literature review N and P excretions
+g_excr <- function(dataset, label_nutrient, y_lim, our_value, label_unit){
+  #mean total excretion
+  mean_excr <- round(mean(dataset %>% pull(excr), na.rm=T), 2)
+  
+  #order studies by increasing value
+  dataset$study <- reorder(dataset$study, dataset %>% pull(value_urine_feces))
+  #remove empty values
+  dataset <- dataset %>% filter(is.na(value_urine_feces)==F)
+  
+  #colors of urine and feces 
+  colors_fill <- scale_fill_manual(
+    limits = c("urine", "feces"),
+    values=c("#e3dc00", "#591000")
+  )
+  
+  
+  plot_grid(
+    
+    #plot of the review values
+    ggplot(dataset) +
+      #urine and feces values
+      geom_col(
+        aes(study, value_urine_feces, fill=urine_feces)
+        ) +
+      #urine + feces value (black contour)
+      geom_col(
+        aes(study, excr),
+        color="black", fill="transparent"
+        ) +
+      #label for urine+feces value
+      geom_text(
+        aes(study, excr, label=excr),
+        hjust=-0.1, family = "Times New Roman", fontface="italic"
+        ) +
+      colors_fill +#colors
+      ylim(c(0, y_lim)) +
+      coord_flip() +
+      theme(
+        legend.position = "none",
+        axis.text.x = element_blank(),
+        plot.subtitle = ggtext::element_markdown() #for colored title
+        ) +
+      labs(
+        x="", y="", 
+        title = paste("Review of", label_nutrient, "excretion per capita"),
+        subtitle = "in<span style='color:#e3dc00;'>urine,</span><span style='color:#591000;'>feces,</span>and urine+feces",
+        ),
+    
+    #plot of our values (INCA3)
+    ggplot(data_frame(study = "This study (based on INCA3)", value = our_value)) +
+      geom_col(
+        aes(study, value), fill="black"
+          ) +
+      geom_label(
+        aes(study, value, label=value),
+        hjust=-0.2, family = "Times New Roman", fontface="bold"
+        ) +
+      coord_flip() +
+      ylim(c(0, y_lim)) +
+      labs(
+        x="", y=label_unit, 
+        fill = "", 
+        caption = Source
+      ),
+    
+    
+    ncol=1, rel_heights = c(0.8, 0.2), align="v"
+    
+  )
+}
+```
+
+::: panel-tabset
+## P
+
+::: panel-tabset
+### kg per year
+
+```{r}
+#prepare for P excretion graph
+temp <- review_excretion %>% 
+  select(study, excr=P_excr, urine=P_urine, feces=P_feces) %>%
+  gather(urine_feces, value_urine_feces, urine, feces)
+temp$urine_feces <- factor(temp$urine_feces, c("feces", "urine"))
+
+#graph
+g_excr(temp, "P", 0.8, P_excr_kg_year, "kg per year") 
+```
+
+### g per day
+
+```{r}
+#prepare for P excretion graph
+temp <- review_excretion %>% 
+  select(study, excr=P_excr, urine=P_urine, feces=P_feces) %>%
+  gather(urine_feces, value_urine_feces, urine, feces) %>%
+  #convert from kg/year to g/day
+  mutate(
+    excr = round(excr/365*1000, 1), 
+    value_urine_feces = round(value_urine_feces/365*1000, 1)
+    )
+temp$urine_feces <- factor(temp$urine_feces, c("feces", "urine"))
+
+g_excr(temp, "P", 2.2, P_excr_g_day, "g per day")
+```
+:::
+
+## N
+
+::: panel-tabset
+### kg per year
+
+```{r}
+#prepare for N excretion graph
+temp <- review_excretion %>% 
+  select(study, excr=N_excr, urine=N_urine, feces=N_feces) %>%
+  gather(urine_feces, value_urine_feces, urine, feces) %>%
+  #we round the value
+  mutate(
+    excr = round(excr, 1), 
+    value_urine_feces = round(value_urine_feces, 1)
+    )
+
+temp$urine_feces <- factor(temp$urine_feces, c("feces", "urine"))
+g_excr(temp, "N", 5, N_excr_kg_year, "kg per year")
+```
+
+### g per day
+
+```{r}
+#prepare for P excretion graph
+temp <- review_excretion %>% 
+  select(study, excr=N_excr, urine=N_urine, feces=N_feces) %>%
+  gather(urine_feces, value_urine_feces, urine, feces) %>%
+  #convert from kg/year to g/day
+  mutate(
+    excr = round(excr/365*1000, 1), 
+    value_urine_feces = round(value_urine_feces/365*1000, 1)
+    )
+temp$urine_feces <- factor(temp$urine_feces, c("feces", "urine"))
+
+g_excr(temp, "N", 14, N_excr_g_day, "g per day")
+```
+:::
+
+## Repartition urine / feces
+
+```{r}
+#prepare file for graph, columns
+temp <- review_excretion %>% 
+  select(study, perc_N_urine, perc_P_urine) %>%
+  gather(perc_type, perc, perc_N_urine, perc_P_urine) %>%
+  mutate(
+    nutrient = case_when(
+      perc_type %in% c("perc_N_urine") ~ "Nitrogen",
+      perc_type %in% c("perc_P_urine") ~ "Phosphorus"
+    )
+  ) 
+
+#for labels
+temp2 <- temp %>% 
+  mutate(
+    perc = round(perc)
+  ) 
+
+
+temp$study <- reorder(temp$study, temp$perc)
+#graph for nitrogen
+g1 <- ggplot(temp %>% filter(nutrient=="Nitrogen", is.na(perc)==F)) +
+  #columns for feces
+  geom_col(
+    aes(100, reorder(study, perc)), fill="#591000"
+    ) +
+  #columns of urine
+  geom_col(
+    aes(perc, study), fill="#e3dc00"
+    ) +
+  #labels
+  geom_text(
+    data=temp2 %>% filter(nutrient=="Nitrogen", is.na(perc)==F),
+    aes(100, study, label = paste(perc, "/", 100-perc, "%")),
+    hjust=-0.1, family = "Times New Roman", fontface="italic"
+    ) +
+  facet_wrap(vars(nutrient), nrow=2) +
+  theme(plot.title = ggtext::element_markdown()) + #for colored title
+  scale_x_continuous(
+    breaks = seq(0, 100, by=10), 
+    limits = c(0, 130)) +
+  labs(
+    x="", y="",
+    title = "N and P repartition in <span style='color:#e3dc00;'>urine</span> and in <span style='color:#591000;'>feces</span>",
+    subtitle = "nutrient in urine: ~85% for N and ~60% for P"
+  )
+#graph for nitrogen
+g2 <- ggplot(temp %>% filter(nutrient=="Phosphorus", is.na(perc)==F)) +
+  #columns for feces
+  geom_col(
+    aes(100, reorder(study, perc)), fill="#591000"
+    ) +
+  #columns of urine
+  geom_col(
+    aes(perc, study), fill="#e3dc00"
+    ) +
+  #labels
+  geom_text(
+    data=temp2 %>% filter(nutrient=="Phosphorus", is.na(perc)==F),
+    aes(100, study, label = paste(perc, "/", 100-perc, "%")),
+    hjust=-0.1, family = "Times New Roman", fontface="italic"
+    ) +
+  facet_wrap(vars(nutrient), nrow=2) +
+  scale_x_continuous(
+    breaks = seq(0, 100, by=10), 
+    limits = c(0, 130)) +
+  labs(
+    x="%", y="",
+    caption=Source
+  )
+plot_grid(g1, g2, nrow=2, align="v")
+```
+
+## N:P ratio
+
+```{r}
+#prepare data for ratio graph
+temp <- review_excretion %>%
+  mutate(
+    N_P_ratio_excr = round(N_excr/P_excr, 1),
+    N_P_ratio_urine = round(N_urine/P_urine, 1),
+    N_P_ratio_feces = round(N_feces/P_feces, 1)
+  )
+temp$study <- reorder(temp$study, temp$N_P_ratio_excr)
+temp <- temp %>%
+  select(study, N_P_ratio_excr, N_P_ratio_urine, N_P_ratio_feces) %>%
+  gather(ratio_type, ratio_value, N_P_ratio_excr, N_P_ratio_urine, N_P_ratio_feces) %>%
+  filter(is.na(ratio_value)==F) %>%
+  mutate(
+    ratio_type = case_when(
+      ratio_type == "N_P_ratio_excr" ~ "urine + feces",
+      ratio_type == "N_P_ratio_urine" ~ "urine",
+      ratio_type == "N_P_ratio_feces" ~ "feces"
+    )
+  )
+temp$ratio_type <- factor(temp$ratio_type, levels=c("feces", "urine", "urine + feces"))
+colors_fill <- scale_fill_manual(
+    limits = c("urine", "feces", "urine + feces"),
+    values=c("#e3dc00", "#591000", "black")
+  )
+
+
+#ratio graph review
+g1 <- ggplot(temp) +
+  geom_col(
+    aes(ratio_value, study, fill=ratio_type), 
+    position="dodge"
+    ) +
+  geom_text(
+    aes(x=ratio_value, y=study, label=ratio_value),
+    hjust=0, family = "Times New Roman", fontface="italic"
+    ) +
+  colors_fill + 
+  theme(
+    legend.position = "none",
+    axis.text.x = element_blank(),
+    plot.subtitle = ggtext::element_markdown()  #for colored title
+    ) +
+  facet_wrap(vars(ratio_type), nrow=3) +
+  labs(
+    y="",  x="", 
+    title = "N:P ratio values in our review",
+    subtitle = "in<span style='color:#e3dc00;'>urine,</span><span style='color:#591000;'>feces,</span>and urine+feces",
+    ) +
+  xlim(0, 18) 
+
+
+g2 <- 
+  ggplot(
+    data = 
+      data_frame(
+        study="Our value, 2017, France\n(from INCA3 study)", 
+        value = N_P_ratio_excr
+        )
+    ) +
+  geom_col(
+    aes(value, study), 
+    fill="black"
+      ) +
+  geom_label(
+    aes(value, study, label=value),
+    hjust=-0.2, family = "Times New Roman", fontface="italic"
+    ) +
+  labs(
+    y="", x="",
+    caption=Source
+    ) +
+  xlim(0, 18)
+
+plot_grid(g1, g2, nrow=2, align="v", rel_heights = c(0.8, 0.2))
+```
+
+## Comparison with crop N:P content
+
+```{r}
+path_source <- "source_data/crop_N_P_content/"
+crop_N_P_content <- read_csv(paste0(path_source, "crop_N_P_content.csv")) %>%
+  mutate(N_P_ratio = perc_N/perc_P)
+                             
+ggplot(crop_N_P_content) +
+  annotate("rect", xmin = -Inf, xmax=Inf, ymin = 8, ymax=14, fill="#e3dc00", alpha=.7) +
+  annotate("rect",xmin = -Inf, xmax=Inf, ymin = 1.5, ymax=3, fill="#591000", alpha=.7) +
+  annotate("rect",xmin = -Inf, xmax=Inf, ymin = 6, ymax=10, fill="grey", alpha=.7) +
+  geom_point(aes(reorder(crop, N_P_ratio), N_P_ratio)) +
+  coord_flip() +
+  scale_y_continuous(breaks = seq(0, 20, by=2), limits=c(0, 20)) +
+  facet_grid(vars(group), scales="free_y", space="free_y") +
+  theme(
+    strip.text.y.right = element_text(angle = 0),
+    plot.subtitle = ggtext::element_markdown()  #for colored title) 
+  ) +
+  labs(
+    y="N:P ratio", x="",
+    title= "N:P ratio of different crop contents",
+    subtitle = "comparison with <span style='color:#e3dc00;'>urine</span>, <span style='color:#591000;'>feces (similar to urban sludge)</span> and <span style='color:grey;'>urine+feces</span>",
+    caption = "Source: crop content in Le Noé Thesis, 2018, page 53\nurine and feces ratios from litterature review by Tanguy Fardet\ncomputation by Thomas Starck"
+    )
+```
+:::
+
+```{r remove_all_objects_in_environment}
+rm(list = ls())
+```

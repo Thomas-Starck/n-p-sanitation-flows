@@ -1,0 +1,1029 @@
+---
+title: "Nutrient flows synthesis"
+---
+
+```{r setup, include=T, warning=F, message=F, results=F}
+knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
+
+library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
+
+#core tidyverse packages loaded:
+# ggplot2, for data visualisation. https://ggplot2.tidyverse.org/
+# dplyr, for data manipulation. https://dplyr.tidyverse.org/
+# tidyr, for data tidying. https://tidyr.tidyverse.org/
+# readr, for data import. https://readr.tidyverse.org/
+# purrr, for functional programming. https://purrr.tidyverse.org/
+# tibble, for tibbles, a modern re-imagining of data frames. https://tibble.tidyverse.org/
+# stringr, for strings. https://stringr.tidyverse.org/
+# forcats, for factors. https://forcats.tidyverse.org/
+# lubridate, for date/times. https://lubridate.tidyverse.org/
+
+#also loads the following packages (less frequently used):
+# Working with specific types of vectors:
+#     hms, for times. https://hms.tidyverse.org/
+# Importing other types of data:
+#     feather, for sharing with Python and other languages. https://github.com/wesm/feather
+#     haven, for SPSS, SAS and Stata files. https://haven.tidyverse.org/
+#     httr, for web apis. https://httr.r-lib.org/
+#     jsonlite for JSON. https://arxiv.org/abs/1403.2805
+#     readxl, for .xls and .xlsx files. https://readxl.tidyverse.org/
+#     rvest, for web scraping. https://rvest.tidyverse.org/
+#     xml2, for XML. https://xml2.r-lib.org/
+# Modelling
+#     modelr, for modelling within a pipeline. https://modelr.tidyverse.org/
+#     broom, for turning models into tidy data. https://broom.tidymodels.org/
+
+# Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+#loading relevant packages
+# library(tidyr)
+# library(tidyverse) #mainly for reading files functions
+# library(dplyr)
+# library(ggplot2) #for ggplot graphs
+library(cowplot) #for plot_grid()
+# library(stringr) #to manipulate strings
+# library(ggpattern) #to have patterns area with geom_area_pattern
+# library(viridis)
+# library(readxl) #to read excel file
+
+#setting graphs theme
+theme_set(
+  theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold")
+      )
+  )
+
+#setting viridis theme for colors
+scale_colour_continuous <- scale_colour_viridis_c
+scale_colour_discrete   <- scale_colour_viridis_d
+scale_colour_binned     <- scale_colour_viridis_b
+#setting viridis theme for fill
+scale_fill_continuous <- scale_fill_viridis_c
+scale_fill_discrete   <- scale_fill_viridis_d
+scale_fill_binned     <- scale_fill_viridis_b
+
+Source <- "Sources: Water Agencies\nComputation Thomas Starck"
+
+
+#WOULD BE BETTER IF SIAAP WERE THE SAME COLOR AS SEINE-NORMANDIE BASIN
+
+# Load the function file
+source("functions.R")
+```
+
+# Load basins files
+
+We create a file combining the different basins flows and ratios, for metropolitan France and for each basin. Since the Seine-Normandie basin data is only available for 2015, we also load the SIAAP data, containing 5 of the largest WWTP of Seine-Normandie, over a longer time period.
+
+```{r}
+path_source <- "output_data/basins/"
+#artois-picardie
+file_basin_artois_picardie <- read_csv(paste0(path_source, "basin_01_artois_picardie.csv")) %>% 
+  mutate(basin="Artois-Picardie")
+#rhin-meuse
+file_basin_rhin_meuse <- read_csv(paste0(path_source, "basin_02_rhin_meuse.csv")) %>% 
+  mutate(basin="Rhin-Meuse")
+#SIAAP
+file_basin_SIAAP <- read_csv(paste0(path_source, "basin_03_SIAAP.csv")) %>%
+  mutate(basin="SIAAP")
+#Seine-Normandie
+file_basin_seine_normandie <- read_csv(paste0(path_source, "basin_03_seine_normandie.csv")) %>%
+  mutate(basin="Seine-Normandie")
+#Loire-Bretagne
+file_basin_loire_bretagne <- read_csv(paste0(path_source, "basin_04_loire_bretagne.csv")) %>% 
+  mutate(basin="Loire-Bretagne")
+#Adour-Garonne
+file_basin_adour_garonne <- read_csv(paste0(path_source, "basin_05_adour_garonne.csv")) %>% 
+  mutate(basin="Adour-Garonne")
+#Rhone-Mediterranée
+file_basin_rhone_mediterranee <- read_csv(paste0(path_source, "basin_06_rhone_mediterranee.csv")) %>% 
+  mutate(basin="Rhône-Méditerranée")
+
+file_basin <- 
+  bind_rows(
+    file_basin_artois_picardie,
+    file_basin_rhin_meuse,
+    file_basin_seine_normandie,
+    file_basin_loire_bretagne,
+    file_basin_adour_garonne,
+    file_basin_rhone_mediterranee
+  )
+rm(
+  file_basin_artois_picardie, 
+  file_basin_rhin_meuse, 
+  file_basin_seine_normandie, 
+  file_basin_loire_bretagne, 
+  file_basin_adour_garonne, 
+  file_basin_rhone_mediterranee
+  )
+
+```
+
+We load the same data as above but including nominal capacities categories (Basin x Capacity tabs below).
+
+```{r}
+path_source <- "output_data/basins_PE/"
+#artois-picardie
+file_basin_PE_artois_picardie <- read_csv(paste0(path_source, "basin_PE_01_artois_picardie.csv")) %>% 
+  mutate(basin="Artois-Picardie")
+#rhin-meuse
+file_basin_PE_rhin_meuse <- read_csv(paste0(path_source, "basin_PE_02_rhin_meuse.csv")) %>% 
+  mutate(basin="Rhin-Meuse")
+#SIAAP
+file_basin_PE_SIAAP <- read_csv(paste0(path_source, "basin_PE_03_SIAAP.csv")) %>%
+  mutate(basin="SIAAP")
+#Seine-Normandie
+file_basin_PE_seine_normandie <- read_csv(paste0(path_source, "basin_PE_03_seine_normandie.csv")) %>%
+  mutate(basin="Seine-Normandie")
+#Loire-Bretagne
+file_basin_PE_loire_bretagne <- read_csv(paste0(path_source, "basin_PE_04_loire_bretagne.csv")) %>% 
+  mutate(basin="Loire-Bretagne")
+#Adour-Garonne
+file_basin_PE_adour_garonne <- read_csv(paste0(path_source, "basin_PE_05_adour_garonne.csv")) %>% 
+  mutate(basin="Adour-Garonne")
+#Rhone-Mediterranée
+file_basin_PE_rhone_mediterranee <- read_csv(paste0(path_source, "basin_PE_06_rhone_mediterranee.csv")) %>% 
+  mutate(basin="Rhône-Méditerranée")
+
+
+file_basin_PE <- 
+  bind_rows(
+    file_basin_PE_artois_picardie,
+    file_basin_PE_rhin_meuse,
+    file_basin_PE_seine_normandie,
+    file_basin_PE_loire_bretagne,
+    file_basin_PE_adour_garonne,
+    file_basin_PE_rhone_mediterranee
+  ) 
+
+file_basin_PE$PE_bin <- 
+    factor(
+      file_basin_PE$PE_bin, 
+      levels = 
+        c("unreported PE",
+          "0 - 200 PE", 
+          "200 - 2 000 PE", 
+          "2 000 - 10 000 PE",
+          "10 000 - 100 000 PE", 
+          "> 100 000 PE"
+          )
+        )
+
+rm(
+  file_basin_PE_artois_picardie, 
+  file_basin_PE_rhin_meuse, 
+  file_basin_PE_seine_normandie, 
+  file_basin_PE_loire_bretagne, 
+  file_basin_PE_adour_garonne, 
+  file_basin_PE_rhone_mediterranee
+  )
+```
+
+# Nutrient Ratios 
+
+::: panel-tabset
+## Basin scale 
+
+```{r}
+f_graph_ratio_basin <- function(dataset, ratio_in, ratio_out, ratio_label, y_min, y_max, legend_x, legend_y){
+  g <- plot_grid(
+    ggplot(dataset) +
+      #basins
+      geom_line(
+        aes(Year, !!as.symbol(ratio_in), color=basin)
+        ) +
+      #SIAAP and it dotted line
+      geom_line(
+        data = file_basin_SIAAP, aes(Year, !!as.symbol(ratio_in), linetype="SIAAP")
+        ) +
+      scale_linetype_manual(values=c("dotted")) +
+      #Seine-Normandie basin point for 20157
+      geom_point(
+        data = dataset %>% filter(basin=="Seine-Normandie"), 
+        aes(Year, !!as.symbol(ratio_in), color = factor(basin))
+        ) +
+      ylim(y_min, y_max) +
+      theme(legend.position = "none") +
+      labs(
+        x="", y="",
+        title = paste(ratio_label, "in the different French basins"),
+        subtitle = "Incoming flow",
+        caption = "\n"
+      ),
+    ggplot(dataset) +
+      #basins and the modified legend
+      geom_line(
+        aes(Year, !!as.symbol(ratio_out), color=basin)
+        ) +
+      guides(
+        color = 
+          guide_legend(
+            override.aes = 
+              list(
+                linetype = c(1, 1, 1, 1, 1, 0),
+                shape = c(NA, NA, NA, NA, NA, 19)
+                )
+            ) 
+      ) +
+      #SIAAP and its dotter line
+      geom_line(
+        data = file_basin_SIAAP, 
+        aes(Year, !!as.symbol(ratio_out), linetype="SIAAP")
+        ) +
+      scale_linetype_manual(values=c("dotted")) +
+      #Seine Normandie point in 2015
+      geom_point(
+        data = dataset %>% filter(basin=="Seine-Normandie"), 
+        aes(Year, !!as.symbol(ratio_out), color = basin)
+        ) +
+      ylim(y_min, y_max) +
+      theme(legend.position = c(legend_x, legend_y)) +
+      labs(
+        x="", y="",
+        title = "",
+        subtitle = "Discharged flow",
+        caption = Source,
+        color="",
+        linetype = ""
+      )
+      )
+  return(g)
+}
+```
+
+::: panel-tabset
+### N:P ratio
+
+```{r}
+f_graph_ratio_basin(file_basin, "N_P_ratio_in", "N_P_ratio_out", "N:P ratio", 0, 16, -0.85, 0.7) 
+```
+
+### DCO:DBO5 ratio
+
+```{r}
+f_graph_ratio_basin(file_basin, "DCO_DBO5_ratio_in", "DCO_DBO5_ratio_out", "DCO:DBO5 ratio", 0, 8, -0.6, 0.7)
+```
+
+### DBO5:Pt ratio
+
+```{r}
+f_graph_ratio_basin(file_basin, "DBO5_P_ratio_in", "DBO5_P_ratio_out", "DBO5:P ratio", 0, 40, 0.7, 0.75)
+```
+
+### DBO5:NGL ratio
+
+```{r}
+f_graph_ratio_basin(file_basin, "DBO5_N_ratio_in", "DBO5_N_ratio_out", "DBO5:N ratio", 0, 6, 0.7, 0.6)
+```
+
+### DCO:Pt ratio
+
+```{r}
+f_graph_ratio_basin(file_basin, "DCO_P_ratio_in", "DCO_P_ratio_out", "DCO:P ratio", 0, 100, -0.5, 0.35)
+```
+
+### DCO:NGL ratio
+
+```{r}
+f_graph_ratio_basin(file_basin, "DCO_N_ratio_in", "DCO_N_ratio_out", "DCO:N ratio", 0, 15, 0.4, 0.7)
+```
+
+:::
+
+## Basin x Capacity 
+
+We do not analyse the very small WWTP (0 to 200 PE) which are very noisy and unreliable. Furthermore, they represent only a few percent of total flows.
+
+```{r}
+f_graph_ratio_basin_PE <- function(dataset, nutrient_ratio, ratio_label, y_min, y_max){
+  g <- ggplot(dataset %>% filter(PE_bin !="unreported PE")) + 
+    #basins and the modified legend
+    geom_line(aes(Year, !!as.symbol(nutrient_ratio), color=basin)) +
+      guides(
+        color = 
+          guide_legend(
+            override.aes = 
+              list(
+                linetype = c(1, 1, 1, 1, 1, 0),
+                shape = c(NA, NA, NA, NA, NA, 19)
+                )
+            ) 
+      ) +
+    #SIAAP and its dotted line
+    geom_line(
+      data = file_basin_PE_SIAAP, aes(Year, !!as.symbol(nutrient_ratio), linetype="SIAAP")
+      ) +
+    scale_linetype_manual(values=c("dotted")) +
+    # Seine-Normandie 2015 point
+    geom_point(
+      data = dataset %>% filter(basin=="Seine-Normandie"), 
+      aes(Year, !!as.symbol(nutrient_ratio), color = factor(basin))
+      ) +
+    labs(
+      x="", y="", color="",
+      title = paste(ratio_label, "ratio at the basins scale"),
+      subtitle = "in the different French basins for each capacity category",
+      caption = Source, 
+      linetype = ""
+    ) +
+    facet_wrap(vars(PE_bin)) +
+    ylim(y_min, y_max)
+  return(g)
+}
+```
+
+::: panel-tabset
+### N:P ratio 
+
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "N_P_ratio_in", "incoming N:P", 0, 10)
+```
+
+#### out
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "N_P_ratio_out", "discharged N:P", 0, 31)
+```
+
+:::
+### DCO:DBO5 ratio 
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_DBO5_ratio_in", "incoming DCO:DBO5", 0, 3)
+```
+
+#### out
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_DBO5_ratio_out", "discharged DCO:DBO5", 0, 10)
+```
+
+:::
+### DBO5:Pt ratio 
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5_P_ratio_in", "incoming DBO5:P", 0, 40)
+```
+
+#### out
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5_P_ratio_out", "discharged DBO5:P", 0, 20)
+```
+
+:::
+### DBO5:NGL ratio 
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5_N_ratio_in", "incoming DBO5:N", 0, 6)
+```
+
+#### out
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5_N_ratio_out", "discharged DBO5:N", 0, 2)
+```
+
+:::
+### DCO:Pt ratio 
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_P_ratio_in", "incoming DCO:P", 0, 100)
+```
+
+#### out
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_P_ratio_out", "discharged DCO:P", 0, 100)
+```
+
+:::
+### DCO:NGL ratio 
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_N_ratio_in", "incoming DCO:N", 0, 15)
+```
+
+#### out
+
+```{r}
+f_graph_ratio_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_N_ratio_out", "discharged DCO:N", 0, 10)
+```
+
+:::
+
+:::
+
+:::
+
+# Yield 
+
+::: panel-tabset
+## Basin 
+
+```{r}
+f_graph_yield_basin <- function(dataset, nutrient_yield, yield_label){
+  g <- ggplot(dataset) +
+    # basins and the adapted legend
+    geom_line(aes(Year, !!as.symbol(nutrient_yield), color=basin)) +
+    guides(
+        color = 
+          guide_legend(
+            override.aes = 
+              list(
+                linetype = c(1, 1, 1, 1, 1, 0),
+                shape = c(NA, NA, NA, NA, NA, 19)
+                )
+            ) 
+      ) +
+    #SIAAP and its dotter line
+    geom_line(
+      data = file_basin_SIAAP, aes(Year, !!as.symbol(nutrient_yield), linetype="SIAAP")
+      ) +
+    scale_linetype_manual(values=c("dotted")) +
+    #Seine-Normandie 2015 point
+    geom_point(
+      data = dataset %>% filter(basin=="Seine-Normandie"), 
+      aes(Year, !!as.symbol(nutrient_yield), color = basin)
+      ) +
+    ylim(0, 100) +
+    labs(
+      x="", y="yield (%)", color="",
+      title = paste(yield_label, "wastewater treatment plant yield at the basins scale"),
+      subtitle = "in the different French basins",
+      linetype = ""
+    )
+  return(g)
+}
+```
+
+::: panel-tabset
+### Pt
+
+```{r}
+f_graph_yield_basin(file_basin, "Pt_yield", "Pt")
+```
+
+### NGL
+
+```{r}
+f_graph_yield_basin(file_basin, "NGL_yield", "NGL")
+```
+
+### DBO5
+
+```{r}
+f_graph_yield_basin(file_basin, "DBO5_yield", "DBO5")
+```
+
+### DCO
+
+```{r}
+f_graph_yield_basin(file_basin, "DCO_yield", "DCO")
+```
+
+### MES
+
+```{r}
+f_graph_yield_basin(file_basin, "MES_yield", "MES")
+```
+
+:::
+
+## Basin x Capacity 
+
+We do not analyse the very small WWTP (0 to 200 PE) which are very noisy and unreliable. Furthermore, they represent only a few percent of total flows.
+
+```{r}
+f_graph_yield_basin_PE <- function(dataset, nutrient_yield, yield_label){
+  g <- ggplot(dataset %>% filter(PE_bin !="unreported PE")) + 
+    #basins and adapted legend
+    geom_line(aes(Year, !!as.symbol(nutrient_yield), color=basin)) +
+    guides(
+        color = 
+          guide_legend(
+            override.aes = 
+              list(
+                linetype = c(1, 1, 1, 1, 1, 0),
+                shape = c(NA, NA, NA, NA, NA, 19)
+                )
+            ) 
+      ) +
+    #SIAAP and its dotter line
+    geom_line(
+      data = file_basin_PE_SIAAP, aes(Year, !!as.symbol(nutrient_yield), linetype="SIAAP")
+      ) +
+    scale_linetype_manual(values=c("dotted")) +
+    #Seine-Normandie basin in 2015
+    geom_point(
+      data = dataset %>% filter(basin=="Seine-Normandie"), 
+      aes(Year, !!as.symbol(nutrient_yield), color = basin)
+    ) +
+    ylim(0, 100) +
+    labs(
+      x="", y="yield (%)", color="",
+      title = paste(yield_label, "wastewater treatment plant yield at the basins scale"),
+      subtitle = "in the different French basins",
+      caption = Source,
+      linetype = ""
+    ) +
+    facet_wrap(vars(PE_bin)) 
+  return(g)
+}
+```
+
+::: panel-tabset
+### Pt
+
+```{r}
+f_graph_yield_basin_PE(file_basin_PE %>% filter(PE_bin!="0 - 200 PE"), "Pt_yield", "Pt")
+```
+
+### NGL
+
+```{r}
+f_graph_yield_basin_PE(file_basin_PE %>% filter(PE_bin!="0 - 200 PE"), "NGL_yield", "NGL")
+```
+
+### DBO5
+
+```{r}
+f_graph_yield_basin_PE(file_basin_PE %>% filter(PE_bin!="0 - 200 PE"), "DBO5_yield", "DBO5")
+```
+
+### DCO
+
+```{r}
+f_graph_yield_basin_PE(file_basin_PE %>% filter(PE_bin!="0 - 200 PE"), "DCO_yield", "DCO")
+```
+
+### MES
+
+```{r}
+f_graph_yield_basin_PE(file_basin_PE %>% filter(PE_bin!="0 - 200 PE"), "MES_yield", "MES")
+```
+
+:::
+
+:::
+
+# Flow / Capacity 
+
+::: panel-tabset
+
+## Basin 
+
+```{r}
+f_graph_capacity_basin <- function(dataset, ratio_in, ratio_out, ratio_label, y_min, y_max, legend_x, legend_y){
+  g <- plot_grid(
+    ggplot(dataset) +
+      #basins 
+      geom_line(aes(Year, !!as.symbol(ratio_in), color=basin)) +
+      #SIAAP dotted line
+      geom_line(
+        data = file_basin_SIAAP, aes(Year, !!as.symbol(ratio_in), linetype="SIAAP")
+        ) +
+      scale_linetype_manual(values=c("dotted")) +
+      #Seine-Normandie point in 2015
+      geom_point(
+        data = dataset %>% filter(basin=="Seine-Normandie"), 
+        aes(Year, !!as.symbol(ratio_in), color = factor(basin))
+        ) +
+      theme(legend.position = "none") +
+      labs(
+        x="", y=expression(paste("g.PE"^"-1", ".day"^"-1")),
+        title = paste(ratio_label, "per nominal PE in the different French basins"),
+        subtitle = "Incoming flow",
+        caption = "\n"
+      ) +
+      scale_y_continuous(
+        limits = c(y_min, y_max),
+        sec.axis = 
+          sec_axis(
+            trans=~.*(365/1000), 
+            name=""
+            )
+          ),
+    ggplot(dataset) +
+      #basins and adapted legend
+      geom_line(aes(Year, !!as.symbol(ratio_out), color=basin)) +
+      guides(
+        color = 
+          guide_legend(
+            override.aes = 
+              list(
+                linetype = c(1, 1, 1, 1, 1, 0),
+                shape = c(NA, NA, NA, NA, NA, 19)
+                )
+            ) 
+        ) +
+      #SIAAP
+      geom_line(
+        data = file_basin_SIAAP, 
+        aes(Year, !!as.symbol(ratio_out), linetype="SIAAP")
+        ) +
+      scale_linetype_manual(values=c("dotted")) +
+      #Seine Normandie
+      geom_point(
+        data = dataset %>% filter(basin=="Seine-Normandie"), 
+        aes(Year, !!as.symbol(ratio_out), color = basin)
+        ) +
+      theme(legend.position = c(legend_x, legend_y)) +
+      labs(
+        x="", y="",
+        title = "",
+        subtitle = "Discharged flow",
+        caption = Source,
+        color="",
+        linetype = ""
+      ) +
+      scale_y_continuous(
+        limits = c(y_min, y_max),
+        sec.axis = 
+          sec_axis(
+            trans=~.*(365/1000), 
+            name=expression(paste("kg.PE"^"-1", ".year"^"-1"))
+            )
+        )
+      )
+  return(g)
+}
+```
+
+::: panel-tabset
+### Pt / nominal PE
+
+```{r}
+f_graph_capacity_basin(file_basin, "Pt_PE_ratio_in", "Pt_PE_ratio_out", "Pt", 0, 2, 0.7, 0.7) 
+```
+
+### NGL / nominal PE
+
+```{r}
+f_graph_capacity_basin(file_basin, "NGL_PE_ratio_in", "NGL_PE_ratio_out", "NGL", 0, 12, 0.25, 0.75)
+```
+
+### DBO5 / nominal PE
+
+```{r}
+f_graph_capacity_basin(file_basin, "DBO5_PE_ratio_in", "DBO5_PE_ratio_out", "DBO5", 0, 40, 0.6, 0.7)
+```
+
+### DCO / nominal PE
+
+```{r}
+f_graph_capacity_basin(file_basin, "DCO_PE_ratio_in", "DCO_PE_ratio_out", "DCO", 0, 90, 0.6, 0.7)
+```
+
+### MES / nominal PE
+
+```{r}
+f_graph_capacity_basin(file_basin, "MES_PE_ratio_in", "MES_PE_ratio_out", "MES", 0, 60, 0.6, 0.7)
+```
+
+
+:::
+## Basin x Capacity 
+
+We do not analyse the very small WWTP (0 to 200 PE) which are very noisy and unreliable. Furthermore, they represent only a few percent of total flows.
+
+```{r}
+f_graph_capacity_basin_PE <- function(dataset, nutrient_ratio, ratio_label, y_min, y_max){
+  g <- ggplot(dataset %>% filter(PE_bin !="unreported PE")) + 
+    #basins and adapted legend
+    geom_line(aes(Year, !!as.symbol(nutrient_ratio), color=basin)) +
+    guides(
+        color = 
+          guide_legend(
+            override.aes = 
+              list(
+                linetype = c(1, 1, 1, 1, 1, 0),
+                shape = c(NA, NA, NA, NA, NA, 19)
+                )
+            ) 
+      ) +
+    #seine normandie point in 2015
+    geom_point(
+      data = dataset %>% filter(basin=="Seine-Normandie"), 
+      aes(Year, !!as.symbol(nutrient_ratio), color = factor(basin))
+      ) +
+    #SIAAP dotted line
+    geom_line(
+      data = file_basin_PE_SIAAP, aes(Year, !!as.symbol(nutrient_ratio), linetype="SIAAP")
+      ) +
+    scale_linetype_manual(values=c("dotted")) +
+    labs(
+      x="", y=expression(paste("g.PE"^"-1", ".day"^"-1")), 
+      color="",
+      title = paste(ratio_label, "per nominal PE in the different French basins"),
+      subtitle = "in the different French basins for each capacity category",
+      caption = Source,
+      linetype =""
+    ) +
+  facet_wrap(vars(PE_bin)) +
+    scale_y_continuous(
+        limits = c(y_min, y_max),
+        sec.axis = 
+          sec_axis(
+            trans=~.*(365/1000), 
+            name=expression(paste("kg.PE"^"-1", ".year"^"-1"))
+            )
+        )
+  return(g)
+}
+```
+
+::: panel-tabset
+### Pt / nominal PE 
+
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "Pt_PE_ratio_in", "Incoming Pt", 0, 2) 
+```
+
+#### out
+
+```{r}
+f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "Pt_PE_ratio_out", "Discharged Pt", 0, 1.5)
+```
+
+:::
+### NGL / nominal PE 
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "NGL_PE_ratio_in", "Incoming NGL", 0, 12)
+```
+
+#### out
+
+```{r}
+f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "NGL_PE_ratio_out", "Discharged NGL", 0, 5)
+```
+
+:::
+### DBO5 / nominal PE 
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5_PE_ratio_in", "Incoming DBO5", 0, 40)
+```
+
+#### out
+
+```{r}
+f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DBO5_PE_ratio_out", "Discharged DBO5", 0, 5)
+```
+
+:::
+### DCO / nominal PE 
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_PE_ratio_in", "Incoming DCO", 0, 100)
+```
+
+#### out
+
+```{r}
+f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "DCO_PE_ratio_out", "Discharged DCO", 0, 15)
+```
+
+:::
+### MES / nominal PE 
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "MES_PE_ratio_in", "Incoming DCO", 0, 60)
+```
+
+#### out
+
+```{r}
+f_graph_capacity_basin_PE(file_basin_PE %>% filter(PE_bin !="0 - 200 PE"), "MES_PE_ratio_out", "Discharged DCO", 0, 10)
+```
+
+:::
+
+:::
+
+:::
+# Industrial network discharge 
+
+```{r}
+path_source <- "output_data/industry_sewers_network_discharge/"
+temp <- read_csv(paste0(path_source, "industry_sewers_network_discharge_GEREP_basins.csv"))
+```
+
+```{r}
+Source <- "GEREP database\nComputation by Thomas Starck"
+
+f_graph_industry_discharge <- function(dataset, nutrient_select, nutrient_label){
+  g <- plot_grid(
+    ggplot(temp %>% filter(basin != "Metropolitan France")) +
+      geom_area(aes(Year, !!as.symbol(nutrient_select), fill = basin), alpha=.8) +
+      geom_line(
+        data = temp %>% filter(basin == "Metropolitan France"),
+        aes(Year, !!as.symbol(nutrient_select))) +
+      theme(legend.position = "none") +
+      labs(
+        x="", y="kt per year",
+        fill = "",
+        title = paste("Industrial", nutrient_label ,"pollution discharged in sewage network"),
+        subtitle = "Metropolitan France",
+        caption = "\n"
+      ),
+    ggplot(temp %>% filter(basin != "Metropolitan France")) +
+      geom_area(aes(Year, !!as.symbol(nutrient_select), fill = basin), alpha=.8) +
+      labs(
+        x="", y="",
+        fill = "",
+        title = "",
+        subtitle = "for each basin",
+        caption = Source
+      ) +
+      theme(legend.position = "none") +
+      facet_wrap(vars(basin), scales = "free_y"),
+    rel_widths = c(0.25, 0.75)
+    )
+  
+  return(g)
+}
+```
+
+::: panel-tabset
+## Pt
+
+```{r}
+f_graph_industry_discharge(temp, "Pt_in", "Pt")
+```
+
+## NGL
+
+```{r}
+f_graph_industry_discharge(temp, "NGL_in", "NGL")
+```
+
+## DBO5
+
+```{r}
+f_graph_industry_discharge(temp, "DBO5_in", "DBO5")
+```
+
+## DCO
+
+```{r}
+f_graph_industry_discharge(temp, "DCO_in", "DCO")
+```
+
+## MES
+
+```{r}
+f_graph_industry_discharge(temp, "MES_in", "MES")
+```
+
+:::
+
+# Capacities distribution 
+
+```{r}
+path_source <- "output_data/zipf_law"
+Source <- "Source: Water Agencies\nComputation by Thomas Starck"
+
+file_zipf_law <- 
+  list.files( 
+    #read and merge csv of all years
+    path = path_source,
+    pattern = "zipf_law*", 
+    full.names = T, 
+    recursive = T
+    ) %>% 
+  lapply(read_csv) %>% 
+  bind_rows
+```
+
+
+::: panel-tabset
+## Nb of WWTPs vs Capacity 
+
+::: panel-tabset
+### linear scale
+
+```{r}
+ggplot(file_zipf_law) +
+  geom_step(
+    aes(percent_rank, percent_cumulative_capacity, color = basin)
+    ) +
+  labs(
+    x="% of WWTP, by basin", y="% of total capacity",
+    title = "Cumulative distribution",
+    subtitle = "nb of WWTP vs total capacity, by basin"
+  ) +
+  ylim(0, 100)
+```
+
+### log scale
+
+```{r}
+ggplot(file_zipf_law) +
+  geom_step(
+    aes(percent_rank, percent_cumulative_capacity, color = basin)
+    ) +
+  scale_x_log10(labels = scales::label_number(drop0trailing = TRUE)) +
+  scale_y_log10(labels = scales::label_number(drop0trailing = TRUE)) +
+  labs(
+    x="% of WWTP, by basin", y="% of total capacity",
+    title = "Cumulative distribution",
+    subtitle = "nb of WWTP vs total capacity, by basin"
+  ) +
+  ylim(0, 100)
+```
+
+:::
+
+## Zipf law
+
+```{r}
+ggplot(file_zipf_law) +
+  geom_point(
+    aes(rank_STEU, capacity, color = basin)
+    ) +
+  geom_line(
+    aes(rank_STEU, capacity, color = basin)
+    ) +
+  scale_x_log10(labels = scales::label_number(drop0trailing = TRUE)) +
+  scale_y_log10(labels = scales::label_number(drop0trailing = TRUE)) +
+  labs(
+    x="rank of WWTP capacity, by basin", y="WWTP nominal capacity\n(population equivalent)",
+    title = "Looking for a Zipf Law",
+    subtitle = "as an indication, shaded area represent the -1 power law"
+  ) +
+  geom_function(fun = ~ (2*10^6)*.x^-(1), linewidth=9, alpha=.4)
+```
+
+:::
+
+# Save final data
+
+We save the adjusted nutrient flows for each basin, averaged over the 2015-2020 period.
+
+```{r}
+#basin mean over 2015-2020
+temp <- file_basin %>%
+  filter(Year>2014 & Year<2021) %>%
+  mutate(Year = "2015-2020 mean") %>%
+  select(
+    basin, Year,
+    Pt_in_adj, Pt_out_adj,
+    NGL_in_adj, NGL_out_adj,
+    DBO5_in_adj, DBO5_out_adj,
+    DCO_in_adj, DCO_out_adj,
+    MES_in_adj, MES_out_adj
+  ) %>%
+  group_by(Year, basin) %>%
+  summarise_all(mean, na.rm=T) %>%
+  mutate_if(
+    is.numeric, signif, 2
+    )
+
+#metropolitan mean over 2015-2020
+temp2 <- temp %>%
+  mutate(basin = "Metropolitan France") %>%
+  group_by(Year, basin) %>%
+  summarise_all(sum) 
+
+#save all data
+temp <- bind_rows(
+  temp2, temp
+)
+path_output <- "output_data/0_final_data/"
+f_save_csv_files(
+  temp,
+  path_output,
+  "basins_flows_2015_2020.csv"
+)
+```
+
+```{r remove_all_objects_in_environment}
+rm(list = ls())
+```

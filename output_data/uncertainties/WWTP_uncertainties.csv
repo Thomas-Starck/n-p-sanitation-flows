@@ -1,0 +1,17 @@
+type,nutrient,value
+"coefficient of
+variation",Pt_in,1.3
+"maximum variation
+over 2015-2020",Pt_in,2.2
+"coefficient of
+variation",Pt_out,2.2
+"maximum variation
+over 2015-2020",Pt_out,3.6
+"coefficient of
+variation",NGL_in,2.4
+"maximum variation
+over 2015-2020",NGL_in,3.3
+"coefficient of
+variation",NGL_out,3.6
+"maximum variation
+over 2015-2020",NGL_out,6.7

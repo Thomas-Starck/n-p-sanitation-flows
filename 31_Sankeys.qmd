@@ -1,0 +1,2062 @@
+---
+title: "Sankeys"
+---
+
+```{r setup, include=T, warning=F, message=F, results=F}
+knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
+
+library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
+
+#core tidyverse packages loaded:
+# ggplot2, for data visualisation. https://ggplot2.tidyverse.org/
+# dplyr, for data manipulation. https://dplyr.tidyverse.org/
+# tidyr, for data tidying. https://tidyr.tidyverse.org/
+# readr, for data import. https://readr.tidyverse.org/
+# purrr, for functional programming. https://purrr.tidyverse.org/
+# tibble, for tibbles, a modern re-imagining of data frames. https://tibble.tidyverse.org/
+# stringr, for strings. https://stringr.tidyverse.org/
+# forcats, for factors. https://forcats.tidyverse.org/
+# lubridate, for date/times. https://lubridate.tidyverse.org/
+
+#also loads the following packages (less frequently used):
+# Working with specific types of vectors:
+#     hms, for times. https://hms.tidyverse.org/
+# Importing other types of data:
+#     feather, for sharing with Python and other languages. https://github.com/wesm/feather
+#     haven, for SPSS, SAS and Stata files. https://haven.tidyverse.org/
+#     httr, for web apis. https://httr.r-lib.org/
+#     jsonlite for JSON. https://arxiv.org/abs/1403.2805
+#     readxl, for .xls and .xlsx files. https://readxl.tidyverse.org/
+#     rvest, for web scraping. https://rvest.tidyverse.org/
+#     xml2, for XML. https://xml2.r-lib.org/
+# Modelling
+#     modelr, for modelling within a pipeline. https://modelr.tidyverse.org/
+#     broom, for turning models into tidy data. https://broom.tidymodels.org/
+
+# Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+#loading relevant packages
+library(networkD3) #for sankey
+library(htmlwidgets) #for sankey
+library(readxl) #to read excel file
+library(cowplot) #for plot_grid, multiple plots
+
+#path for data 
+
+#setting graphs theme
+theme_set(
+  theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold")
+      )
+  )
+
+#setting viridis theme for colors
+scale_colour_continuous <- scale_colour_viridis_c
+scale_colour_discrete   <- scale_colour_viridis_d
+scale_colour_binned     <- scale_colour_viridis_b
+#setting viridis theme for fill
+scale_fill_continuous <- scale_fill_viridis_c
+scale_fill_discrete   <- scale_fill_viridis_d
+scale_fill_binned     <- scale_fill_viridis_b
+
+Source <- "Source: \ncomputation by Thomas Starck"
+
+# Load the function file
+source("functions.R")
+```
+
+# Load data
+
+We load the data produced in the preparation pages, for each water agency basin and at the national scale: wastewater treatment plants inflows and outflows, industry discharge to sewers networks, French nutrient ingestion/excretion, share of population with individual autonomous system (not connected to sewers), 
+
+```{r}
+#human ingestion/excretion
+path_source <- "output_data/nutrient_ingestion_excretion/" #source of the data
+#load France excretions
+file_human_excretions <- read_csv(paste0(path_source, "excretions_human_france_kt_year.csv")) %>%
+  mutate(basin = "Metropolitan France")
+#load water agency basins excretions and merge with France excretions
+file_human_excretions <- bind_rows(
+  file_human_excretions,
+  read_csv(paste0(path_source, "excretions_human_basins_kt_year.csv"))
+)  
+
+#large industries network discharge at water agency scale and national scale
+path_source <- "output_data/industry_sewers_network_discharge/" #source of the data
+file_industry_discharge <- read_csv(paste0(path_source, "industry_sewers_network_discharge_GEREP_basins.csv")) #load data 
+#take the mean of the 2015-2020 period
+file_industry_discharge <- file_industry_discharge %>%
+  filter(Year>2014 & Year<2021) %>%
+  group_by(basin) %>%
+  summarise(
+    across(
+      c(
+        NGL_in, NGL_out, Pt_in, Pt_out, 
+        DBO5_in, DBO5_out, DCO_in, DCO_out, 
+        MES_in, MES_out
+      ), ~signif(mean(.x, na.rm=T), 3)
+    )
+  )
+
+#inflow and outflows of WWTP, by basin and at the national scale
+path_source <- "output_data/0_final_data/" #source of the data
+file_in_out_flows <- read_csv(paste0(path_source, "basins_flows_2015_2020.csv")) #load data
+
+#discharged without treatment (% as share of pollution entering WWTP)
+path_source <- "source_data/10_discharge_without_treatment/" #source of the data
+file_direct_discharge <- read_csv(paste0(path_source, "discharge_without_treatment_estimations.csv")) #load data
+
+#connection to sewer networks
+path_source <- "source_data/pop_sewage_connection/" #source of the data
+file_sewage_connection <- read_excel(paste0(path_source, "pop_basins_sewage_connection.xlsx"), range = "A1:F8")
+
+#individual autonomous system balance
+path_source <- "source_data/pop_sewage_connection/" #source of the data
+file_IAS_balance <- read_csv(paste0(path_source, "balance_individual_autonomous_system.csv"))
+
+#sludge destination
+path_source <- "output_data/sludge_destination/"
+file_sludge_destination <- read_csv(paste0(path_source, "sludge_destination.csv"))
+
+#N:P ratio of sludge
+path_source <- "output_data/sludge_composition/" #source of the data
+file_sludge_composition <- read_csv(paste0(path_source, "N_P_sludge_review.csv"))
+N_P_ratio_sludge_review <- 
+  file_sludge_composition$N_P_ratio[file_sludge_composition$compost=="not composted"]
+
+#NH3 volatilization during composting
+N_compost_volatilization <- 0.3
+
+#proportion excretions to sewers from people with Individual Autonomous System (due to excretions in public spaces connected to sewers)
+perc_non_IAS <- 0.33
+```
+
+```{r}
+#compute direct discharge at national scale
+temp <- left_join(file_in_out_flows, file_direct_discharge, by="basin") %>%
+  select(basin, Pt_in_adj, NGL_in_adj, percent_loss) %>%
+  filter(basin != "Metropolitan France")
+#compute national percent direct discharge, weighted by basin pollution flows
+perc_Pt_loss <- weighted.mean(temp$percent_loss, temp$Pt_in_adj)
+perc_NGL_loss <- weighted.mean(temp$percent_loss, temp$NGL_in_adj)
+perc_loss <- round(mean(perc_Pt_loss, perc_NGL_loss), 2)
+
+#very similar for N and P, we take the average 
+file_direct_discharge <- 
+  rbind(
+    file_direct_discharge, 
+    data.frame(basin = "Metropolitan France", percent_loss = perc_loss)
+    )
+rm(perc_Pt_loss, perc_NGL_loss, perc_loss, temp)
+```
+
+# Sankeys P
+
+```{r}
+f_P_file <- function(file_name, basin_selected){
+  #select values of basin 
+  human_excretions <- file_human_excretions %>%
+  filter(basin == basin_selected)
+
+  industry_discharge <- file_industry_discharge %>%
+    filter(basin == basin_selected) %>%
+    select(basin, NGL_in, Pt_in, DBO5_in, DCO_in, MES_in)
+  
+  sewage_connection <- file_sewage_connection %>%
+    filter(basin == basin_selected)
+  
+  in_out_flows <- file_in_out_flows %>%
+    filter(basin == basin_selected) 
+  
+  direct_discharge <- file_direct_discharge %>%
+    filter(basin == basin_selected) 
+  
+  sludge_destination <- file_sludge_destination %>%
+    filter(basin == basin_selected)
+  
+  
+  #create empty sankey file
+  sankey <- 
+    data.frame(
+      source = character(), 
+      target = character(),
+      flow_group = character(),
+      value = numeric()
+      )
+  
+  #NETWORK REPARTITION
+  #P excretions to IAS
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "excretion", "IAS", "excretion", 
+      human_excretions$P_excretion*sewage_connection$share_IAS*(1-perc_non_IAS)
+      )
+  #P excretions to sewage network
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "excretion", "sewage network", "excretion", 
+      human_excretions$P_excretion*(
+        (1-sewage_connection$share_IAS) + sewage_connection$share_IAS*(perc_non_IAS)
+        )
+      )
+  
+  #P IAS to water and to WWTP
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "IAS", "groundwater", "water", 
+      IAS_balance$water*sankey$value[sankey$target=="IAS"]
+      )
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "IAS", "WWTP", "WWTP", 
+      IAS_balance$sludge*sankey$value[sankey$target=="IAS"]
+      )
+  
+  #P industry to sewage network
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "large industries", "sewage network", "large industries", 
+      industry_discharge$Pt_in
+      )
+  
+  #P from network to WWTP (taking into account IAS inputs)
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "sewage network", "WWTP", "WWTP", 
+      in_out_flows$Pt_in_adj-sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"]
+      )
+  #P out WWTP in water
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "WWTP", "water", "water", 
+      in_out_flows$Pt_out_adj
+      )
+  #P in sludge
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "WWTP", "sludge", "sludge", 
+      in_out_flows$Pt_in_adj-in_out_flows$Pt_out_adj
+      )
+  
+  #P discharge without treatment
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "sewage network", "water", "water", 
+      in_out_flows$Pt_in_adj*direct_discharge$percent_loss
+      )
+  
+  #P in sludge returning to farming system
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "sludge", "composted, spread", "sludge", 
+      sankey$value[sankey$target=="sludge"]*(sludge_destination$spread+sludge_destination$composted)
+      )
+  
+  #P not returning to farming system
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "sludge", "landfill, incineration..", "lost", 
+      sankey$value[sankey$target=="sludge"]-sankey$value[sankey$target=="composted, spread"]
+      )
+  
+  #P residual 
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "residual", "sewage network", "large industries", 
+      sankey$value[sankey$source=="sewage network" & sankey$target=="water"] +
+        sankey$value[sankey$source=="sewage network" & sankey$target=="WWTP"] -
+        sankey$value[sankey$source=="large industries"] -
+        sankey$value[sankey$source=="excretion" & sankey$target=="sewage network"] 
+      )
+  
+  
+  
+  
+  #now that we have residuals in sewers, we recompute IAS flows, considering residuals in IAS
+  
+  #residuals P to IAS
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "residual", "IAS", "sewage network", 
+      sankey$value[sankey$source=="residual" & sankey$target=="sewage network"]*
+        sewage_connection$share_IAS/(1-sewage_connection$share_IAS)
+      )
+  
+  #recompute P IAS to water and to WWTP
+  sankey$value[sankey$source=="IAS" & sankey$target=="groundwater"] <- 
+    IAS_balance$water*(
+      sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
+        sankey$value[sankey$source=="residual" & sankey$target=="IAS"]
+    )
+  sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"] <- 
+    IAS_balance$sludge*(
+      sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
+        sankey$value[sankey$source=="residual" & sankey$target=="IAS"]
+    )
+  
+  #recompute P from network to WWTP (taking into account IAS inputs)
+  sankey$value[sankey$source=="sewage network" & sankey$target=="WWTP"] <- 
+    in_out_flows$Pt_in_adj-sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"]
+
+  
+  #rounding the results
+  sankey$value <- round(sankey$value, 2)
+  
+  #save file
+  f_save_csv_files(
+    sankey,
+    "output_data/sankey_flows/phosphorus/",
+    file_name
+  )
+  
+  return(sankey)
+}
+
+f_sankey <- function(sankey){
+  # nodes names for the sankey 
+  nodes <- data.frame(
+    name=c(as.character(sankey$source), as.character(sankey$target)) %>% 
+      unique())
+  
+  # With networkD3, connection must be provided using id, not using real name like in the links dataframe. So we need to add it.
+  sankey$IDsource <- match(sankey$source, nodes$name)-1
+  sankey$IDtarget <- match(sankey$target, nodes$name)-1
+  
+  # Colors groups (for nodes and flow links)
+  nodes$group <- as.factor(c("nodes_group"))
+  my_color <-
+  'd3.scaleOrdinal()
+  .domain(["excretion","large industries" ,"lost", "water", "sludge", "nodes_group"])
+  .range(["#7d6608" , "grey" , "#5e5e5e", "#2e86c1", "#6e2c00", "black"])'
+
+  #to ba able to show decimales on the snkey graph
+  # see here https://stackoverflow.com/questions/72129768/r-networkd3-issues
+  # see also https://stackoverflow.com/questions/74259905/network-d3-sankey-node-value-too-precise-using-htmlwidgets
+customJS <- '
+  function(el,x) { 
+      var link = d3.selectAll(".link");
+  
+      var format = d3.formatLocale({"decimal": ".", "thousands": ",", "grouping": [3], "currency": ["", "\u00a0€"]}).format(",.1f");
+  
+      link.select("title").select("body")
+          .html(function(d) { return "<pre>" + d.source.name + " \u2192 " + d.target.name +
+              "\\n" + format(d.value) + " ktP" + "<pre>"; });
+              
+      d3.select(el).selectAll(".node text")
+          .html(function(d) { return d.name + " " + format(d.value) + " ktP"; });
+              
+  }
+  '
+  
+  # Make the sankey
+  p <- 
+    sankeyNetwork(
+      Links = sankey, Nodes = nodes, Source = "IDsource", Target = "IDtarget",
+      Value = "value", NodeID = "name", colourScale=my_color,
+      fontSize=25, units = "ktP", nodePadding = 50,
+      sinksRight = T, margin = c(top = 0, right = 0, bottom = 0, left = 0),
+      LinkGroup="flow_group", NodeGroup="group"
+      )
+  
+onRender(p, customJS)
+}
+
+f_table <- function(sankey){
+  # table to see the flow values between nodes
+  knitr::kable(
+    sankey %>% 
+      select(source, target, value) %>%
+      mutate(value = round(value, digits = 1)), 
+    caption ="Values of the flows (ktP)") %>%
+    kableExtra::kable_styling(full_width = F)
+}
+```
+
+```{r}
+#select IAS balance of P for all sankeys
+IAS_balance <- file_IAS_balance %>%
+  filter(nutrient=="P")
+```
+
+::: panel-tabset
+## France
+
+```{r}
+sankey_P <- f_P_file("sankey_P_flows_France.csv", "Metropolitan France")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_P)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_P)
+```
+
+## Artois-Picardie
+
+```{r}
+sankey_P <- f_P_file("sankey_P_flows_Artois_Picardie.csv", "Artois-Picardie")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_P)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_P)
+```
+
+## Rhin-Meuse
+
+```{r}
+sankey_P <- f_P_file("sankey_P_flows_Rhin_Meuse.csv", "Rhin-Meuse")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_P)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_P)
+```
+
+## Seine-Normandie
+
+```{r}
+sankey_P <- f_P_file("sankey_P_flows_Seine_Normandie.csv", "Seine-Normandie")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_P)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_P)
+```
+
+## Loire-Bretagne
+
+```{r}
+sankey_P <- f_P_file("sankey_P_flows_Loire_Bretagne.csv", "Loire-Bretagne")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_P)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_P)
+```
+
+## Adour-Garonne
+
+```{r}
+sankey_P <- f_P_file("sankey_P_flows_Adour_Garonne.csv", "Adour-Garonne")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_P)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_P)
+```
+
+## Rhône-Méditerranée-Corse
+
+```{r}
+sankey_P <- f_P_file("sankey_P_flows_Rhone_Mediterranee.csv", "Rhône-Méditerranée")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_P)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_P)
+```
+:::
+
+# Sankeys N
+
+```{r}
+f_N_file <- function(file_name, basin_selected){
+  #select basin values
+  human_excretions <- file_human_excretions %>%
+  filter(basin == basin_selected)
+
+  industry_discharge <- file_industry_discharge %>%
+    filter(basin == basin_selected) %>%
+    select(basin, NGL_in, Pt_in, DBO5_in, DCO_in, MES_in)
+  
+  sewage_connection <- file_sewage_connection %>%
+    filter(basin == basin_selected)
+  
+  in_out_flows <- file_in_out_flows %>%
+    filter(basin == basin_selected) 
+  
+  direct_discharge <- file_direct_discharge %>%
+    filter(basin == basin_selected) 
+  
+  sludge_destination <- file_sludge_destination %>%
+    filter(basin == basin_selected) 
+  
+  #create empty sankey file
+  sankey <- 
+    data.frame(
+      source = character(), 
+      target = character(),
+      flow_group = character(),
+      value = numeric()
+      )
+  
+  #NETWORK REPARTITION
+  #N excretions to IAS
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "excretion", "IAS", "excretion", 
+      human_excretions$N_excretion*sewage_connection$share_IAS*(1-perc_non_IAS)
+      )
+  #N excretions to sewage network
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "excretion", "sewage network", "excretion", 
+      human_excretions$N_excretion*(
+        (1-sewage_connection$share_IAS) + sewage_connection$share_IAS*(perc_non_IAS)
+        )
+      )
+  
+  #N IAS to water, air and to WWTP
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "IAS", "groundwater", "water", 
+      IAS_balance$water*sankey$value[sankey$target=="IAS"]
+      )
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "IAS", "WWTP", "WWTP", 
+      IAS_balance$sludge*sankey$value[sankey$target=="IAS"]
+      )
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "IAS", "air", "air", 
+      IAS_balance$air*sankey$value[sankey$target=="IAS"]
+      )
+  
+  #N industry to sewage network
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "large industries", "sewage network", "large industries", 
+      industry_discharge$NGL_in
+      )
+  
+  #N from network to WWTP (taking into account IAS inputs)
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "sewage network", "WWTP", "WWTP", 
+      in_out_flows$NGL_in_adj-sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"]
+      )
+  
+  #N out of WWTP to water
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "WWTP", "water", "water", 
+      in_out_flows$NGL_out_adj
+      )
+  
+  #N discharge without treatment
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "sewage network", "water", "water", 
+      in_out_flows$NGL_in_adj*direct_discharge$percent_loss
+      )
+  
+  #N in sludge
+  sankey[nrow(sankey) + 1,] =
+    list(
+      "WWTP", "sludge", "sludge",
+      P_sludge*N_P_ratio_sludge_review
+      )
+  
+  #N de-nitrified
+  sankey[nrow(sankey) + 1,] =
+    list(
+      "WWTP", "air", "air",
+      #N into WWTP
+      (sankey$value[sankey$source=="sewage network" & sankey$target=="WWTP"] +
+         sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"])
+      #minus N into into water
+      -sankey$value[sankey$source=="WWTP" & sankey$target=="water"]
+      #minus N insludge
+      -sankey$value[sankey$source=="WWTP" & sankey$target=="sludge"]
+      )
+  
+  #N in sludge directly spread
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "sludge", "spread", "sludge", 
+      sankey$value[sankey$target=="sludge"]*(sludge_destination$spread)
+      )
+  
+  #N in sludge composted
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "sludge", "composted", "sludge", 
+      sankey$value[sankey$target=="sludge"]*(sludge_destination$composted)
+      )
+  
+  #N not returning to farming system
+  sankey[nrow(sankey) + 1,] =
+    list(
+      "sludge", "landfill, incineration..", "lost",
+      sankey$value[sankey$target=="sludge"]-
+        sankey$value[sankey$target=="composted"]-
+        sankey$value[sankey$target=="spread"]
+      )
+
+  #N in sludge composted N losses volatilizations
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "composted", "air", "air", 
+      sankey$value[sankey$target=="composted"]*N_compost_volatilization
+      )
+  
+  #N compost returning to farming system
+  sankey[nrow(sankey) + 1,] =
+    list(
+      "composted", "recycled", "sludge",
+      sankey$value[sankey$target=="composted"]*(1-N_compost_volatilization)
+      )
+  
+  #N spread returning to farming system
+  sankey[nrow(sankey) + 1,] =
+    list(
+      "spread", "recycled", "sludge",
+      sankey$value[sankey$target=="spread"]
+    )
+  
+  #N residual 
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "residual", "sewage network", "large industries", 
+      sankey$value[sankey$source=="sewage network" & sankey$target=="water"] +
+        sankey$value[sankey$source=="sewage network" & sankey$target=="WWTP"] -
+        sankey$value[sankey$source=="large industries"] -
+        sankey$value[sankey$source=="excretion" & sankey$target=="sewage network"] 
+      )
+  
+  #now that we have residuals in sewers, we recompute IAS flows, considering residuals in IAS
+  
+  #residuals N to IAS
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "residual", "IAS", "sewage network", 
+      sankey$value[sankey$source=="residual" & sankey$target=="sewage network"]*
+        sewage_connection$share_IAS/(1-sewage_connection$share_IAS)
+      )
+  
+  #recompute N IAS to water and to WWTP
+  sankey$value[sankey$source=="IAS" & sankey$target=="groundwater"] <- 
+    IAS_balance$water*(
+      sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
+        sankey$value[sankey$source=="residual" & sankey$target=="IAS"]
+    )
+  sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"] <- 
+    IAS_balance$sludge*(
+      sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
+        sankey$value[sankey$source=="residual" & sankey$target=="IAS"]
+    )
+  sankey$value[sankey$source=="IAS" & sankey$target=="air"] <- 
+    IAS_balance$air*(
+      sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
+        sankey$value[sankey$source=="residual" & sankey$target=="IAS"]
+    )
+  
+  #recompute N from network to WWTP (taking into account IAS inputs)
+  sankey$value[sankey$source=="sewage network" & sankey$target=="WWTP"] <- 
+    in_out_flows$NGL_in_adj-sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"]
+  
+  #rounding the results
+  sankey$value <- round(sankey$value, 2)
+  
+  #save file
+  f_save_csv_files(
+    sankey,
+    "output_data/sankey_flows/nitrogen/",
+    file_name
+  )
+  
+  return(sankey)
+}
+
+f_sankey <- function(sankey){
+  # nodes names for the sankey 
+  nodes <- data.frame(
+    name=c(as.character(sankey$source), as.character(sankey$target)) %>% 
+      unique())
+  
+  # With networkD3, connection must be provided using id, not using real name like in the links dataframe. So we need to add it.
+  sankey$IDsource <- match(sankey$source, nodes$name)-1
+  sankey$IDtarget <- match(sankey$target, nodes$name)-1
+  
+  # Colors groups (for nodes and flow links)
+  nodes$group <- as.factor(c("nodes_group"))
+  my_color <-
+  'd3.scaleOrdinal()
+  .domain(["excretion", "large industries", "lost", "water", "sludge", "air", "nodes_group"])
+  .range(["#7d6608", "grey", "#5e5e5e", "#2e86c1", "#6e2c00", "#3ab02a", "black"])'
+  
+  #to ba able to show decimales on the snkey graph
+  # see here https://stackoverflow.com/questions/72129768/r-networkd3-issues
+  # see also https://stackoverflow.com/questions/74259905/network-d3-sankey-node-value-too-precise-using-htmlwidgets
+customJS <- '
+  function(el,x) { 
+      var link = d3.selectAll(".link");
+  
+      var format = d3.formatLocale({"decimal": ".", "thousands": ",", "grouping": [3], "currency": ["", "\u00a0€"]}).format(",.1f");
+  
+      link.select("title").select("body")
+          .html(function(d) { return "<pre>" + d.source.name + " \u2192 " + d.target.name +
+              "\\n" + format(d.value) + " ktN" + "<pre>"; });
+              
+      d3.select(el).selectAll(".node text")
+          .html(function(d) { return d.name + " " + format(d.value) + " ktN"; });
+              
+  }
+  '
+  
+  # Make the sankey
+  p <- 
+    sankeyNetwork(
+      Links = sankey, Nodes = nodes, Source = "IDsource", Target = "IDtarget",
+      Value = "value", NodeID = "name", colourScale=my_color,
+      fontSize=25, units = "ktP", nodePadding = 50,
+      sinksRight = T, margin = c(top = 0, right = 0, bottom = 0, left = 0),
+      LinkGroup="flow_group", NodeGroup="group"
+      )
+  
+onRender(p, customJS)
+}
+
+f_table <- function(sankey){
+  # table to see the flow values between nodes
+  knitr::kable(
+    sankey %>% 
+      select(source, target, value) %>%
+      mutate(value = round(value, digits = 1)), 
+    caption ="Values of the flows (ktN)") %>%
+    kableExtra::kable_styling(full_width = F)
+}
+
+#source of files for P sludge
+source_data <- "output_data/sankey_flows/phosphorus/"
+```
+
+```{r}
+#select IAS N balance for all sankeys
+IAS_balance <- file_IAS_balance %>%
+  filter(nutrient=="N")
+```
+
+::: panel-tabset
+## France
+
+```{r}
+P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_France.csv")) 
+P_sludge <- P_sludge$value[P_sludge$source=="WWTP" & P_sludge$target=="sludge" ]
+
+sankey_N <- f_N_file("sankey_N_flows_France.csv", "Metropolitan France")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_N)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_N)
+```
+
+## Artois-Picardie
+
+```{r}
+P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Artois_Picardie.csv")) 
+P_sludge <- P_sludge$value[P_sludge$source=="WWTP" & P_sludge$target=="sludge" ]
+
+sankey_N <- f_N_file("sankey_N_flows_Artois_Picardie.csv", "Artois-Picardie")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_N)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_N)
+```
+
+## Rhin-Meuse
+
+```{r}
+P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Rhin_Meuse.csv")) 
+P_sludge <- P_sludge$value[P_sludge$source=="WWTP" & P_sludge$target=="sludge" ]
+
+sankey_N <- f_N_file("sankey_N_flows_Rhin_Meuse.csv", "Rhin-Meuse")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_N)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_N)
+```
+
+## Seine-Normandie
+
+```{r}
+P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Seine_Normandie.csv")) 
+P_sludge <- P_sludge$value[P_sludge$source=="WWTP" & P_sludge$target=="sludge" ]
+
+sankey_N <- f_N_file("sankey_N_flows_Seine_Normandie.csv", "Seine-Normandie")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_N)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_N)
+```
+
+## Loire-Bretagne
+
+```{r}
+P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Loire_Bretagne.csv")) 
+P_sludge <- P_sludge$value[P_sludge$source=="WWTP" & P_sludge$target=="sludge" ]
+
+sankey_N <- f_N_file("sankey_N_flows_Loire_Bretagne.csv", "Loire-Bretagne")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_N)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_N)
+```
+
+## Adour-Garonne
+
+```{r}
+P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Adour_Garonne.csv")) 
+P_sludge <- P_sludge$value[P_sludge$source=="WWTP" & P_sludge$target=="sludge" ]
+
+sankey_N <- f_N_file("sankey_N_flows_Adour_Garonne.csv", "Adour-Garonne")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_N)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_N)
+```
+
+## Rhône-Méditerranée-Corse
+
+```{r}
+P_sludge <- read_csv(paste0(source_data, "sankey_P_flows_Rhone_Mediterranee.csv")) 
+P_sludge <- P_sludge$value[P_sludge$source=="WWTP" & P_sludge$target=="sludge" ]
+
+sankey_N <- f_N_file("sankey_N_flows_Rhone_Mediterranee.csv", "Rhône-Méditerranée")
+```
+
+### Sankey
+
+```{r out.width = '100%', results = T}
+f_sankey(sankey_N)
+```
+
+### Table
+
+```{r results = T}
+f_table(sankey_N)
+```
+:::
+
+# Results
+
+```{r create_nodes_and_flows_files}
+#remove files not used anymore
+rm(
+  IAS_balance, sewage_connection, sludge_destination, industry_discharge, 
+  in_out_flows, human_excretions
+)
+
+#group all sankey files, for N and P
+path_source <- "output_data/sankey_flows/phosphorus/"
+sankey_P <- bind_rows(
+  read_csv(paste0(path_source, "sankey_P_flows_Adour_Garonne.csv")) %>% mutate(basin = "Adour-Garonne"),
+  read_csv(paste0(path_source, "sankey_P_flows_Artois_Picardie.csv")) %>% mutate(basin = "Artois-Picardie"),
+  read_csv(paste0(path_source, "sankey_P_flows_Loire_Bretagne.csv")) %>% mutate(basin = "Loire-Bretagne"),
+  read_csv(paste0(path_source, "sankey_P_flows_Rhin_Meuse.csv")) %>% mutate(basin = "Rhin-Meuse"),
+  read_csv(paste0(path_source, "sankey_P_flows_Rhone_Mediterranee.csv")) %>% mutate(basin = "Rhône-Méditerranée"),
+  read_csv(paste0(path_source, "sankey_P_flows_Seine_Normandie.csv")) %>% mutate(basin = "Seine-Normandie"),
+  read_csv(paste0(path_source, "sankey_P_flows_France.csv")) %>% mutate(basin = "Metropolitan France")
+)
+path_source <- "output_data/sankey_flows/nitrogen/"
+sankey_N <- bind_rows(
+  read_csv(paste0(path_source, "sankey_N_flows_Adour_Garonne.csv")) %>% mutate(basin = "Adour-Garonne"),
+  read_csv(paste0(path_source, "sankey_N_flows_Artois_Picardie.csv")) %>% mutate(basin = "Artois-Picardie"),
+  read_csv(paste0(path_source, "sankey_N_flows_Loire_Bretagne.csv")) %>% mutate(basin = "Loire-Bretagne"),
+  read_csv(paste0(path_source, "sankey_N_flows_Rhin_Meuse.csv")) %>% mutate(basin = "Rhin-Meuse"),
+  read_csv(paste0(path_source, "sankey_N_flows_Rhone_Mediterranee.csv")) %>% mutate(basin = "Rhône-Méditerranée"),
+  read_csv(paste0(path_source, "sankey_N_flows_Seine_Normandie.csv")) %>% mutate(basin = "Seine-Normandie"),
+  read_csv(paste0(path_source, "sankey_N_flows_France.csv")) %>% mutate(basin = "Metropolitan France")
+)
+
+#group nutrient flows in 1 file
+sankey_N_flows <- sankey_N %>%
+  mutate(flow = paste(source, "to", target)) %>%
+  select(basin, flow, value) %>%
+  spread(flow, value)
+sankey_P_flows <- sankey_P %>%
+  mutate(flow = paste(source, "to", target)) %>%
+  select(basin, flow, value) %>%
+  spread(flow, value)
+N_P_flows_basins <- bind_rows(
+  sankey_P_flows %>% mutate(nutrient="Phosphorus"),
+  sankey_N_flows %>% mutate(nutrient="Nitrogen")
+)
+rm(sankey_N_flows, sankey_P_flows)
+
+#group nutrient nodes in 1 file
+sankey_P_nodes <- bind_rows(
+  #compute all target nodes
+  sankey_P %>%
+    group_by(basin, node = target) %>%
+    summarise(value = sum(value, na.rm=T)), 
+  #compute primary source nodes
+  sankey_P %>%
+    group_by(basin, node = source) %>%
+    summarise(value = sum(value, na.rm=T)) %>%
+    filter(node %in% c("excretion", "large industries", "residual"))
+) %>%
+  spread(node, value) %>%
+  mutate(
+    recycled = `composted, spread`,
+    perc_recycled = round(recycled/(recycled + water + groundwater + `landfill, incineration..`)*100,0)
+  )
+sankey_N_nodes <- bind_rows(
+  #compute all target nodes
+  sankey_N %>%
+    group_by(basin, node = target) %>%
+    summarise(value = sum(value, na.rm=T)), 
+  #compute primary source nodes
+  sankey_N %>%
+    group_by(basin, node = source) %>%
+    summarise(value = sum(value, na.rm=T)) %>%
+    filter(node %in% c("excretion", "large industries", "residual"))
+) %>%
+  spread(node, value) %>%
+  mutate(
+    perc_recycled = round(recycled/(recycled + air + water + groundwater + `landfill, incineration..`)*100,0)
+  )
+N_P_nodes_basins <- bind_rows(
+  sankey_P_nodes %>% mutate(nutrient = "Phosphorus"), 
+  sankey_N_nodes %>% mutate(nutrient = "Nitrogen")
+)
+rm(sankey_N_nodes, sankey_P_nodes)
+
+#adding population to both files
+N_P_flows_basins <- left_join(
+  file_sewage_connection %>% select(basin, pop, pop_sewage, pop_IAS),
+  N_P_flows_basins
+)
+
+#adding population to both files
+N_P_nodes_basins <- left_join(
+  file_sewage_connection %>% select(basin, pop, pop_sewage, pop_IAS),
+  N_P_nodes_basins
+)
+```
+
+::: panel-tabset
+## Per capita values
+
+::: panel-tabset
+### Excretions
+
+::: panel-tabset
+#### kg per year
+
+```{r check excretions}
+temp <- N_P_nodes_basins%>%
+  mutate(ToHighlight = ifelse(basin == "Metropolitan France", "yes", "no"))
+
+ggplot(temp) +
+  geom_col(
+    aes(basin, excretion/pop, fill=ToHighlight), 
+    alpha=.8, colour="black"
+    ) +
+  geom_label(
+    aes(basin, excretion/pop, label=signif(excretion/pop, 2))
+    ) +
+  facet_wrap(vars(nutrient)) +
+  ylim(0, 6) +
+  theme(legend.position = "none") +
+  coord_flip() +
+  labs(
+    y="kg/year", x="",
+    title = "N and P excretions per capita",
+    subtitle = "kg per year"
+  )
+```
+
+#### g per day
+
+```{r}
+temp <- N_P_nodes_basins%>%
+  mutate(ToHighlight = ifelse(basin == "Metropolitan France", "yes", "no"))
+
+ggplot(temp) +
+  geom_col(
+    aes(basin, excretion/pop*1000/365, fill=ToHighlight),
+    alpha=.8, colour="black") +
+  geom_label(
+    aes(basin, excretion/pop*1000/365, label=signif(excretion/pop*1000/365, 3))
+    ) +
+  ylim(0, 16) +
+  facet_wrap(vars(nutrient)) +
+  theme(legend.position = "none") +
+  coord_flip() +
+  labs(
+    y="g/day", x="",
+    title = "N and P excretions per capita",
+    subtitle = "g per day"
+  )
+```
+:::
+
+### In and out of system
+
+::: panel-tabset
+#### Absolute
+
+::: panel-tabset
+##### P
+
+```{r}
+#source
+temp <- N_P_nodes_basins %>% 
+  filter(nutrient == "Phosphorus") %>%
+  select(basin, excretion, residual, `large industries`, pop) %>%
+  gather(node, value, excretion, residual, `large industries`) %>%
+  mutate(value = round(value/pop, 3), in_out = "in")
+#sink
+temp2 <- N_P_nodes_basins %>% 
+  filter(nutrient == "Phosphorus") %>%
+  select(basin, water, groundwater, `landfill, incineration..`, recycled, pop) %>%
+  gather(node, value, water, groundwater, `landfill, incineration..`, recycled) %>%
+  mutate(value = round(value/pop, 3), in_out = "out")
+#values for sankey per capita
+sankey_P_cap <- bind_rows(
+  #in
+  temp %>%
+    select(
+      source = node, flow_group = node, value, basin, pop
+    ) %>%
+    mutate(
+      target = "Sanitation System"
+    ),
+  #out
+  temp2 %>%
+    select(
+      target = node, flow_group = node, value, basin, pop
+    ) %>%
+    mutate(
+      source = "Sanitation System"
+    )
+  ) %>%
+  mutate(value = 1000*value) #convert in g per cap per year
+
+#combine 2 files for graphs
+temp <- bind_rows(temp, temp2) %>% select(-pop) 
+
+nodes <- c(
+  "large industries", "residual", "excretion", #nodes in #nodes in
+  "landfill, incineration..", "water", "groundwater", "recycled" #nodes out
+  )
+nodes_colour <- c(
+  "#5e5e5e", "#440154FF", "#7d6608", #nodes in
+  "black", "#2e86c1", "#236aaa","#6e2c00", "" #nodes out
+  )
+temp$node <- 
+  factor(
+    temp$node,
+    levels = nodes
+  )
+color_theme <- scale_fill_manual(label = nodes, values = nodes_colour)
+
+
+plot_grid(
+  ggplot(temp %>% filter(basin=="Metropolitan France")) +
+    geom_col(
+      aes(in_out, value, fill=node), 
+      position="stack", alpha=.8
+      ) +
+    color_theme +
+    labs(
+      fill= "", title = "Source and destination of P in sanitation system",
+      subtitle = "Metropolitan France",
+      y="kgP/year", x=""
+    ),
+  ggplot(temp %>% filter(basin!="Metropolitan France")) +
+    geom_col(
+      aes(in_out, value, fill=node), 
+      position="stack", alpha=.8
+      ) +
+    facet_wrap(vars(basin)) +
+    color_theme +
+    labs(
+      title="",
+      fill="", subtitle = "by basin",
+      y="", x=""
+    ) +
+    theme(legend.position = "none"),
+  rel_widths = c(0.5, 0.5)
+)
+```
+
+##### N
+
+```{r}
+#source
+temp <- N_P_nodes_basins %>% 
+  filter(nutrient == "Nitrogen") %>%
+  select(basin, excretion, residual, `large industries`, pop) %>%
+  gather(node, value, excretion, residual, `large industries`) %>%
+  mutate(value = round(value/pop, 3), in_out = "in")
+#sink
+temp2 <- N_P_nodes_basins %>% 
+  filter(nutrient == "Nitrogen") %>%
+  select(basin, water, groundwater, air, `landfill, incineration..`, recycled, pop) %>%
+  gather(node, value, water, groundwater, air, `landfill, incineration..`, recycled) %>%
+  mutate(value = round(value/pop, 3), in_out = "out")
+#values for sankey per capita
+sankey_N_cap <- bind_rows(
+  #in
+  temp %>%
+    select(
+      source = node, flow_group = node, value, basin, pop
+    ) %>%
+    mutate(
+      target = "Sanitation System"
+    ),
+  #out
+  temp2 %>%
+    select(
+      target = node, flow_group = node, value, basin, pop
+    ) %>%
+    mutate(
+      source = "Sanitation System"
+    )
+  )
+#combine 2 files
+temp <- bind_rows(temp, temp2) %>% select(-pop)
+
+nodes <- c(
+  "large industries", "residual", "excretion", #nodes in #nodes in
+  "landfill, incineration..", "water", "groundwater", "air", "recycled" #nodes out
+  )
+nodes_colour <- c(
+  "#5e5e5e", "#440154FF", "#7d6608", #nodes in
+  "black", "#2e86c1", "#236aaa", "#3ab02a", "#6e2c00" #nodes out
+  )
+temp$node <- 
+  factor(
+    temp$node,
+    levels = nodes
+  )
+color_theme <- scale_fill_manual(label = nodes, values = nodes_colour)
+
+
+plot_grid(
+  ggplot(temp %>% filter(basin=="Metropolitan France")) +
+    geom_col(
+      aes(in_out, value, fill=node), 
+      position="stack", alpha=.8
+      ) +
+    color_theme +
+    labs(
+      fill= "", title = "Source and destination of N in sanitation system",
+      subtitle = "Metropolitan France",
+      y="kgN/year", x=""
+    ),
+  ggplot(temp %>% filter(basin!="Metropolitan France")) +
+    geom_col(
+      aes(in_out, value, fill=node), 
+      position="stack", alpha=.8
+      ) +
+    facet_wrap(vars(basin)) +
+    color_theme +
+    labs(
+      title="",
+      fill="", subtitle = "by basin",
+      y="", x=""
+    ) +
+    theme(legend.position = "none"),
+  rel_widths = c(0.5, 0.5)
+)
+```
+:::
+
+#### Relative
+
+::: panel-tabset
+##### P
+
+```{r}
+#source
+temp <- N_P_nodes_basins %>% 
+  filter(nutrient == "Phosphorus") %>%
+  select(basin, excretion, residual, `large industries`, pop) %>%
+  gather(node, value, excretion, residual, `large industries`) %>%
+  mutate(value = round(value/pop, 3), in_out = "in")
+#sink
+temp2 <- N_P_nodes_basins %>% 
+  filter(nutrient == "Phosphorus") %>%
+  select(basin, water, groundwater, `landfill, incineration..`, recycled, pop) %>%
+  gather(node, value, water, groundwater, `landfill, incineration..`, recycled) %>%
+  mutate(value = round(value/pop, 3), in_out = "out")
+#combine 2 files
+temp <- bind_rows(temp, temp2) %>% select(-pop) 
+
+nodes <- c(
+  "large industries", "residual", "excretion", #nodes in #nodes in
+  "landfill, incineration..", "water", "groundwater", "recycled" #nodes out
+  )
+nodes_colour <- c(
+  "#5e5e5e", "#440154FF", "#7d6608", #nodes in
+  "black", "#2e86c1", "#236aaa", "#6e2c00", "" #nodes out
+  )
+temp$node <- 
+  factor(
+    temp$node,
+    levels = nodes
+  )
+color_theme <- scale_fill_manual(label = nodes, values = nodes_colour)
+
+
+plot_grid(
+  ggplot(temp %>% filter(basin=="Metropolitan France")) +
+    geom_col(
+      aes(in_out, value, fill=node), 
+      position="fill", alpha=.8
+      ) +
+    color_theme +
+    labs(
+      fill= "", title = "Source and destination of P in sanitation system",
+      subtitle = "Metropolitan France",
+      y="kgP/year", x=""
+    ),
+  ggplot(temp %>% filter(basin!="Metropolitan France")) +
+    geom_col(
+      aes(in_out, value, fill=node), 
+      position="fill", alpha=.8
+      ) +
+    facet_wrap(vars(basin)) +
+    color_theme +
+    labs(
+      title="",
+      fill="", subtitle = "by basin",
+      y="", x=""
+    ) +
+    theme(legend.position = "none"),
+  rel_widths = c(0.5, 0.5)
+)
+```
+
+##### N
+
+```{r}
+#source
+temp <- N_P_nodes_basins %>% 
+  filter(nutrient == "Nitrogen") %>%
+  select(basin, excretion, residual, `large industries`, pop) %>%
+  gather(node, value, excretion, residual, `large industries`) %>%
+  mutate(value = round(value/pop, 3), in_out = "in")
+#sink
+temp2 <- N_P_nodes_basins %>% 
+  filter(nutrient == "Nitrogen") %>%
+  select(basin, water, groundwater, air, `landfill, incineration..`, recycled, pop) %>%
+  gather(node, value, water, groundwater, air, `landfill, incineration..`, recycled) %>%
+  mutate(value = round(value/pop, 3), in_out = "out")
+#combine 2 files
+temp <- bind_rows(temp, temp2) %>% select(-pop)
+
+
+nodes <- c(
+  "large industries", "residual", "excretion", #nodes in #nodes in
+  "landfill, incineration..", "water", "groundwater", "air", "recycled" #nodes out
+  )
+nodes_colour <- c(
+  "#5e5e5e", "#440154FF", "#7d6608", #nodes in
+  "black", "#2e86c1", "#236aaa", "#3ab02a", "#6e2c00" #nodes out
+  )
+temp$node <- 
+  factor(
+    temp$node,
+    levels = nodes
+  )
+color_theme <- scale_fill_manual(label = nodes, values = nodes_colour)
+
+
+
+plot_grid(
+  ggplot(temp %>% filter(basin=="Metropolitan France")) +
+    geom_col(
+      aes(in_out, value, fill=node), 
+      position="fill", alpha=.8
+      ) +
+    color_theme +
+    labs(
+      fill= "", title = "Source and destination of N in sanitation system",
+      subtitle = "Metropolitan France",
+      y="kgN/year", x=""
+    ),
+  ggplot(temp %>% filter(basin!="Metropolitan France")) +
+    geom_col(
+      aes(in_out, value, fill=node), 
+      position="fill", alpha=.8
+      ) +
+    facet_wrap(vars(basin)) +
+    color_theme +
+    labs(
+      title="",
+      fill="", subtitle = "by basin",
+      y="", x=""
+    ) +
+    theme(legend.position = "none"),
+  rel_widths = c(0.5, 0.5)
+)
+```
+:::
+:::
+
+### N:P Ratio
+
+```{r}
+temp <- N_P_nodes_basins %>%
+  select(basin, excretion, recycled, water, groundwater, nutrient) %>%
+  gather(step, value, excretion, recycled, water, groundwater) %>%
+  spread(nutrient, value) %>%
+  mutate(
+    N_P_ratio = Nitrogen/Phosphorus,
+    ToHighlight = ifelse(basin == "Metropolitan France", "yes", "no" ))
+temp$step <- 
+  factor(temp$step, levels=c("excretion", "water", "groundwater", "recycled"))
+
+
+plot_grid(
+  ggplot(temp %>% filter(basin=="Metropolitan France")) +
+    geom_col(aes(step, N_P_ratio, fill=step), alpha=.8) +
+    geom_label(
+      aes(step, N_P_ratio, label=signif(N_P_ratio, 3))
+      ) +
+    theme(
+      legend.position = "none",
+      axis.text.x = element_text(angle = 45)
+      ) +
+    labs(
+      y="", x="", 
+      title = "N:P ratio at the different steps of sanitation",
+      subtitle = "Metropolitan France"
+    ),
+  ggplot(temp %>% filter(basin!="Metropolitan France"),) +
+    geom_col(aes(step, N_P_ratio, fill=step), alpha=.8) +
+    geom_label(
+      aes(step, N_P_ratio, label=signif(N_P_ratio, 3))
+      ) +
+    facet_wrap(vars(basin), ncol=2) +
+    theme(
+      legend.position = "none",
+      axis.text.y=element_blank()
+      ) +
+    coord_flip() +
+    labs(
+      y="", x="", title = "",
+      subtitle = "by basin"
+    ),
+  rel_widths = c(0.3, 0.7)
+)
+```
+:::
+
+## Recycling
+
+::: panel-tabset
+### N
+
+```{r}
+temp <- N_P_nodes_basins %>% 
+  filter(nutrient=="Nitrogen") %>%
+  mutate(ToHighlight = ifelse(basin=="Metropolitan France", "yes", "no"))
+#Nitrogen recycling
+ggplot(temp) +
+  geom_col(
+    aes(basin, perc_recycled, fill = ToHighlight), 
+    alpha=.8, color="black") +
+  geom_text(
+    aes(label=paste0(perc_recycled, "%"), x=basin, y=perc_recycled),
+    family = "Times New Roman", fontface = "italic", hjust=-0.2
+        ) +
+  ylim(0,100) +
+  coord_flip() +
+  theme(
+    legend.position = "none"
+  ) +
+  labs(
+    x="", y="%",
+    subtitle = "by basin",
+    title = "% of excreted Nitrogen recycled",
+    caption = "Source:\ncomputation by Thomas Starck from multiple sources"
+  ) 
+```
+
+### P
+
+```{r}
+temp <- N_P_nodes_basins %>% 
+  filter(nutrient=="Phosphorus") %>%
+  mutate(ToHighlight = ifelse(basin=="Metropolitan France", "yes", "no"))
+
+#Phosphorus recycling
+ggplot(temp) +
+  geom_col(
+    aes(basin, perc_recycled, fill = ToHighlight), 
+    alpha=.8, color="black") +
+  geom_text(
+    aes(label=paste0(perc_recycled, "%"), x=basin, y=perc_recycled),
+    family = "Times New Roman", fontface = "italic", hjust=-0.2
+        ) +
+  ylim(0,100) +
+  coord_flip() +
+  theme(
+    legend.position = "none"
+  ) +
+  labs(
+    x="", y="%",
+    subtitle = "by basin",
+    title = "% of excreted Phosphorus recycled",
+    caption = "Source:\ncomputation by Thomas Starck from multiple sources"
+  ) 
+```
+:::
+
+## Sankey in / out system
+
+::: panel-tabset
+### Per cap per year
+
+::: panel-tabset
+#### N
+
+```{r}
+f_sankey <- function(sankey){
+  # nodes names for the sankey 
+  nodes <- data.frame(
+    name=c(as.character(sankey$source), as.character(sankey$target)) %>% 
+      unique())
+  
+  # With networkD3, connection must be provided using id, not using real name like in the links dataframe. So we need to add it.
+  sankey$IDsource <- match(sankey$source, nodes$name)-1
+  sankey$IDtarget <- match(sankey$target, nodes$name)-1
+  
+  # Colors groups (for nodes and flow links)
+  nodes$group <- as.factor(c("nodes_group"))
+  
+    my_color <-
+  'd3.scaleOrdinal()
+  .domain(["excretion", "large industries", "residual", "landfill, incineration..", "water", "groundwater", "recycled", "air", "nodes_group"])
+  .range(["#7d6608", "grey", "grey", "#5e5e5e", "#2e86c1", "#2e86c1", "#6e2c00", "#3ab02a", "black"])'
+
+  #to ba able to show decimales on the snkey graph
+  # see here https://stackoverflow.com/questions/72129768/r-networkd3-issues
+  # see also https://stackoverflow.com/questions/74259905/network-d3-sankey-node-value-too-precise-using-htmlwidgets
+customJS <- '
+  function(el,x) { 
+      var link = d3.selectAll(".link");
+  
+      var format = d3.formatLocale({"decimal": ".", "thousands": ",", "grouping": [3], "currency": ["", "\u00a0€"]}).format(",.1f");
+  
+      link.select("title").select("body")
+          .html(function(d) { return "<pre>" + d.source.name + " \u2192 " + d.target.name +
+              "\\n" + format(d.value) + " kgN" + "<pre>"; });
+              
+      d3.select(el).selectAll(".node text")
+          .html(function(d) { return d.name + " " + format(d.value) + " kgN"; });
+              
+  }
+  '
+  
+  # Make the sankey
+  p <- 
+    sankeyNetwork(
+      Links = sankey, Nodes = nodes, Source = "IDsource", Target = "IDtarget",
+      Value = "value", NodeID = "name", colourScale=my_color,
+      fontSize=25, units = "kgN", nodePadding = 50,
+      sinksRight = T, margin = c(top = 0, right = 0, bottom = 0, left = 0),
+      LinkGroup="flow_group", NodeGroup="group"
+      )
+  
+onRender(p, customJS)
+}
+```
+
+```{r out.width = '100%', results = T}
+temp <- sankey_N_cap %>% filter(basin=="Metropolitan France")
+f_save_csv_files(
+  temp,
+  "output_data/sankey_flows/nitrogen/simplified/",
+  "sankey_N_France_per_cap.csv"
+)
+
+f_sankey(temp)
+```
+
+#### P
+
+```{r}
+f_sankey <- function(sankey){
+  # nodes names for the sankey 
+  nodes <- data.frame(
+    name=c(as.character(sankey$source), as.character(sankey$target)) %>% 
+      unique())
+  
+  # With networkD3, connection must be provided using id, not using real name like in the links dataframe. So we need to add it.
+  sankey$IDsource <- match(sankey$source, nodes$name)-1
+  sankey$IDtarget <- match(sankey$target, nodes$name)-1
+  
+  # Colors groups (for nodes and flow links)
+  nodes$group <- as.factor(c("nodes_group"))
+  
+    my_color <-
+  'd3.scaleOrdinal()
+  .domain(["excretion", "large industries", "residual", "landfill, incineration..", "water", "groundwater", "recycled", "nodes_group"])
+  .range(["#7d6608", "grey", "grey", "#5e5e5e", "#2e86c1", "#2e86c1", "#6e2c00", "black"])'
+
+  #to ba able to show decimales on the snkey graph
+  # see here https://stackoverflow.com/questions/72129768/r-networkd3-issues
+  # see also https://stackoverflow.com/questions/74259905/network-d3-sankey-node-value-too-precise-using-htmlwidgets
+customJS <- '
+  function(el,x) { 
+      var link = d3.selectAll(".link");
+  
+      var format = d3.formatLocale({"decimal": ".", "thousands": ",", "grouping": [3], "currency": ["", "\u00a0€"]}).format(",.1f");
+  
+      link.select("title").select("body")
+          .html(function(d) { return "<pre>" + d.source.name + " \u2192 " + d.target.name +
+              "\\n" + format(d.value) + " gP" + "<pre>"; });
+              
+      d3.select(el).selectAll(".node text")
+          .html(function(d) { return d.name + " " + format(d.value) + " gP"; });
+              
+  }
+  '
+  
+  # Make the sankey
+  p <- 
+    sankeyNetwork(
+      Links = sankey, Nodes = nodes, Source = "IDsource", Target = "IDtarget",
+      Value = "value", NodeID = "name", colourScale=my_color,
+      fontSize=25, units = "gP", nodePadding = 50,
+      sinksRight = T, margin = c(top = 0, right = 0, bottom = 0, left = 0),
+      LinkGroup="flow_group", NodeGroup="group"
+      )
+  
+onRender(p, customJS)
+}
+```
+
+```{r out.width = '100%', results = T}
+temp <- sankey_P_cap %>% filter(basin=="Metropolitan France")
+f_save_csv_files(
+  temp,
+  "output_data/sankey_flows/phosphorus/simplified/",
+  "sankey_P_France_per_cap.csv"
+)
+
+f_sankey(temp)
+```
+:::
+
+### Percent
+
+::: panel-tabset
+#### N
+
+```{r}
+f_sankey <- function(sankey){
+  # nodes names for the sankey 
+  nodes <- data.frame(
+    name=c(as.character(sankey$source), as.character(sankey$target)) %>% 
+      unique())
+  
+  # With networkD3, connection must be provided using id, not using real name like in the links dataframe. So we need to add it.
+  sankey$IDsource <- match(sankey$source, nodes$name)-1
+  sankey$IDtarget <- match(sankey$target, nodes$name)-1
+  
+  # Colors groups (for nodes and flow links)
+  nodes$group <- as.factor(c("nodes_group"))
+  
+    my_color <-
+  'd3.scaleOrdinal()
+  .domain(["excretion", "large industries", "residual", "landfill, incineration..", "water", "groundwater", "recycled", "air", "nodes_group"])
+  .range(["#7d6608", "grey", "grey", "#5e5e5e", "#2e86c1", "#2e86c1", "#6e2c00", "#3ab02a", "black"])'
+
+  #to ba able to show decimales on the snkey graph
+  # see here https://stackoverflow.com/questions/72129768/r-networkd3-issues
+  # see also https://stackoverflow.com/questions/74259905/network-d3-sankey-node-value-too-precise-using-htmlwidgets
+customJS <- '
+  function(el,x) { 
+      var link = d3.selectAll(".link");
+  
+      var format = d3.formatLocale({"decimal": ".", "thousands": ",", "grouping": [3], "currency": ["", "\u00a0€"]}).format(",.1f");
+  
+      link.select("title").select("body")
+          .html(function(d) { return "<pre>" + d.source.name + " \u2192 " + d.target.name +
+              "\\n" + format(d.value) + "%" + "<pre>"; });
+              
+      d3.select(el).selectAll(".node text")
+          .html(function(d) { return d.name + " " + format(d.value) + "%"; });
+              
+  }
+  '
+  
+  # Make the sankey
+  p <- 
+    sankeyNetwork(
+      Links = sankey, Nodes = nodes, Source = "IDsource", Target = "IDtarget",
+      Value = "value", NodeID = "name", colourScale=my_color,
+      fontSize=25, units = "%", nodePadding = 50,
+      sinksRight = T, margin = c(top = 0, right = 0, bottom = 0, left = 0),
+      LinkGroup="flow_group", NodeGroup="group"
+      )
+  
+onRender(p, customJS)
+}
+```
+
+```{r out.width = '100%', results = T}
+total <- sum(sankey_N_cap %>% filter(basin=="Metropolitan France") %>% pull(value))/2
+temp <- sankey_N_cap %>% 
+    filter(basin=="Metropolitan France") %>% 
+    mutate(value=round(value/total*100))
+f_save_csv_files(
+  temp, 
+  "output_data/sankey_flows/nitrogen/simplified/",
+  "sankey_N_France_percent.csv"
+)
+
+
+f_sankey(temp)
+```
+
+#### P
+
+```{r}
+f_sankey <- function(sankey){
+  # nodes names for the sankey 
+  nodes <- data.frame(
+    name=c(as.character(sankey$source), as.character(sankey$target)) %>% 
+      unique())
+  
+  # With networkD3, connection must be provided using id, not using real name like in the links dataframe. So we need to add it.
+  sankey$IDsource <- match(sankey$source, nodes$name)-1
+  sankey$IDtarget <- match(sankey$target, nodes$name)-1
+  
+  # Colors groups (for nodes and flow links)
+  nodes$group <- as.factor(c("nodes_group"))
+  
+    my_color <-
+  'd3.scaleOrdinal()
+  .domain(["excretion", "large industries", "residual", "landfill, incineration..", "water", "groundwater", "recycled", "nodes_group"])
+  .range(["#7d6608", "grey", "grey", "#5e5e5e", "#2e86c1", "#2e86c1", "#6e2c00", "black"])'
+
+  #to ba able to show decimales on the snkey graph
+  # see here https://stackoverflow.com/questions/72129768/r-networkd3-issues
+  # see also https://stackoverflow.com/questions/74259905/network-d3-sankey-node-value-too-precise-using-htmlwidgets
+customJS <- '
+  function(el,x) { 
+      var link = d3.selectAll(".link");
+  
+      var format = d3.formatLocale({"decimal": ".", "thousands": ",", "grouping": [3], "currency": ["", "\u00a0€"]}).format(",.1f");
+  
+      link.select("title").select("body")
+          .html(function(d) { return "<pre>" + d.source.name + " \u2192 " + d.target.name +
+              "\\n" + format(d.value) + "%" + "<pre>"; });
+              
+      d3.select(el).selectAll(".node text")
+          .html(function(d) { return d.name + " " + format(d.value) + "%"; });
+              
+  }
+  '
+  
+  # Make the sankey
+  p <- 
+    sankeyNetwork(
+      Links = sankey, Nodes = nodes, Source = "IDsource", Target = "IDtarget",
+      Value = "value", NodeID = "name", colourScale=my_color,
+      fontSize=25, units = "%", nodePadding = 50,
+      sinksRight = T, margin = c(top = 0, right = 0, bottom = 0, left = 0),
+      LinkGroup="flow_group", NodeGroup="group"
+      )
+  
+onRender(p, customJS)
+}
+```
+
+```{r out.width = '100%', results = T}
+total <- sum(sankey_P_cap %>% filter(basin=="Metropolitan France") %>% pull(value))/2
+temp <- sankey_P_cap %>% 
+    filter(basin=="Metropolitan France") %>%
+    mutate(value=round(value/total*100))
+f_save_csv_files(
+  temp,
+  "output_data/sankey_flows/phosphorus/simplified/",
+  "sankey_P_France_percent.csv"
+)
+
+f_sankey(temp)
+```
+:::
+:::
+:::
+
+# Comparison of sludge composition
+
+We use a French review of sludge composition from 2014, [link](https://hal.inrae.fr/hal-02796871/document) to the study (page 413)
+
+```{r load_review_data}
+path_source <- "source_data/0_sludge_composition/"
+review_sludge_composition <- read_csv(paste0(path_source, "sludge_composition_ESCO_MAFOR.csv")) 
+review_sludge_composition$compost <- factor(
+  review_sludge_composition$compost,
+  c("not composted", "composted")
+)
+Source <- "Source: French Collective Scientifice Expertise on\nOrganic Fertilizers, 2014"
+```
+
+::: panel-tabset
+## Preparation
+
+To assess our sludge composition, we use the sludge production data for each basin, and take the mean over 2015-2020. We then combine this with the N and P flows computed in the Sankey diagram to deduce the sludge compositions at the basin scales.
+
+```{r}
+sludge_production <- read_csv("output_data/basins/basin_sanitation_portal.csv")
+sludge_production <- sludge_production %>%
+  select(basin, Year, sludge_production) %>%
+  filter(Year>2014)
+
+ggplot(sludge_production) +
+  geom_area(aes(Year, sludge_production, fill=basin)) +
+  facet_wrap(vars(basin), scales="free_y") +
+  theme(legend.position = "none")
+
+sludge_production <- sludge_production %>%
+  group_by(basin) %>%
+  summarise(
+    sludge_production = round(mean(sludge_production, na.rm=T), 3)
+    )
+
+# P in sludge
+temp <- sankey_P %>% 
+  filter(target=="sludge") %>%
+  select(basin, sludge_P = value) %>%
+  left_join(sludge_production) %>%
+  mutate(
+    P = round(sludge_P/sludge_production)
+    )
+
+# N in sludge
+temp2 <- sankey_N %>% 
+  filter(target=="sludge") %>%
+  select(basin, sludge_N = value) %>%
+  left_join(sludge_production) %>%
+  mutate(
+    N = round(sludge_N/sludge_production)
+    )
+
+#combine both, computes N:P ratio
+temp <- left_join(temp , temp2) %>%
+  mutate(
+    N_P_ratio = N/P
+  ) 
+
+
+
+temp <- bind_rows(
+  review_sludge_composition %>% 
+    filter(compost=="not composted") %>%
+    select(Study, P, N, N_P_ratio) %>%
+    mutate(source = "French review"),
+  temp %>%
+    select(Study = basin, P, N, N_P_ratio) %>%
+    mutate(source = "This study")
+)
+```
+
+```{r}
+#we use rounded values for the graph
+rounded_values <- review_sludge_composition %>%
+  mutate(
+    P = round(P, 0), 
+    N= round(N, 0),
+    N_P_ratio = round(N_P_ratio, 1)
+  )
+```
+
+```{r g_composition}
+g_composition <- function(dataset, select_variable){
+  #order studies by increasing value
+  dataset$Study <- reorder(dataset$Study, dataset %>% pull(!!as.symbol(select_variable)))
+  #remove empty values
+  dataset <- dataset %>% filter(is.na(!!as.symbol(select_variable))==F)
+  
+  ggplot(dataset) +
+    geom_col(aes(Study, !!as.symbol(select_variable), fill=source)) +
+    geom_text(
+      aes(Study, !!as.symbol(select_variable), label=!!as.symbol(select_variable)),
+      hjust=0, family = "Times New Roman", fontface="italic"
+      ) +
+    coord_flip() +
+    labs(
+      x="", y="", 
+      fill = "", 
+      caption = Source
+    ) 
+}
+```
+
+## P
+
+```{r}
+g_composition(temp, "P") +
+  labs(
+    title = "P content in urban sludge",
+    subtitle = "g of P per kg of Dry Matter"
+  ) +
+  ylim(0, 40)
+
+ggplot(temp) +
+  geom_jitter(aes("", P, fill=source), shape=21, width = .1) +
+  ylim(0, 40) +
+  facet_wrap(vars(source)) +
+  theme(legend.position = "none") +
+  labs(
+    x="", y="gP / kg DM",
+    title = "P content in urban sludge"
+  )
+```
+
+## N
+
+```{r}
+g_composition(temp, "N") +
+  labs(
+    title = "Review of N content in urban sludge",
+    subtitle = "g of N per kg of Dry Matter"
+  ) +
+  ylim(0, 60)
+
+ggplot(temp) +
+  geom_jitter(aes("", N, fill=source), shape=21, width=.1) +
+  ylim(0, 50) +
+  facet_wrap(vars(source)) +
+  theme(legend.position = "none") +
+  labs(
+    x="", y="gN / kg DM",
+    title = "N content in urban sludge"
+  )
+```
+:::
+
+```{r remove_all_objects_in_environment}
+rm(list = ls())
+```
+
+
+
+```{python}
+import numpy as np
+import pandas as pd
+
+
+rng = np.random.default_rng()
+
+num_vals = int(1e6)
+
+# distributions
+
+P_in_WWTP = rng.normal(loc=30.17, scale=1.509, size=num_vals)
+P_out_WWTP = rng.normal(loc=6.6, scale=0.33, size=num_vals)
+
+frac_sewer_discharge = rng.uniform(low=0.05, high=0.2, size=num_vals)
+
+P_industries = rng.normal(loc=1.120, scale=0.056, size=num_vals)
+
+ias_pop = rng.uniform(low=0.15, high=0.2, size=num_vals)
+
+P_per_cap = rng.uniform(low=0.44, high=0.58, size=num_vals)  # in kgP/year
+P_excreted = 64.9*P_per_cap  # in ktP/year
+
+frac_from_ias_to_sewers = rng.uniform(low=0.05, high=0.3)
+
+P_excr_IAS = P_excreted*ias_pop*(1-frac_from_ias_to_sewers)
+
+P_excr_sewers = P_excreted - P_excr_IAS
+
+P_in_sewers = P_in_WWTP / (1 - frac_sewer_discharge)
+
+# check potentially missing inputs
+
+P_residual_sewers = P_in_sewers - P_excr_sewers - P_industries
+
+missing_input = P_residual_sewers < 0
+
+P_in_sewers[missing_input] = P_excr_sewers[missing_input] + P_industries[missing_input]
+P_residual_sewers[missing_input] = 0
+
+P_lost_sewers = P_in_sewers*frac_sewer_discharge
+
+print("fraction mising input", missing_input.sum() / num_vals)
+
+frac_lost = P_lost_sewers / P_in_sewers
+
+P_residual_IAS = P_residual_sewers * ias_pop / (1 - ias_pop)
+
+frac_loss_IAS = rng.uniform(low=0.8, high=0.9, size=num_vals)
+
+P_loss_IAS = frac_loss_IAS * (P_residual_IAS + P_excr_IAS)
+
+# sludge
+
+frac_IAS_sludge = rng.uniform(low=0.1, high=0.2, size=num_vals)
+
+P_sludge_IAS = P_residual_IAS + P_excr_IAS - P_loss_IAS
+P_IAS_to_sewers = ias_pop * (1 - frac_loss_IAS) * (P_in_sewers - P_industries - P_excreted*frac_from_ias_to_sewers) / (1 - ias_pop)
+
+P_sludge_sewers = P_in_WWTP - P_out_WWTP
+
+frac_sludge_spread =  rng.normal(loc=0.770, scale=0.038, size=num_vals)
+
+
+# P to diffuse, surface, incineration and soil
+
+P_tot = (P_excreted + P_residual_sewers + P_residual_IAS + P_industries)
+
+P_spread = frac_sludge_spread*P_sludge_sewers
+
+ratio_diffuse = P_loss_IAS / P_tot
+
+ratio_spread = P_spread / P_tot
+ratio_residual = (P_residual_IAS + P_residual_sewers) / P_tot
+
+ratio_ias_to_sewers = P_IAS_to_sewers / P_IAS_to_sewers
+
+P_surface = P_out_WWTP + (P_in_sewers - P_in_WWTP)
+
+ratio_surfacewater = P_surface / P_tot
+
+P_incinerated = (P_sludge_sewers - P_spread)
+
+ratio_incinerated = P_incinerated / P_tot
+
+print("Fraction P spread", ratio_spread.mean(), 2*ratio_spread.std())
+print("P res", np.percentile(P_residual_sewers, [5, 25, 50, 75, 95]))
+print("Fraction P res", np.percentile(ratio_residual, [5, 25, 50, 75, 95]))
+print("FIAS_ratios", np.percentile(ratio_ias_to_sewers, [5, 25, 50, 75, 95]))
+
+
+# results in dataframe
+
+res = {
+   "P_in_WWTP": P_in_WWTP,
+   "P_out_WWTP": P_out_WWTP,
+   "P_sludge": P_sludge_sewers,
+   "P_spread": P_spread,
+   "P_in_sewers": P_in_sewers,
+   "P_lost_sewers": P_lost_sewers,
+   "P_industries": P_industries,
+   "P_excreted": P_excreted,
+   "P_residual_sewers": P_residual_sewers,
+   "P_residual_IAS": P_residual_IAS,
+   "P_surface": P_surface,
+   "P_incinerated": P_incinerated,
+   "P_loss_IAS": P_loss_IAS,
+   "ratio_spread": ratio_spread,
+   "ratio_diffuse": ratio_diffuse,
+   "ratio_surfacewater": ratio_surfacewater,
+   "ratio_incinerated": ratio_incinerated
+}
+
+df = pd.DataFrame(res)
+
+print(df.describe())
+
+```
+

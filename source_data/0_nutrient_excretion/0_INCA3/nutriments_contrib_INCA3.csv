@@ -1,0 +1,107 @@
+﻿nutriment_contrib_nb,nutriment_contrib_name,nutriment_contrib_name_simple
+nutriment1,Energie-Apport énergétique total (AET) (kcal/j),AET
+nutriment2,Energie-Apport énergétique sans alcool (AESA) (kcal/j),AESA
+nutriment3,Protéines (g/j),proteins
+nutriment4,Glucides (g/j),carbohydrates
+nutriment5,Sucres (g/j),sugars
+nutriment6,Amidon (g/j),
+nutriment7,Polyols (g/j),
+nutriment8,Fibres (g/j),
+nutriment9,Acides organiques (g/j),
+nutriment10,Lipides (g/j),lipids
+nutriment11,Acides gras saturés (AGS) (g/j),
+nutriment12,Acide palmitique (g/j),
+nutriment13,Acide stéarique (g/j),
+nutriment14,Acide myristique (g/j),
+nutriment15,Acide laurique (g/j),
+nutriment16,Acide caprique (g/j),
+nutriment17,Acide butyrique (g/j),
+nutriment18,Acide caproïque (g/j),
+nutriment19,Acide caprylique (g/j),
+nutriment20,Acides gras mono-insaturés (AGMI) (g/j),
+nutriment21,Acide oléique (g/j),
+nutriment22,Acides gras poly-insaturés (AGPI) (g/j),
+nutriment23,Acide linoléique (g/j),
+nutriment24,Acide alpha-linolénique (g/j),
+nutriment25,Acide arachidonique (mg/j),
+nutriment26,Acide EPA (mg/j),
+nutriment27,Acide DHA (mg/j),
+nutriment28,Alcool (g/j),alcool
+nutriment29,Eau (g/j),water
+nutriment30,Sodium (mg/j),sodium
+nutriment31,Sel (g/j),salt
+nutriment32,Magnésium (mg/j),magnesium
+nutriment33,Phosphore (mg/j),phosphorus
+nutriment34,Potassium (mg/j),potassium
+nutriment35,Calcium (mg/j),calcium
+nutriment36,Manganèse (mg/j),manganese
+nutriment37,Fer (mg/j),iron
+nutriment38,Cuivre (mg/j),copper
+nutriment39,Zinc (mg/j),zinc
+nutriment40,Sélénium (μg/j),selenium
+nutriment41,Iode (μg/j),iodine
+nutriment42,Rétinol (μg/j),
+nutriment43,Bétacarotène (μg/j),
+nutriment44,Vitamine B1-Thiamine (mg/j),
+nutriment45,Vitamine B2-Riboflavine (mg/j),
+nutriment46,Vitamine B3-Niacine (mg/j),
+nutriment47,Vitamine B5-Acide pantothénique (mg/j),
+nutriment48,Vitamine B6-Pyridoxine (mg/j),
+nutriment49,Vitamine B9-Acide folique (μg/j),
+nutriment50,Vitamine B12-Cobalamine (μg/j),
+nutriment51,Vitamine C (mg/j),
+nutriment52,Vitamine D (μg/j),
+nutriment53,Vitamine E (mg/j),
+nutriment54,Vitamine K2 (μg/j),
+contrib3,Contribution des Protéines à l'AESA (%),proteins_percent_AESA
+contrib4,Contribution des Glucides à l'AESA (%),carbohydrates_percent_AESA
+contrib5,Contribution des Sucres à l'AESA (%),
+contrib6,Contribution de l'Amidon à l'AESA (%),
+contrib7,Contribution des Polyols à l'AESA (%),
+contrib8,Contribution des Fibres à l'AESA (%),
+contrib9,Contribution des Acides organiques à l'AESA (%),
+contrib10,Contribution des Lipides à l'AESA (%),lipids_percent_AESA
+contrib11,Contribution des AGS à l'AESA (%),
+contrib12,Contribution de l'Acide palmitique à l'AESA (%),
+contrib13,Contribution de l'Acide stéarique à l'AESA (%),
+contrib14,Contribution de l'Acide myristique à l'AESA (%),
+contrib15,Contribution de l'Acide laurique à l'AESA (%),
+contrib16,Contribution de l'Acide caprique à l'AESA (%),
+contrib17,Contribution de l'Acide butyrique à l'AESA (%),
+contrib18,Contribution de l'Acide caproïque à l'AESA (%),
+contrib19,Contribution de l'Acide caprylique à l'AESA (%),
+contrib20,Contribution des AGMI à l'AESA (%),
+contrib21,Contribution de l'Acide oléique à l'AESA (%),
+contrib22,Contribution des AGPI à l'AESA (%),
+contrib23,Contribution de l'Acide linoléique à l'AESA (%),
+contrib24,Contribution de l'Acide alpha-linolénique à l'AESA (%),
+contrib25,Contribution de l'Acide arachidonique à AESA (%),
+contrib26,Contribution de l'Acide EPA à l'AESA (%),
+contrib27,Contribution de l'Acide DHA à l'AESA (%),
+contrib28,Contribution de l'Alcool à l'AET (%),
+contrib29,Contribution de l'Eau à l'AESA (%),
+contrib30,Apports pour 100 kcal de Sodium,
+contrib31,Apports pour 100 kcal de Sel,
+contrib32,Apports pour 100 kcal de Magnésium,
+contrib33,Apports pour 100 kcal de Phosphore,
+contrib34,Apports pour 100 kcal de Potassium,
+contrib35,Apports pour 100 kcal de Calcium,
+contrib36,Apports pour 100 kcal de Manganèse,
+contrib37,Apports pour 100 kcal de Fer,
+contrib38,Apports pour 100 kcal de Cuivre,
+contrib39,Apports pour 100 kcal de Zinc,
+contrib40,Apports pour 100 kcal de Sélénium,
+contrib41,Apports pour 100 kcal de Iode,
+contrib42,Apports pour 100 kcal de Rétinol,
+contrib43,Apports pour 100 kcal de Bétacarotène,
+contrib44,Apports pour 100 kcal de Vitamine B1,
+contrib45,Apports pour 100 kcal de Vitamine B2,
+contrib46,Apports pour 100 kcal de Vitamine B3,
+contrib47,Apports pour 100 kcal de Vitamine B5,
+contrib48,Apports pour 100 kcal de Vitamine B6,
+contrib49,Apports pour 100 kcal de Vitamine B9,
+contrib50,Apports pour 100 kcal de Vitamine B12,
+contrib51,Apports pour 100 kcal de Vitamine C,
+contrib52,Apports pour 100 kcal de Vitamine D,
+contrib53,Apports pour 100 kcal de Vitamine E,
+contrib54,Apports pour 100 kcal de Vitamine K2,

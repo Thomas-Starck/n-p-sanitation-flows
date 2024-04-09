@@ -1,0 +1,2930 @@
+---
+title: "Adour-Garonne"
+---
+
+```{r setup, include=T, warning=F, message=F, results=F}
+knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
+
+library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
+
+#core tidyverse packages loaded:
+# ggplot2, for data visualisation. https://ggplot2.tidyverse.org/
+# dplyr, for data manipulation. https://dplyr.tidyverse.org/
+# tidyr, for data tidying. https://tidyr.tidyverse.org/
+# readr, for data import. https://readr.tidyverse.org/
+# purrr, for functional programming. https://purrr.tidyverse.org/
+# tibble, for tibbles, a modern re-imagining of data frames. https://tibble.tidyverse.org/
+# stringr, for strings. https://stringr.tidyverse.org/
+# forcats, for factors. https://forcats.tidyverse.org/
+# lubridate, for date/times. https://lubridate.tidyverse.org/
+
+#also loads the following packages (less frequently used):
+# Working with specific types of vectors:
+#     hms, for times. https://hms.tidyverse.org/
+# Importing other types of data:
+#     feather, for sharing with Python and other languages. https://github.com/wesm/feather
+#     haven, for SPSS, SAS and Stata files. https://haven.tidyverse.org/
+#     httr, for web apis. https://httr.r-lib.org/
+#     jsonlite for JSON. https://arxiv.org/abs/1403.2805
+#     readxl, for .xls and .xlsx files. https://readxl.tidyverse.org/
+#     rvest, for web scraping. https://rvest.tidyverse.org/
+#     xml2, for XML. https://xml2.r-lib.org/
+# Modelling
+#     modelr, for modelling within a pipeline. https://modelr.tidyverse.org/
+#     broom, for turning models into tidy data. https://broom.tidymodels.org/
+
+# Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+#loading additional relevant packages
+library(cowplot) #for plot_grid()
+library(viridis) #for viridis colors
+
+#path for data 
+path_source <- "source_data/05_adour_garonne/"
+path_output <- "output_data/STEU/Adour_Garonne/"
+
+Year_analysis <- 2020
+
+#setting graphs theme
+theme_set(
+  theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold")
+      )
+  )
+
+#for captions below graphs
+Source <- "Agence de l'Eau Adour-Garonne\nComputation by Thomas Starck"
+
+
+#setting viridis theme for colors
+scale_colour_continuous <- scale_colour_viridis_c
+scale_colour_discrete   <- scale_colour_viridis_d
+scale_colour_binned     <- scale_colour_viridis_b
+#setting viridis theme for fill
+scale_fill_continuous <- scale_fill_viridis_c
+scale_fill_discrete   <- scale_fill_viridis_d
+scale_fill_binned     <- scale_fill_viridis_b
+
+# Load the function file
+source("functions.R")
+```
+
+# Source and data 
+
+::: panel-tabset
+## Basin presentation
+
+Informations about the Adour-Garonne basin can be found in the "Etat des lieux" (Status report) in [2019](https://www.occitanie.developpement-durable.gouv.fr/IMG/pdf/5512_sdage_etat_des_lieux_bd.pdf) and [2013](https://www.documentation.eauetbiodiversite.fr/notice/preparation-du-sdage-et-pdm-2016-2021-du-bassin-adour-garonne-aide-a-l-identification-des-donnees-de0).
+
+In 2018, the basin had 7.86 M inhabitants ["Out of 7M habitants, 30% live in scattered housings"](https://www.coeurdecharente.fr/wp-content/uploads/20211216_07_b_ANNEXE-2-Note-AEAG-Rapport-2020.pdf). We consider these people are not connected to sewers and are in Individual Autonomous Systems (IAS).
+
+More information in the Guide de l'eau ([here](https://www.guide-eau.com/fichiers/donnees/adour_garonne.pdf) and [here](https://www.guide-eau.com/fichiers/donnees/adour_garonne1.pdf)), and on the [basin website](https://www.aquitaineonline.com/actualites-en-aquitaine/nature-et-environnement/7468-bassin-adour-garonne-un-territoire-aux-visages-multiples.html), or [here](https://eau-grandsudouest.fr/sites/default/files/2021-03/Documents%20accompagnement_0.pdf).
+
+## Source
+
+The data are available on the  [Système d'Information sur l'Eau du bassin Adour-Garonne](http://www.adour-garonne.eaufrance.fr/).
+
+Two kinf of files are downloaded : one concerns pollution discharge and their location for each year ([here](http://adour-garonne.eaufrance.fr/catalogue/581d5f70-558c-49e4-8d77-5bd4fe974b62)), the other provides information about the waste water treatment plants characteristics ([here](http://adour-garonne.eaufrance.fr/catalogue/42f43670-099d-11de-97dd-001517506978)). 
+
+## Description
+
+There are 2 main files for each year (and also pdf files describing the variables). To see more details about the different points (A1, A2...), see [here](https://www.lozere.gouv.fr/content/download/10812/69814/file/les%20points%20r%C3%A9glementaires%20de%20surveillance.pdf).
+
+listObj_YEAR : these files describe the characteristics of the WWTP and networks.
+
+listDataIndicateurs : these files describe the different flows, with 2 main variables, "indicator" and "parameter". It also specified type_rj, whether it is RJ ("Point de rejet du système de traitement", i.e. discharge by WWTP) or SC ("Système de collecte, direct dans le milieu naturel", i.e. discharge by sewers) 
+
+indicators : 
+  
+  -   **PORDO** "Pollution déversée par le système de collecte représentative d'un jour moyen du mois considéré (issue de l'autosurveillance (Kg/j)". Only starting 2009. Associated with type_rj=RJ. We assimilate this to the **A1** point, i.e. discharge by sewers, and rename it **._collection_discharge**.
+  -   **PORBP** "Pollution by-passée en tête de station représentative d'un jour moyen du mois considéré (issue de l'autosurveillance (Kg/j)". Associated with type_rj RJ. We assimilate this to the **A2** point, i.e. last discharge point before the WWTP, and rename it **._head_by_pass**.
+  -   **PORMX** "Pollution estimée rejetée directement par le système de collecte (si pas de station d'épuration ou pas de mesures sur DO ou By-pass)". Only before 2015. Associated with type_rj RJ, but before 2007 also associated to SC. This is an estimation of **A1+A2** points discharge **before 2015**, and rename it **._discharge_estimate**.
+  -   **POENT** "Pollution mesurée entrante en station (Kg/j)". We assimilate this to the **A3** point, i.e. pollution **inflow** to WWTP.
+  -   **POSOR** "Pollution mesurée en sortie de station d'épuration". We assimilate this to the **A4** point, i.e. pollution **outflow** of WWTP.
+  -   **PLUIE** "Pluie mesurée (mm)". Rain in mm. We do not analyse this.
+  -   **BOUE** "Quantité de boues produite et évacuée". Quantity of sludge produced, we do not analyse it.
+  -   **A2**. Not described, but always associated to the parameter **NBJDV** "nombre de jours de déversement", not reported before 2018. Associated with type_rj RJ. This is the nb of days (per month) where discharge on **A2** point occurs.
+  -   **PODMI** Not described, but just from 2000 to 2007. Associated with the parameters nutrients (MES, Pt, NGL...) and only with type_rj SC (not RJ). We do not analyse it.
+  -   **POIMI** same as PODMI, but also associated with VOL. We do not analyse it.
+
+parameters : 
+  
+  -   the **nutrients** : "NO2"   "MES"   "NTK"  "DBO5"  "NGL"   "NO3"   "PT"    "DCO"   "NH4", in kg/day
+  -   **volume "VOL"** in m3/day
+  -   **rainfall "PLUIE"** in mm
+  -   **"NBJDV"** "Nombre de jours de déversement". Associated with type_rj RJ. For 2015-2020, associated with the indicator PORDO. Also associated with A2 for 2018-2020.This is the nb of days (per month) where discharge on A1 or A2 point occurs.
+  -   and the **sludge** production and destination in kg of dry matter per year : production "PROD", spread "U", composted (before 2013) "C", composted normalized "C1", composted non normalized "C2", landfilled "S", in transition "T", incinerated "I", to other WWTP, "STEP". We do not analise it.
+    
+
+**type_rj SC** is only associated to PORMX, PODMI and POIMI, from 2000 to 2007.
+
+## Load Data  
+
+We load the pollutions in the listDataIndicateurs files, for each year.
+
+```{r load_pollutions}
+#loading all years, for pollutions (by discharge code name)
+file_adour_garonne <- 
+  list.files( 
+    #read and merge csv of all years
+    path = path_source,
+    pattern = "listeDataIndicateurs*", 
+    full.names = T, 
+    recursive = T
+    ) %>% 
+  lapply(read_delim, delim = ";") %>% 
+  bind_rows
+```
+
+```{r remove_duplicate_pollutions}
+#Spotting duplicates observation of the quadruplets (code_rj, indicateur, parametre, annee)
+temp <- file_adour_garonne %>% select(code_rj, annee, indicateur, parametre) #selects quadruplets
+temp$duplicated <- duplicated(temp) #spots duplicates
+temp <- temp %>% filter(duplicated == T) #filters duplicates
+temp <- left_join(temp, file_adour_garonne) #exctract dupplicates informations from main file
+nrow(temp) #number of rows 200 (so 100 unique observations)
+unique(temp$code_rj) #spots the unique code_rj duplicated (only 3)
+
+# We remove SERRES-MORLAAS and ST AULAYE (Bourg)
+file_adour_garonne <- subset(file_adour_garonne, !(code_rj %in% c("0564520V0011", "0524376V0021")))
+# We remove LAVAUR just for 2000
+file_adour_garonne <- subset(file_adour_garonne, !(code_rj == "0581140V0041" & annee == "2000"))
+```
+
+In the listDataIndicateurs files, which reports pollution at the discharge points, there are `r nrow(temp)/2` pollution observations (code_rj) that are reported twice, concerning `r length(unique(temp$code_rj))` waste water treatment plants.
+
+  -   SERRES-MORLAAS in 2018, 2019 and 2020 (code_rj 0564520V0011), capacity of 850 population equivalent. Negligible, we completely remove it.
+  -   ST AULAYE (Bourg) in 2018 (code_rj 0524376V0021), capacity of 1 200 population equivalent. Negligible, we completely remove it.
+  -   LAVAUR in 2000 (code_rj 0581140V0041), capacity of 10 000 population equivalent => We remove Lavaur just for this year since its a rather big town.
+  
+Then we load the WWTP descriptions in the listeObj files, for each year.
+
+```{r load_WWTP_description}
+#for 2010-2020, the files are reported in multiple folders : we load each file, add the year, and merge them
+f_load_WWTP_2010_2020 <- function (year_min, year_max){
+  path <- "source_data/05_adour_garonne/donnees_rejets_collectivites_"
+  #intialization
+  temp <- 
+    read_csv2(
+      paste0(path, as.character(year_min), "/listeObj.csv"),
+      #we have to specify the columns types, otherwise some problems
+      col_types = cols(
+        debit_nominal_tps_pluie="numeric",
+        insee_commune="character",
+        insee_commune_step="character"
+        )
+      ) %>%
+    #adding the year
+    mutate(annee=year_min)
+  #loop
+  for (i in (year_min+1):year_max){
+    temp2 <- 
+      read_csv2(
+        paste0(path, as.character(i), "/listeObj.csv"),
+        col_types = 
+          #we have to specify the columns types, otherwise some problems
+          cols(
+            debit_nominal_tps_pluie="numeric",
+            insee_commune="character",
+            insee_commune_step="character"
+            )
+        ) %>%
+      #adding the year
+      mutate(annee=i)
+    temp <- bind_rows(temp, temp2)
+  }
+  return(temp)
+}
+file_WWTP_2010_2020 <- f_load_WWTP_2010_2020(2010, 2020) %>% distinct()
+
+#for 2000-2009, files are reported in one unique folder ; we load each file, add the year, merge them
+f_load_WWTP_2000_2009 <- function (year_min, year_max){
+  path <- "source_data/05_adour_garonne/donnees_rejets_collectivites_2000_2009/listeObj.csv"
+  temp <- 
+    read_csv2(path) %>%
+    mutate(annee=year_min)
+  for (i in (year_min+1):year_max){
+    temp2 <- 
+      read_csv2(path) %>%
+      mutate(annee=i)
+    temp <- bind_rows(temp, temp2)
+  }
+  return(temp)
+}
+file_WWTP_2000_2009 <- f_load_WWTP_2000_2009(2000, 2009) %>% distinct()
+
+#we merge the files for 2000-2009 and 2010-2020
+file_WWTP <- bind_rows(
+  file_WWTP_2000_2009, file_WWTP_2010_2020
+)
+```
+
+```{r creates_main_files}
+WWTP <- file_WWTP %>%
+  select(
+    #we select and rename in standard denomination the variables of interest
+    Year = annee,
+    code_discharge = code_rj,
+    code_WWTP = code_step,
+    name_WWTP = nom_step,
+    INSEE_COM = insee_commune_step, #commune of the WWTP : possible to also have commune of discharge location
+    name_commune = nom_commune_step, #commune of the WWTP : possible to also have commune of discharge location
+    capacity = capacite, # in population equivalent
+    network_type = nature_reseau,
+    treatment_type = traitement_principal,
+    long_WWTP = x_step,
+    lat_WWTP = y_step,
+    long_discharge = x_rj,
+    lat_discharge = y_rj,
+    discharge_location = milieu_recepteur
+    #possible to get : water nominal flow (dry and wet weather)
+    #possible to get : nominal load DBO5, DCO, MES
+    #other variables (type_rj...) not selected because already in file_adour_garonne, merged after
+  )
+
+#transform monthly values into annual values, drops monthly values
+N_P_adour_garonne <-  file_adour_garonne %>% 
+  rename(
+    Year = annee,
+    code_discharge = code_rj
+    ) %>%
+  mutate(valeur = rowMeans(.[7:18], na.rm = T)) %>% #annual mean over the 12 months
+  select(!(valeur_01:valeur_12)) #drops monthly values
+
+N_P_adour_garonne <- N_P_adour_garonne %>%
+  #sludge values put with other values
+  mutate(valeur = 
+           case_when(
+             is.na(valeur_y) == F ~ valeur_y, 
+             T ~ valeur
+             )
+         ) %>%
+  #drops useless columns of sludge
+  select(-valeur_y) %>% 
+  #replace NAN (issued from rowMean) into NA
+  mutate_all(~ifelse(is.nan(.), NA, .)) %>%
+  #preparing standard renaming for columns
+  mutate(
+    #rename PT in Pt
+    parametre = case_when(
+      parametre == "PT" ~ "Pt",
+      T ~ parametre
+    )
+  ) %>%
+  filter(
+    #"PLUIE" not selected for now ; PORMX neither (data before 2015)
+    (indicateur %in% c("POENT", "POSOR", "PORDO", "PORBP", "BOUE", "A2", "PORMX")) & 
+      (parametre %in% c("NGL", "NTK", "NH4", "NO2", "NO3", "Pt", "DBO5", "DCO", "MES", "VOL",
+                        #for now only sludge production, not destination (U, I, S...)
+                        "PROD",
+                        #nb of days of discharge
+                        "NBJDV"))
+  ) %>%
+  #rename for concatenation
+  mutate(
+    indicateur = case_when(
+      indicateur == "POENT"  ~ "in", #A3 point
+      indicateur == "POSOR"  ~ "out", #A4 point
+      indicateur == "PORDO"  ~ "collection_discharge", #A1 point
+      indicateur == "PORBP"  ~ "head_by_pass", #A5 point (and A2 ?)
+      indicateur == "BOUE"  ~ "sludge", #A6 point
+      indicateur == "A2"  ~ "A2", #A2 point
+      indicateur == "PORMX"  ~ "discharge_estimate", #A1 point (and A2 point ?) before 2015 if no measure
+      ),
+    parametre = paste(parametre, indicateur, sep="_")
+    ) %>%
+  select(-indicateur) %>% 
+  spread(key = parametre, value = valeur) 
+```
+
+```{r spot_duplicate_WWTP_description}
+#Spotting duplicates observation of the doublets (code_rj, Year)
+temp <- WWTP %>% select(code_discharge, Year) #selects quadruplets
+temp$duplicated <- duplicated(temp) #spots duplicates
+temp <- temp %>% filter(duplicated == T) #filters duplicates
+temp <- left_join(temp, WWTP) #exctract dupplicates informations from main file
+unique(temp$code_discharge) #spots the unique code_discharge duplicated (only 7)
+```
+
+For the listObj files, which reports WWTP characteristics, there are `r length(unique(temp$code_discharge))` discharge codes that are reported twice (under 2 different WWTP codes) :
+
+  -   0531555V0181, TOULOUSE (GINESTOUS G1), 950 000 (or 400 000) population equivalent
+  -   0516345V0011, ST QUENTIN SUR CHARENTE (Barrage Lavaud village), 100 population equivalent
+  -   0581140V0041, LAVAUR, 13 000 (or 8 000) population equivalent
+  -   0587034V0031, CHAMPAGNAC LA RIVIERE (le Bourg ), 230 population equivalent
+  -   0563047V0011, LA BOURBOULE, 30 000 population equivalent
+  -   0524376V0021, ST AULAYE (BOURG), 1350 (or 1200) population equivalent
+  -   0564520V0011, SERRES-MORLAAS, 8500 population equivalent
+  
+On the [portail assainissement](https://www.assainissement.developpement-durable.gouv.fr/PortailAC/liste_inc_new2) we check the WWTP code (Code SANDRE) which is unique to decide which one of the 2 to keep. The kept ones are: 
+  
+<details>
+<summary>See cleaning process</summary>
+  -   0531555V018 for TOULOUSE (GINESTOUS G1), (removed : 0531555V001)
+  -   0516345V001 for ST QUENTIN SUR CHARENTE (Barrage Lavaud village), (removed : 0416345S0001) 
+  -   0581140V004 for LAVAUR, (removed : 0581140V001)
+  -   0487034V003 for CHAMPAGNAC LA RIVIERE (le Bourg ), (removed : 0487034S0003) 
+  -   0463047S0001 for LA BOURBOULE, (removed : 0563047S0001)
+  -   0524376V004 for ST AULAYE (BOURG) (removed : 0524376V002)
+  -   0564520V002 for SERRES-MORLAAS (removed : 0564520V001). But the reported capacity is inconsistent (8500 instead of 850), so we remove this WWTP.
+</details>
+
+```{r remove_WWTP_duplicates}
+WWTP <- subset(WWTP, !(code_WWTP %in% c("0531555V001", "0416345S0001", "0581140V001", "0487034S0003", "0563047S0001", "0524376V002")))
+WWTP <- subset(WWTP, code_discharge != "0564520V0011") #completely remove SERRES-MORLAAS
+```
+
+Now we join the 2 files (WWTP description and pollution flows)
+
+```{r}
+#merge with WWTP characteristics
+N_P_adour_garonne <- left_join(N_P_adour_garonne, WWTP, by=c("Year", "code_discharge"))
+```
+
+Finally, for 2000-2019 (not for 2020), WWTP capacities are over reported by a factor 10. We fix this.
+
+```{r }
+N_P_adour_garonne$capacity[N_P_adour_garonne$Year < 2020] <- N_P_adour_garonne$capacity[N_P_adour_garonne$Year < 2020]/10
+```
+
+When nutrient flows are negative or null, we replace them by empty values.
+
+```{r}
+# Some reported flows are negative or null. We replace them with empty values.
+#Pt
+N_P_adour_garonne$Pt_in[N_P_adour_garonne$Pt_in <= 0] <- NA
+N_P_adour_garonne$Pt_out[N_P_adour_garonne$Pt_out <= 0] <- NA
+N_P_adour_garonne$Pt_collection_discharge[N_P_adour_garonne$Pt_collection_discharge <= 0] <- NA
+N_P_adour_garonne$Pt_head_by_pass[N_P_adour_garonne$Pt_head_by_pass <= 0] <- NA
+#DBO5
+N_P_adour_garonne$DBO5_in[N_P_adour_garonne$DBO5_in <= 0] <- NA
+N_P_adour_garonne$DBO5_out[N_P_adour_garonne$DBO5_out <= 0] <- NA
+N_P_adour_garonne$DBO5_collection_discharge[N_P_adour_garonne$DBO5_collection_discharge <= 0] <- NA
+N_P_adour_garonne$DBO5_head_by_pass[N_P_adour_garonne$DBO5_head_by_pass <= 0] <- NA
+#DCO
+N_P_adour_garonne$DCO_in[N_P_adour_garonne$DCO_in <= 0] <- NA
+N_P_adour_garonne$DCO_out[N_P_adour_garonne$DCO_out <= 0] <- NA
+N_P_adour_garonne$DCO_collection_discharge[N_P_adour_garonne$DCO_collection_discharge <= 0] <- NA
+N_P_adour_garonne$DCO_head_by_pass[N_P_adour_garonne$DCO_head_by_pass <= 0] <- NA
+#MES
+N_P_adour_garonne$MES_in[N_P_adour_garonne$MES_in <= 0] <- NA
+N_P_adour_garonne$MES_out[N_P_adour_garonne$MES_out <= 0] <- NA
+N_P_adour_garonne$MES_collection_discharge[N_P_adour_garonne$MES_collection_discharge <= 0] <- NA
+N_P_adour_garonne$MES_head_by_pass[N_P_adour_garonne$MES_head_by_pass <= 0] <- NA
+#NTK
+N_P_adour_garonne$NTK_in[N_P_adour_garonne$NTK_in <= 0] <- NA
+N_P_adour_garonne$NTK_out[N_P_adour_garonne$NTK_out <= 0] <- NA
+N_P_adour_garonne$NTK_collection_discharge[N_P_adour_garonne$NTK_collection_discharge <= 0] <- NA
+N_P_adour_garonne$NTK_head_by_pass[N_P_adour_garonne$NTK_head_by_pass <= 0] <- NA
+#NO3
+N_P_adour_garonne$NO3_in[N_P_adour_garonne$NO3_in <= 0] <- NA
+N_P_adour_garonne$NO3_out[N_P_adour_garonne$NO3_out <= 0] <- NA
+N_P_adour_garonne$NO3_collection_discharge[N_P_adour_garonne$NO3_collection_discharge <= 0] <- NA
+N_P_adour_garonne$NO3_head_by_pass[N_P_adour_garonne$NO3_head_by_pass <= 0] <- NA
+#NO2
+N_P_adour_garonne$NO2_in[N_P_adour_garonne$NO2_in <= 0] <- NA
+N_P_adour_garonne$NO2_out[N_P_adour_garonne$NO2_out <= 0] <- NA
+N_P_adour_garonne$NO2_collection_discharge[N_P_adour_garonne$NO2_collection_discharge <= 0] <- NA
+N_P_adour_garonne$NO2_head_by_pass[N_P_adour_garonne$NO2_head_by_pass <= 0] <- NA
+#NH4
+N_P_adour_garonne$NH4_in[N_P_adour_garonne$NH4_in <= 0] <- NA
+N_P_adour_garonne$NH4_out[N_P_adour_garonne$NH4_out <= 0] <- NA
+N_P_adour_garonne$NH4_collection_discharge[N_P_adour_garonne$NH4_collection_discharge <= 0] <- NA
+N_P_adour_garonne$NH4_head_by_pass[N_P_adour_garonne$NH4_head_by_pass <= 0] <- NA
+#NGL_reported
+N_P_adour_garonne$NGL_in[N_P_adour_garonne$NGL_in <= 0] <- NA
+N_P_adour_garonne$NGL_out[N_P_adour_garonne$NGL_out <= 0] <- NA
+N_P_adour_garonne$NGL_collection_discharge[N_P_adour_garonne$NGL_collection_discharge <= 0] <- NA
+N_P_adour_garonne$NGL_head_by_pass[N_P_adour_garonne$NGL_head_by_pass <= 0] <- NA
+#Volume
+N_P_adour_garonne$VOL_in[N_P_adour_garonne$VOL_in <= 0] <- NA
+N_P_adour_garonne$VOL_out[N_P_adour_garonne$VOL_out <= 0] <- NA
+N_P_adour_garonne$VOL_collection_discharge[N_P_adour_garonne$VOL_collection_discharge <= 0] <- NA
+N_P_adour_garonne$VOL_head_by_pass[N_P_adour_garonne$VOL_head_by_pass <= 0] <- NA
+```
+
+
+We compute the yields and ratios for each WWTP, and we compute NGL with NTK, NO2 and NO3 when possible. For incoming NGL, when possible we use NTK, NO2 and NO3, but if only NTK is available we also keep it as a good approximation (NO is negligible for incoming pollution). For discharged NGL, NO3 and NTK must be reported, and we accept to neglect NO2 when it is unreported.
+
+```{r ratios_and_yields}
+N_P_adour_garonne <- N_P_adour_garonne %>%
+  ungroup() %>%
+  # we need to be "row wise" to use "sum(., na.rm=T) : 
+  # just summing the columns A+B would return NA when at least 1 columns as NA in the row
+  rowwise() %>%
+  mutate(
+    #for NGL in, if NTK_in reported we accept to not consider unreported NO2_in and NO2_in as 0 (because NO in negligible)
+    #if NTK_in unreported, NGL_in is unreported
+    NGL_in_computed = sum(NTK_in, NO2_in, NO3_in, na.rm=!is.na(NTK_in)), 
+    NGL_collection_discharge_computed = sum(NTK_collection_discharge, NO2_collection_discharge, NO3_collection_discharge, na.rm=!is.na(NTK_collection_discharge)), 
+    NGL_head_by_pass_computed = sum(NTK_head_by_pass, NO2_head_by_pass, NO3_head_by_pass, na.rm=!is.na(NTK_head_by_pass)), 
+    #For NGL_out, NO3 and NTK must be reported, and we accept to neglect NO2 when it is unreported.
+    NGL_out_computed = sum(NTK_out, NO2_out, NO3_out, na.rm=!((is.na(NTK_out)|is.na(NO3_out))))
+    ) %>%
+  mutate(
+    #yields
+    Pt_yield = (1-Pt_out/Pt_in)*100,
+    NGL_yield = (1-NGL_out/NGL_in)*100,
+    DBO5_yield =(1-DBO5_out/DBO5_in)*100, 
+    DCO_yield =(1-DCO_out/DCO_in)*100,
+    MES_yield =(1-MES_out/MES_in)*100,
+    #ratios
+    N_P_ratio_in = NGL_in/Pt_in,
+    N_P_ratio_out = NGL_in/Pt_out,
+    DCO_DBO5_ratio_in = DCO_in/DBO5_in,
+    DCO_DBO5_ratio_out = DCO_out/DBO5_out,
+    DBO5_NGL_ratio_in = DBO5_in/NGL_in,
+    DBO5_NGL_ratio_out = DBO5_out/NGL_out,
+    DBO5_Pt_ratio_in = DBO5_in/Pt_in,
+    DBO5_Pt_ratio_out = DBO5_out/Pt_out
+  )
+```
+
+
+
+We create the capacity categories in terms of population equivalent.
+
+```{r f_PE_bin_categories}
+#function to create capacity categories
+f_PE_bin_categories <- function(dataset){
+  #Creating size categories
+  dataset <- 
+    dataset %>%
+    mutate(
+      PE_bin = case_when(
+        capacity < 200 ~ "0 - 200 PE",
+        (capacity >= 200) & (capacity <2000) ~ "200 - 2 000 PE",
+        (capacity >= 2000) & (capacity <10000) ~ "2 000 - 10 000 PE",
+        (capacity >= 10000) & (capacity <100000) ~ "10 000 - 100 000 PE",
+        capacity >= 100000 ~ "> 100 000 PE",
+        T ~ "unreported PE"
+      )
+    )
+  
+  #reorders treatment by their share of total capacity
+  dataset$PE_bin <- 
+    factor(
+      dataset$PE_bin, 
+      levels = 
+        c("unreported PE",
+          "0 - 200 PE", 
+          "200 - 2 000 PE", 
+          "2 000 - 10 000 PE",
+          "10 000 - 100 000 PE", 
+          "> 100 000 PE"
+          )
+        )
+  return(dataset)
+}
+N_P_adour_garonne <- f_PE_bin_categories(N_P_adour_garonne)
+```
+
+We create the file with aggregated flows at the basin scale, and also by capacity categories.
+
+```{r f_basin_flows}
+f_basin_flows <- function(dataset){
+  basin <- dataset %>%
+    group_by(Year) %>%
+    summarise(
+      across(
+        c(
+          #incoming_flow
+          NGL_in, NGL_in_computed, NTK_in, NH4_in, NO2_in, NO3_in,
+          Pt_in, DBO5_in, DCO_in, MES_in,
+          #outgoing_flow
+          NGL_out, NGL_out_computed, NTK_out, NH4_out, NO2_out, NO3_out,
+          Pt_out, DBO5_out, DCO_out, MES_out,
+          #by pass
+          NGL_head_by_pass, NGL_head_by_pass_computed, NTK_head_by_pass, NH4_head_by_pass, NO2_head_by_pass, NO3_head_by_pass,
+          Pt_head_by_pass, DBO5_head_by_pass, DCO_head_by_pass, MES_head_by_pass,
+          #collection discharge
+          NGL_collection_discharge, NGL_collection_discharge_computed, NTK_collection_discharge, NH4_collection_discharge, NO2_collection_discharge, NO3_collection_discharge,
+          Pt_collection_discharge, DBO5_collection_discharge, DCO_collection_discharge, MES_collection_discharge
+        ),
+        ~signif(sum(.x, na.rm = T)*365/10^6, digits=3)
+      ),
+    #nb of waste water treatment plant
+    nb_WWTP = n(),
+    #capacity converted in million Population Equivalent
+    capacity = signif(sum(capacity, na.rm = T)/10^6, digits=3),
+    )
+  return(basin)
+}
+basin_N_P_adour_garonne <- f_basin_flows(N_P_adour_garonne)
+
+f_basin_PE_flows <- function(dataset){
+  basin <- dataset %>%
+    group_by(Year, PE_bin) %>%
+    summarise(
+      across(
+        c(
+          #incoming_flow
+          NGL_in, NGL_in_computed, NTK_in, NH4_in, NO2_in, NO3_in,
+          Pt_in, DBO5_in, DCO_in, MES_in,
+          #outgoing_flow
+          NGL_out, NGL_out_computed, NTK_out, NH4_out, NO2_out, NO3_out,
+          Pt_out, DBO5_out, DCO_out, MES_out,
+          #by pass
+          NGL_head_by_pass, NGL_head_by_pass_computed, NTK_head_by_pass, NH4_head_by_pass, NO2_head_by_pass, NO3_head_by_pass,
+          Pt_head_by_pass, DBO5_head_by_pass, DCO_head_by_pass, MES_head_by_pass,
+          #collection discharge
+          NGL_collection_discharge, NGL_collection_discharge_computed, NTK_collection_discharge, NH4_collection_discharge, NO2_collection_discharge, NO3_collection_discharge,
+          Pt_collection_discharge, DBO5_collection_discharge, DCO_collection_discharge, MES_collection_discharge
+        ),
+        ~signif(sum(.x, na.rm = T)*365/10^6, digits=3)
+      ),
+    #nb of waste water treatment plant
+    nb_WWTP = n(),
+    #capacity converted in million Population Equivalent
+    capacity = signif(sum(capacity, na.rm = T)/10^6, digits=3),
+    )
+  return(basin)
+}
+basin_PE_N_P_adour_garonne <- f_basin_PE_flows(N_P_adour_garonne)
+```
+
+We compute the nutrient ratios at the basin scale, and also by capacity categories.
+
+```{r f_nutrient_ratio_basin}
+#have to do this in case 1 nutrient is more reported than the other, which would create a bia if we took the ratio of the already aggregated flows
+f_nutrient_ratio_basin <- function(basin, dataset, nutrient1, nutrient2){
+  temp <- dataset %>% 
+    filter(
+      is.na(!!as.symbol(nutrient1))==F & is.na(!!as.symbol(nutrient2))==F
+      ) %>%
+    group_by(Year) %>%
+    summarise(
+      nutrient_1 = sum(!!as.symbol(nutrient1), na.rm=T),
+      nutrient_2 = sum(!!as.symbol(nutrient2), na.rm=T),
+      ratio = signif(nutrient_1/nutrient_2, digits=3)
+    ) %>%
+    select(-nutrient_1, -nutrient_2)
+  basin <- left_join(
+    basin, temp, by="Year"
+  )
+  return(basin)
+}
+
+f_nutrient_ratio_basin_PE <- function(basin_PE, dataset, nutrient1, nutrient2){
+  temp <- dataset %>% 
+    filter(
+      is.na(!!as.symbol(nutrient1))==F & is.na(!!as.symbol(nutrient2))==F
+      ) %>%
+    group_by(Year, PE_bin) %>%
+    summarise(
+      nutrient_1 = sum(!!as.symbol(nutrient1), na.rm=T),
+      nutrient_2 = sum(!!as.symbol(nutrient2), na.rm=T),
+      ratio = signif(nutrient_1/nutrient_2, digits=3)
+    ) %>%
+    select(-nutrient_1, -nutrient_2)
+  basin_PE <- left_join(
+    basin_PE, temp, by=c("Year", "PE_bin")
+  )
+  return(basin_PE)
+}
+
+f_all_nutrient_ratios_basin <- function(basin, dataset){
+basin <- basin %>%
+    
+    #nutrient ratios
+    #N_P in
+    f_nutrient_ratio_basin(dataset, "NGL_in", "Pt_in") %>%
+    rename(N_P_ratio_in = ratio) %>%
+    #N_P out
+    f_nutrient_ratio_basin(dataset, "NGL_out", "Pt_out") %>%
+    rename(N_P_ratio_out = ratio) %>%
+    #DCO_DBO5 in
+    f_nutrient_ratio_basin(dataset, "DCO_in", "DBO5_in") %>%
+    rename(DCO_DBO5_ratio_in = ratio) %>%
+    #DCO_DBO5 out
+    f_nutrient_ratio_basin(dataset, "DCO_out", "DBO5_out") %>%
+    rename(DCO_DBO5_ratio_out = ratio) %>%
+    #DBO5_N in
+    f_nutrient_ratio_basin(dataset, "DBO5_in", "NGL_in") %>%
+    rename(DBO5_N_ratio_in = ratio) %>%
+    #DBO5_N out
+    f_nutrient_ratio_basin(dataset, "DBO5_out", "NGL_out") %>%
+    rename(DBO5_N_ratio_out = ratio) %>%
+    #DBO5_P in
+    f_nutrient_ratio_basin(dataset, "DBO5_in", "Pt_in") %>%
+    rename(DBO5_P_ratio_in = ratio) %>%
+    #DBO5_P out
+    f_nutrient_ratio_basin(dataset, "DBO5_out", "Pt_out") %>%
+    rename(DBO5_P_ratio_out = ratio) %>%
+    #DCO_N in
+    f_nutrient_ratio_basin(dataset, "DCO_in", "NGL_in") %>%
+    rename(DCO_N_ratio_in = ratio) %>%
+    #DCO_N out
+    f_nutrient_ratio_basin(dataset, "DCO_out", "NGL_out") %>%
+    rename(DCO_N_ratio_out = ratio) %>%
+    #DCO_P in
+    f_nutrient_ratio_basin(dataset, "DCO_in", "Pt_in") %>%
+    rename(DCO_P_ratio_in = ratio) %>%
+    #DCO_P out
+    f_nutrient_ratio_basin(dataset, "DCO_out", "Pt_out") %>%
+    rename(DCO_P_ratio_out = ratio) %>%
+    
+    #capacity ratios
+    #Pt_PE_in
+    f_nutrient_ratio_basin(dataset, "Pt_in", "capacity") %>%
+    rename(Pt_PE_ratio_in = ratio) %>%
+    #Pt_PE_out
+    f_nutrient_ratio_basin(dataset, "Pt_out", "capacity") %>%
+    rename(Pt_PE_ratio_out = ratio) %>%
+    #NGL_PE_in
+    f_nutrient_ratio_basin(dataset, "NGL_in", "capacity") %>%
+    rename(NGL_PE_ratio_in = ratio) %>%
+    #NGL_PE_out
+    f_nutrient_ratio_basin(dataset, "NGL_out", "capacity") %>%
+    rename(NGL_PE_ratio_out = ratio) %>%
+    #DBO5_PE_in
+    f_nutrient_ratio_basin(dataset, "DBO5_in", "capacity") %>%
+    rename(DBO5_PE_ratio_in = ratio) %>%
+    #DBO5_PE_out
+    f_nutrient_ratio_basin(dataset, "DBO5_out", "capacity") %>%
+    rename(DBO5_PE_ratio_out = ratio) %>%
+    #DCO_PE_in
+    f_nutrient_ratio_basin(dataset, "DCO_in", "capacity") %>%
+    rename(DCO_PE_ratio_in = ratio) %>%
+    #DCO_PE_out
+    f_nutrient_ratio_basin(dataset, "DCO_out", "capacity") %>%
+    rename(DCO_PE_ratio_out = ratio) %>%
+    #MES_PE_in
+    f_nutrient_ratio_basin(dataset, "MES_in", "capacity") %>%
+    rename(MES_PE_ratio_in = ratio) %>%
+    #MES_PE_out
+    f_nutrient_ratio_basin(dataset, "MES_out", "capacity") %>%
+    rename(MES_PE_ratio_out = ratio) %>%
+    
+    #convert from kg per PE per day to g per PE per day
+    mutate(
+      across(
+        c(
+          Pt_PE_ratio_in, Pt_PE_ratio_out, NGL_PE_ratio_in, NGL_PE_ratio_out, DBO5_PE_ratio_in, DBO5_PE_ratio_out,
+          DCO_PE_ratio_in, DCO_PE_ratio_out, MES_PE_ratio_in, MES_PE_ratio_out
+        ), ~.x*1000 
+      )
+    )
+  return(basin)
+}
+
+f_all_nutrient_ratios_basin_PE <- function(basin_PE, dataset){
+  basin_PE <- basin_PE %>%
+    
+    #nutrient ratios
+    #N_P in
+    f_nutrient_ratio_basin_PE(dataset, "NGL_in", "Pt_in") %>%
+    rename(N_P_ratio_in = ratio) %>%
+    #N_P out
+    f_nutrient_ratio_basin_PE(dataset, "NGL_out", "Pt_out") %>%
+    rename(N_P_ratio_out = ratio) %>%
+    #DCO_DBO5 in
+    f_nutrient_ratio_basin_PE(dataset, "DCO_in", "DBO5_in") %>%
+    rename(DCO_DBO5_ratio_in = ratio) %>%
+    #DCO_DBO5 out
+    f_nutrient_ratio_basin_PE(dataset, "DCO_out", "DBO5_out") %>%
+    rename(DCO_DBO5_ratio_out = ratio) %>%
+    #DBO5_N in
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_in", "NGL_in") %>%
+    rename(DBO5_N_ratio_in = ratio) %>%
+    #DBO5_N out
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_out", "NGL_out") %>%
+    rename(DBO5_N_ratio_out = ratio) %>%
+    #DBO5_P in
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_in", "Pt_in") %>%
+    rename(DBO5_P_ratio_in = ratio) %>%
+    #DBO5_P out
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_out", "Pt_out") %>%
+    rename(DBO5_P_ratio_out = ratio) %>%
+    #DCO_N in
+    f_nutrient_ratio_basin_PE(dataset, "DCO_in", "NGL_in") %>%
+    rename(DCO_N_ratio_in = ratio) %>%
+    #DCO_N out
+    f_nutrient_ratio_basin_PE(dataset, "DCO_out", "NGL_out") %>%
+    rename(DCO_N_ratio_out = ratio) %>%
+    #DCO_P in
+    f_nutrient_ratio_basin_PE(dataset, "DCO_in", "Pt_in") %>%
+    rename(DCO_P_ratio_in = ratio) %>%
+    #DCO_P out
+    f_nutrient_ratio_basin_PE(dataset, "DCO_out", "Pt_out") %>%
+    rename(DCO_P_ratio_out = ratio) %>%
+    
+    #capacity ratios
+    #Pt_PE_in
+    f_nutrient_ratio_basin_PE(dataset, "Pt_in", "capacity") %>%
+    rename(Pt_PE_ratio_in = ratio) %>%
+    #Pt_PE_out
+    f_nutrient_ratio_basin_PE(dataset, "Pt_out", "capacity") %>%
+    rename(Pt_PE_ratio_out = ratio) %>%
+    #NGL_PE_in
+    f_nutrient_ratio_basin_PE(dataset, "NGL_in", "capacity") %>%
+    rename(NGL_PE_ratio_in = ratio) %>%
+    #NGL_PE_out
+    f_nutrient_ratio_basin_PE(dataset, "NGL_out", "capacity") %>%
+    rename(NGL_PE_ratio_out = ratio) %>%
+    #DBO5_PE_in
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_in", "capacity") %>%
+    rename(DBO5_PE_ratio_in = ratio) %>%
+    #DBO5_PE_out
+    f_nutrient_ratio_basin_PE(dataset, "DBO5_out", "capacity") %>%
+    rename(DBO5_PE_ratio_out = ratio) %>%
+    #DCO_PE_in
+    f_nutrient_ratio_basin_PE(dataset, "DCO_in", "capacity") %>%
+    rename(DCO_PE_ratio_in = ratio) %>%
+    #DCO_PE_out
+    f_nutrient_ratio_basin_PE(dataset, "DCO_out", "capacity") %>%
+    rename(DCO_PE_ratio_out = ratio) %>%
+    #MES_PE_in
+    f_nutrient_ratio_basin_PE(dataset, "MES_in", "capacity") %>%
+    rename(MES_PE_ratio_in = ratio) %>%
+    #MES_PE_out
+    f_nutrient_ratio_basin_PE(dataset, "MES_out", "capacity") %>%
+    rename(MES_PE_ratio_out = ratio) %>%
+    
+    #convert from kg per PE per day to g per PE per day
+    mutate(
+      across(
+        c(
+          Pt_PE_ratio_in, Pt_PE_ratio_out, NGL_PE_ratio_in, NGL_PE_ratio_out, DBO5_PE_ratio_in, DBO5_PE_ratio_out,
+          DCO_PE_ratio_in, DCO_PE_ratio_out, MES_PE_ratio_in, MES_PE_ratio_out
+        ), ~.x*1000 
+      )
+    )
+  return(basin_PE)
+}
+
+basin_N_P_adour_garonne <- f_all_nutrient_ratios_basin(basin_N_P_adour_garonne, N_P_adour_garonne)
+
+basin_PE_N_P_adour_garonne <- f_all_nutrient_ratios_basin_PE(basin_PE_N_P_adour_garonne, N_P_adour_garonne)
+```
+
+We compute the yields at the basin scale, and also by capacity categories.
+
+```{r f_basin_yield}
+#have to do this in case inflow or outflow is more reported than the other one, which would create a bias if we took the ratio of the already aggregated flows
+f_yield_basin <- function(basin, dataset, nutrientIN, nutrientOUT){
+  temp <- dataset %>% 
+    filter(
+      is.na(!!as.symbol(nutrientIN))==F & is.na(!!as.symbol(nutrientOUT))==F
+      ) %>%
+    group_by(Year) %>%
+    summarise(
+      nutrient_in = sum(!!as.symbol(nutrientIN), na.rm=T),
+      nutrient_out = sum(!!as.symbol(nutrientOUT), na.rm=T),
+      yield = round((1-nutrient_out/nutrient_in)*100, digits = 0)
+    ) %>%
+    select(-nutrient_in, -nutrient_out)
+  basin <- left_join(
+    basin, temp, by="Year"
+  )
+  return(basin)
+}
+
+f_yield_basin_PE <- function(basin_PE, dataset, nutrientIN, nutrientOUT){
+  temp <- dataset %>% 
+    filter(
+      is.na(!!as.symbol(nutrientIN))==F & is.na(!!as.symbol(nutrientOUT))==F
+      ) %>%
+    group_by(Year, PE_bin) %>%
+    summarise(
+      nutrient_in = sum(!!as.symbol(nutrientIN), na.rm=T),
+      nutrient_out = sum(!!as.symbol(nutrientOUT), na.rm=T),
+      yield = round((1-nutrient_out/nutrient_in)*100, digits = 0)
+    ) %>%
+    select(-nutrient_in, -nutrient_out)
+  basin_PE <- left_join(
+    basin_PE, temp, by=c("Year", "PE_bin")
+  )
+  return(basin_PE)
+}
+
+f_all_yields_basin <- function(basin, dataset){
+  basin <- basin %>%
+    #NGL yield
+    f_yield_basin(dataset, "NGL_in", "NGL_out") %>%
+    rename(NGL_yield = yield) %>%
+    #Pt yield
+    f_yield_basin(dataset, "Pt_in", "Pt_out") %>%
+    rename(Pt_yield = yield) %>%
+    #DBO5 yield
+    f_yield_basin(dataset, "DBO5_in", "DBO5_out") %>%
+    rename(DBO5_yield = yield) %>%
+    #DCO yield
+    f_yield_basin(dataset, "DCO_in", "DCO_out") %>%
+    rename(DCO_yield = yield) %>%
+    #MES yield
+    f_yield_basin(dataset, "MES_in", "MES_out") %>%
+    rename(MES_yield = yield) 
+  return(basin)
+}
+
+f_all_yields_basin_PE <- function(basin_PE, dataset){
+  basin_PE <- basin_PE %>%
+    #NGL yield
+    f_yield_basin_PE(dataset, "NGL_in", "NGL_out") %>%
+    rename(NGL_yield = yield) %>%
+    #Pt yield
+    f_yield_basin_PE(dataset, "Pt_in", "Pt_out") %>%
+    rename(Pt_yield = yield) %>%
+    #DBO5 yield
+    f_yield_basin_PE(dataset, "DBO5_in", "DBO5_out") %>%
+    rename(DBO5_yield = yield) %>%
+    #DCO yield
+    f_yield_basin_PE(dataset, "DCO_in", "DCO_out") %>%
+    rename(DCO_yield = yield) %>%
+    #MES yield
+    f_yield_basin_PE(dataset, "MES_in", "MES_out") %>%
+    rename(MES_yield = yield) 
+  return(basin_PE)
+}
+
+basin_N_P_adour_garonne <- f_all_yields_basin(basin_N_P_adour_garonne, N_P_adour_garonne)
+
+basin_PE_N_P_adour_garonne <- f_all_yields_basin_PE(basin_PE_N_P_adour_garonne, N_P_adour_garonne)
+```
+
+We create the years categories (every 5 years).
+
+```{r f_year_categories}
+#function to create years categories
+f_year_categories <- function(dataset){
+  dataset <- dataset %>%
+    mutate(
+      Year_category = case_when(
+        Year %in% c(1991, 1992, 1993, 1994, 1995) ~ "1991-1995",
+        Year %in% c(1996, 1997, 1998, 1999, 2000) ~ "1996-2000",
+        Year %in% c(2001, 2002, 2003, 2004, 2005) ~ "2001-2005",
+        Year %in% c(2006, 2007, 2008, 2009, 2010) ~ "2006-2010",
+        Year %in% c(2011, 2012, 2013, 2014, 2015) ~ "2011-2015",
+        Year %in% c(2016, 2017, 2018, 2019, 2020) ~ "2016-2020",
+      )
+    )
+  return(dataset)
+}
+N_P_adour_garonne <- f_year_categories(N_P_adour_garonne)
+basin_N_P_adour_garonne <- f_year_categories(basin_N_P_adour_garonne)
+basin_PE_N_P_adour_garonne <- f_year_categories(basin_PE_N_P_adour_garonne)
+```
+
+
+## Unmatched discharge points 
+
+There are some reported discharge points without any associated WWTP, but only before 2008. In terms of flows (here for Pt and NGL) these points are not negligible.
+
+```{r}
+#check if no doublons
+doublons <-N_P_adour_garonne %>%
+  select(Year, code_discharge) %>%
+  count(Year, code_discharge) %>%
+  filter(n !=1)
+#0 doublons for code discharge: pefect !
+rm(doublons)
+```
+
+::: panel-tabset
+### Nb of stations
+
+```{r}
+ggplot(basin_PE_N_P_adour_garonne) + 
+  geom_col(aes(Year, nb_WWTP, fill = PE_bin), alpha=.8) +
+  labs(
+    x="", caption =Source, y="",
+    title = "Discharge points without any associated WWTP",
+    subtitle = "yellow : with ; purple : without",
+    fill = "nominal capacity (PE)"
+  )
+```
+
+### Pt
+
+```{r }
+plot_grid(
+  #Pt in
+  ggplot(basin_PE_N_P_adour_garonne) + 
+    geom_col(aes(Year, Pt_in, fill = PE_bin), alpha=.8) +
+    theme(legend.position = "none") +
+    labs(
+      x="", caption ="\n", y="inflow (kt Pt)",
+      title = "Discharge Pt flows without any associated WWTP",
+      subtitle = "purple : without"
+    ),
+  #Pt out
+  ggplot(basin_PE_N_P_adour_garonne) + 
+    geom_col(aes(Year, Pt_out, fill = PE_bin), alpha=.8) +
+    theme(legend.position = "none") +
+    labs(
+      x="", caption =Source, y="outflow (kt Pt)",
+      title = "",
+      subtitle = ""
+    )
+)
+```
+
+### NGL
+
+```{r}
+plot_grid(
+  #NGL in
+  ggplot(basin_PE_N_P_adour_garonne) + 
+    geom_col(aes(Year, NGL_in, fill = PE_bin), alpha=.8) +
+    theme(legend.position = "none") +
+    labs(
+      x="", caption ="\n", y="inflow (kt NGL)",
+      title = "Discharge NGL flows without any associated WWTP",
+      subtitle = "purple : without"
+    ),
+  #NGL out
+  ggplot(basin_PE_N_P_adour_garonne) + 
+    geom_col(aes(Year, NGL_out, fill = PE_bin), alpha=.8) +
+    theme(legend.position = "none") +
+    labs(
+      x="", caption =Source, y="outflow (kt NGL)",
+      title = "",
+      subtitle = ""
+    )
+)
+```
+
+:::
+
+## Understand NGL 
+
+We compare the reported NGL to our computed NGL (from NTK, NO2 and NO3). There is a good match for incoming flows (and for incoming flow NGL ~ NTK). This is not the case for outgoing flow, probably because NO3 is often not reported (which is an exclusion criteria for our computing method); same problem for 2018-2020. The reported NGL quantity seems coherent, so we choose to keep this one over our computed result.
+
+::: panel-tabset
+### NGL, NO2, NO3, NTK
+
+```{r}
+# N in data preparation
+temp <- basin_N_P_adour_garonne %>% select(Year, NTK_in, NO2_in, NO3_in) %>%
+  gather(key = N_type, value = kt, NTK_in, NO2_in, NO3_in)
+# N out preaparation
+temp2 <- basin_N_P_adour_garonne %>% 
+  #renaming for the legend
+  select(Year, NTK=NTK_out, NO2=NO2_out, NO3=NO3_out) %>%
+  gather(key = N_type, value = kt, NTK, NO2, NO3)
+
+#graphs
+plot_grid(
+  ggplot(temp) +
+    geom_area(
+      aes(
+        Year, kt, 
+        fill = N_type
+        )
+      ) +
+    geom_line(
+      data = basin_N_P_adour_garonne, 
+      aes(
+        Year, NGL_in_computed, linetype="computed"
+        )
+      ) +
+    geom_line(
+      data = basin_N_P_adour_garonne, 
+      aes(
+        Year, NGL_in, linetype="reported"
+        )
+      ) +
+    theme(legend.position = "none") +
+    annotate("text", x=2007, y=10, label="NH4") +
+    labs(
+      x="", y="kt of N", 
+      title = "Reported N flows in Adour-Garonne WWTPs",
+      subtitle = "Inflows",
+      caption=""
+    ) +
+    ylim(0, 35),
+  ggplot(temp2) +
+    geom_area(
+      aes(
+        Year, kt, 
+        fill = N_type
+        )
+      ) +
+    geom_line(
+      data = basin_N_P_adour_garonne, 
+      aes(
+        Year, NGL_out_computed, linetype="computed"
+        )
+      ) +
+    geom_line(
+      data = basin_N_P_adour_garonne, 
+      aes(
+        Year, NGL_out, linetype="reported"
+        )
+      ) +
+    theme(
+      legend.position = c(0.6, 0.7), 
+      legend.title = element_blank()
+      ) +
+    annotate(
+      "text", label="NH4", 
+      x=2007, y=1.5
+      ) +
+    labs(
+      x="", y="", 
+      title = "",
+      subtitle = "Outflows",
+      caption=Source
+    ) + 
+    ylim(0, 35),
+  align = "hv"
+)
+```
+
+### By category, inflow
+
+```{r}
+ggplot(basin_PE_N_P_adour_garonne) +
+  geom_line(aes(Year, NGL_in_computed, color="computed")) +
+  geom_line(aes(Year, NGL_in, color="reported")) +
+  facet_wrap(vars(PE_bin), scales="free_y")
+
+```
+
+### By category, outflow
+
+```{r}
+ggplot(basin_PE_N_P_adour_garonne) +
+  geom_line(aes(Year, NGL_out_computed, color="computed")) +
+  geom_line(aes(Year, NGL_out, color="reported")) +
+  facet_wrap(vars(PE_bin), scales="free_y")
+```
+
+
+:::
+
+:::
+
+# Data Cleaning  
+
+::: panel-tabset
+## Outliers : first visualization 
+
+For all nutrients, inflow an outflows seem consistent, except for NO2 (very small quantities with high volatility). There are some obvious errors for all nutrients regarding head by pass and collection discharge. We correct them in the "outliers correction" tab.
+
+```{r f_graph_nutrients}
+f_graph_nutrient <- 
+  function (
+    dataset, 
+    nutrient_in, nutrient_out, nutrient_head_by_pass, nutrient_collection_discharge,
+    label, legend_x, legend_y
+    ) {
+    p <- ggplot(dataset) + 
+      #nutrient inflow
+      geom_line(
+        aes(
+          Year, 
+          !!as.symbol(nutrient_in), 
+          color=nutrient_in
+          )
+        ) + 
+      #nutrient outflow
+      geom_line(
+        aes(
+          Year,
+          !!as.symbol(nutrient_out), 
+          color = nutrient_out
+          )
+        ) +
+      #nutrient discharge
+      geom_line(
+        aes(
+          Year,
+          !!as.symbol(nutrient_collection_discharge), 
+          color = nutrient_collection_discharge
+          )
+        ) +
+      #nutrient by pass
+      geom_line(
+        aes(
+          Year,
+          !!as.symbol(nutrient_head_by_pass), 
+          color = nutrient_head_by_pass
+          )
+        ) +
+      ylim(0, NA) +
+      theme(
+        legend.position = c(legend_x, legend_y), 
+        legend.title = element_blank()
+        ) +
+      labs(
+        x="", y=paste("kt of", label) , 
+        title = paste("Reported", label, "flows in Adour-Garonne WWTPs") ,
+        subtitle = "reported, not necessarily actual ; here before data cleaning", 
+        caption = Source
+        )
+  return(p)
+}
+```
+
+::: panel-tabset
+### NGL
+
+```{r NGL_basin_visual_check}
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "NGL_in", "NGL_out", "NGL_head_by_pass", "NGL_collection_discharge",
+  "NGL", 0.7, 0.7) 
+  
+```
+
+### NTK
+
+```{r NTK_basin_visual_check}
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "NTK_in", "NTK_out", "NTK_head_by_pass", "NTK_collection_discharge",
+  "NTK", 0.7, 0.5) 
+```
+
+### NH4
+
+```{r NH4_basin_visual_check}
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "NH4_in", "NH4_out", "NH4_head_by_pass", "NH4_collection_discharge",
+  "NH4", 0.7, 0.5) 
+```
+
+### NO2
+
+```{r NO2_basin_visual_check}
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "NO2_in", "NO2_out", "NO2_head_by_pass", "NO2_collection_discharge",
+  "NO2", 0.4, 0.7) 
+```
+
+### NO3
+
+```{r NO3_basin_visual_check}
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "NO3_in", "NO3_out", "NO3_head_by_pass", "NO3_collection_discharge",
+  "NO3", 0.7, 0.5) 
+```
+
+
+### Pt
+
+```{r Pt_basin_visual_check}
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "Pt_in", "Pt_out", "Pt_head_by_pass", "Pt_collection_discharge",
+  "Pt", 0.4, 0.6) 
+```
+
+### DBO5
+
+```{r DBO5_basin_visual_check}
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "DBO5_in", "DBO5_out", "DBO5_head_by_pass", "DBO5_collection_discharge",
+  "DBO5", 0.4, 0.5)  
+```
+
+### DCO
+
+```{r DCO_basin_visual_check}
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "DCO_in", "DCO_out", "DCO_head_by_pass", "DCO_collection_discharge",
+  "DCO", 0.4, 0.5)  
+```
+
+### MES
+
+```{r MES_basin_visual_check}
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "MES_in", "MES_out", "MES_head_by_pass", "MES_collection_discharge",
+  "MES", 0.3, 0.8)
+```
+
+### Outliers correction
+
+For all nutrient collection discharge for 0512084V0011 (CREISSELS (MILLAU)), in 2016 divide flow by 10, remove 2015 (inconsistent)
+
+```{r }
+# code_rj 0512084V0011 (CREISSELS (MILLAU)) : factor 10 for all discharge in 2016
+#DBO5
+N_P_adour_garonne$DBO5_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016] <- 
+  N_P_adour_garonne$DBO5_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016]/10
+#DCO
+N_P_adour_garonne$DCO_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016] <- 
+  N_P_adour_garonne$DCO_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016]/10
+#MES
+N_P_adour_garonne$MES_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016] <- 
+  N_P_adour_garonne$MES_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016]/10
+#NGL
+N_P_adour_garonne$NGL_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016] <- 
+  N_P_adour_garonne$NGL_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016]/10
+#NH4
+N_P_adour_garonne$NH4_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016] <- 
+  N_P_adour_garonne$NH4_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016]/10
+#NO2 and NO3 not reported
+#NTK
+N_P_adour_garonne$NTK_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016] <- 
+  N_P_adour_garonne$NTK_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016]/10
+#Pt
+N_P_adour_garonne$Pt_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016] <- 
+  N_P_adour_garonne$Pt_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016]/10
+#volume
+N_P_adour_garonne$VOL_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016] <- 
+  N_P_adour_garonne$VOL_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2016]/10
+
+# code_discharge 0512084V0011 (CREISSELS (MILLAU)) : NA for all discharge in 2015
+#DBO5
+N_P_adour_garonne$DBO5_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2015] <- NA
+#DCO
+N_P_adour_garonne$DCO_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2015] <- NA
+#MES
+N_P_adour_garonne$MES_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2015] <- NA
+#NGL
+N_P_adour_garonne$NGL_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2015] <- NA
+#NH4
+N_P_adour_garonne$NH4_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2015] <- NA
+#NO2 and NO3 not reported
+#NTK
+N_P_adour_garonne$NTK_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2015] <- NA
+#Pt
+N_P_adour_garonne$Pt_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2015] <- NA
+#volume
+N_P_adour_garonne$VOL_collection_discharge[N_P_adour_garonne$code_discharge == "0512084V0011" & N_P_adour_garonne$Year == 2015] <- NA
+
+```
+ 
+2019 head by pass : 0519255V0021 SEILHAC (BOURG) factor 1000 for all nutrients
+
+```{r outliers_in}
+# code_rj 0512084V0011 (CREISSELS (MILLAU)) : factor 10 for all discharge in 2016
+#DBO5
+N_P_adour_garonne$DBO5_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019] <- 
+  N_P_adour_garonne$DBO5_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019]/1000
+#DCO
+N_P_adour_garonne$DCO_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019] <- 
+  N_P_adour_garonne$DCO_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019]/1000
+#MES
+N_P_adour_garonne$MES_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019] <- 
+  N_P_adour_garonne$MES_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019]/1000
+#NGL
+N_P_adour_garonne$NGL_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019] <- 
+  N_P_adour_garonne$NGL_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019]/1000
+#NH4
+N_P_adour_garonne$NH4_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019] <- 
+  N_P_adour_garonne$NH4_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019]/1000
+#NO2 and NO3 not reported
+#NTK
+N_P_adour_garonne$NTK_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019] <- 
+  N_P_adour_garonne$NTK_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019]/1000
+#Pt
+N_P_adour_garonne$Pt_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019] <- 
+  N_P_adour_garonne$Pt_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019]/1000
+#volume
+N_P_adour_garonne$VOL_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019] <- 
+  N_P_adour_garonne$VOL_head_by_pass[N_P_adour_garonne$code_discharge == "0519255V0021" & N_P_adour_garonne$Year == 2019]/1000
+
+```
+ 
+Collection discharge have a big outlier in 2014, for 0564545V0051 (INTERCOMMUNALE URRUGNE) : DBO5 factor 10, DCO factor 1000, MES factor 1000
+
+```{r }
+#MES
+N_P_adour_garonne$MES_collection_discharge[N_P_adour_garonne$code_discharge == "0564545V0051" & N_P_adour_garonne$Year == 2014] <- 
+  N_P_adour_garonne$MES_collection_discharge[N_P_adour_garonne$code_discharge == "0564545V0051" & N_P_adour_garonne$Year == 2014]/1000
+#DCO
+N_P_adour_garonne$DCO_collection_discharge[N_P_adour_garonne$code_discharge == "0564545V0051" & N_P_adour_garonne$Year == 2014] <- 
+  N_P_adour_garonne$DCO_collection_discharge[N_P_adour_garonne$code_discharge == "0564545V0051" & N_P_adour_garonne$Year == 2014]/1000
+#DBO5
+N_P_adour_garonne$DBO5_collection_discharge[N_P_adour_garonne$code_discharge == "0564545V0051" & N_P_adour_garonne$Year == 2014] <- 
+  N_P_adour_garonne$DBO5_collection_discharge[N_P_adour_garonne$code_discharge == "0564545V0051" & N_P_adour_garonne$Year == 2014]/10
+```
+
+MES collection discharge starting 2016, very high values for 0540192V0031, inconsistent, we remove them all. For 0524037V0031, factor 1000 in 2017
+
+```{r }
+#MES
+N_P_adour_garonne$MES_collection_discharge[N_P_adour_garonne$code_discharge == "0540192V0031" & N_P_adour_garonne$Year %in% c(2016, 2017, 2018, 2019, 2020)] <- NA
+
+N_P_adour_garonne$MES_collection_discharge[N_P_adour_garonne$code_discharge == "0524037V0031" & N_P_adour_garonne$Year ==2017] <-
+  N_P_adour_garonne$MES_collection_discharge[N_P_adour_garonne$code_discharge == "0524037V0031" & N_P_adour_garonne$Year ==2017]/1000
+```
+
+All for 0519272V0041 in 2008 negative values head by pass => NA
+
+```{r }
+#DBO5
+N_P_adour_garonne$DBO5_collection_discharge[N_P_adour_garonne$code_discharge == "0519272V0041" & N_P_adour_garonne$Year == 2008] <- NA
+#DCO
+N_P_adour_garonne$DCO_collection_discharge[N_P_adour_garonne$code_discharge == "0519272V0041" & N_P_adour_garonne$Year == 2008] <- NA
+#MES
+N_P_adour_garonne$MES_collection_discharge[N_P_adour_garonne$code_discharge == "0519272V0041" & N_P_adour_garonne$Year == 2008] <- NA
+#NGL
+N_P_adour_garonne$NGL_collection_discharge[N_P_adour_garonne$code_discharge == "0519272V0041" & N_P_adour_garonne$Year == 2008] <- NA
+#NH4
+N_P_adour_garonne$NH4_collection_discharge[N_P_adour_garonne$code_discharge == "0519272V0041" & N_P_adour_garonne$Year == 2008] <- NA
+#NO2
+N_P_adour_garonne$NO2_collection_discharge[N_P_adour_garonne$code_discharge == "0519272V0041" & N_P_adour_garonne$Year == 2008] <- NA
+#NO3
+N_P_adour_garonne$NO3_collection_discharge[N_P_adour_garonne$code_discharge == "0519272V0041" & N_P_adour_garonne$Year == 2008] <- NA
+#NTK
+N_P_adour_garonne$NTK_collection_discharge[N_P_adour_garonne$code_discharge == "0519272V0041" & N_P_adour_garonne$Year == 2008] <- NA
+#Pt
+N_P_adour_garonne$Pt_collection_discharge[N_P_adour_garonne$code_discharge == "0519272V0041" & N_P_adour_garonne$Year == 2008] <- NA
+#volume
+N_P_adour_garonne$VOL_collection_discharge[N_P_adour_garonne$code_discharge == "0519272V0041" & N_P_adour_garonne$Year == 2008] <- NA
+
+```
+ 
+for NLG out in 2001 for code_discharge 0531555V0181, just reported same value as NGL_in. We change this by a typical value considering the adjacent years.
+
+```{r }
+#DBO5
+N_P_adour_garonne$NGL_out[N_P_adour_garonne$code_discharge == "0531555V0181" & N_P_adour_garonne$Year == 2001] <- 4500
+```
+
+We recompute the values (yields, ratios, aggregate at the basin scale...) after our outliers changes. We save the final data.
+
+```{r recompute_values_after_outliers_changes}
+N_P_adour_garonne <- N_P_adour_garonne %>%
+  mutate(
+    #Computes yields 
+    Pt_yield = (1-Pt_out/Pt_in)*100, 
+    NGL_yield = (1-NGL_out/NGL_in)*100,
+    DBO5_yield =(1-DBO5_out/DBO5_in)*100, 
+    DCO_yield =(1-DCO_out/DCO_in)*100,
+    MES_yield =(1-MES_out/MES_in)*100,
+    #nutrient ratios
+    N_P_ratio_in = NGL_in/Pt_in, 
+    N_P_ratio_out = NGL_out/Pt_out,
+    DCO_DBO5_ratio_in = DCO_in/DBO5_in,
+    DCO_DBO5_ratio_out = DCO_out/DBO5_out,
+    DBO5_N_ratio_in = DBO5_in/NGL_in,
+    DBO5_N_ratio_out = DBO5_out/NGL_out,
+    DBO5_Pt_ratio_in = DBO5_in/Pt_in,
+    DBO5_Pt_ratio_out = DBO5_out/Pt_out
+  )
+```
+
+```{r same_at_basin_scale}
+#recompute basin values (flows, yields, ratios..)
+basin_N_P_adour_garonne <- f_basin_flows(N_P_adour_garonne)
+basin_N_P_adour_garonne <- f_all_nutrient_ratios_basin(basin_N_P_adour_garonne, N_P_adour_garonne)
+basin_N_P_adour_garonne <- f_all_yields_basin(basin_N_P_adour_garonne, N_P_adour_garonne)
+basin_N_P_adour_garonne <- f_year_categories(basin_N_P_adour_garonne)
+
+#recompute basin x PE values (flows, yields, ratios..)
+basin_PE_N_P_adour_garonne <- f_basin_PE_flows(N_P_adour_garonne)
+basin_PE_N_P_adour_garonne <- f_all_nutrient_ratios_basin_PE(basin_PE_N_P_adour_garonne, N_P_adour_garonne)
+basin_PE_N_P_adour_garonne <- f_all_yields_basin_PE(basin_PE_N_P_adour_garonne, N_P_adour_garonne)
+basin_PE_N_P_adour_garonne <- f_year_categories(basin_PE_N_P_adour_garonne)
+```
+
+
+:::
+
+:::
+
+# Capacities distribution   
+
+::: panel-tabset
+## Reporting Evolution
+
+```{r reporting_rates}
+temp <- N_P_adour_garonne %>%
+  group_by(Year) %>%
+  summarise(
+    capacity = sum(capacity, na.rm = T)/10^6, #capacity in million PE
+    nb_WWTP = n()
+  )
+
+n_min <- first(temp$nb_WWTP)
+n_max <- last(temp$nb_WWTP)
+capacity_min <- round(first(temp$capacity), digits=1)
+capacity_max <- round(last(temp$capacity), digits=1)
+```
+
+The number of listed plants in the data base increases from `r n_min` to `r n_max` (a `r round((n_max-n_min)/n_min*100)`% increase) between 2000 and 2020, and the total capacity increases by `r round((capacity_max-capacity_min)/capacity_min*100)`% from `r capacity_min` to `r capacity_max` million Population Equivalent. 
+
+The total reported capacity stabilizes around 2015.
+
+```{r capacity_nb_temporal_evolution}
+coef <- max(temp$capacity)/max(temp$nb_WWTP)
+ggplot(temp) +
+  geom_line(
+    aes(
+      Year, nb_WWTP, 
+      color = "number of reported facilities (left)"
+      )
+    ) + 
+  geom_line(
+    aes(
+      Year, capacity/coef, 
+      color = "total reported capacity (right)"
+      )
+    ) + 
+  scale_y_continuous(
+    limits = c(0, NA),
+    sec.axis = 
+      sec_axis(
+        trans=~.*coef, 
+        name="million Population Equivalent"
+        )
+    ) +
+  labs(
+    title = "Evolution of the reporting in the database",
+    subtitle = "in terms of number of WWTP reported and total reported capacity",
+    y="", x="", 
+    color="", caption =Source
+  ) +
+  theme(
+    legend.position = c(0.7, 0.5)
+  )
+```
+
+## Large categories 
+
+```{r}
+temp <- N_P_adour_garonne %>%
+  filter(is.na(capacity)==F) %>%
+  select(Year, capacity, PE_bin) %>%
+  group_by(Year, PE_bin) %>%
+  summarise(
+    `capacity (million PE)` = sum(capacity)/10^6,
+    `number of stations` = n()
+  ) %>% 
+  gather(key=capacity_or_n, value = value, `capacity (million PE)`, `number of stations`)
+```
+
+::: panel-tabset
+### Absolute
+
+```{r}
+ggplot(temp) + 
+  geom_area(aes(Year, value, fill=PE_bin), alpha=.8) + 
+  facet_wrap(vars(capacity_or_n), scales="free") + 
+  scale_fill_viridis(discrete = T) +
+  labs(
+    title="Reporting in the database",
+    subtitle = "For each capacity category",
+    x="", y="", fill="nominal capacity \n(Population Equivalent)",
+    caption = Source
+  )
+```
+
+### Relative
+
+```{r}
+ggplot(temp) + 
+  geom_area(aes(Year, value, fill=PE_bin), position = "fill", alpha=.8) + 
+  facet_wrap(vars(capacity_or_n), scales="free") + 
+  scale_fill_viridis(discrete = T) +
+  labs(
+    title="Reporting in the database",
+    subtitle = "Proportion of each capacity category",
+    x="", y="", fill="nominal capacity \n(Population Equivalent)",
+    caption = Source
+  )
+```
+
+
+:::
+
+## Histogram
+
+```{r}
+temp <- N_P_adour_garonne %>% filter(Year==Year_analysis)
+ggplot(temp) + 
+  geom_histogram(
+    aes(
+      capacity, 
+      fill = "Nb of facilities"
+      ), 
+    n=100, alpha=.4, stat="density"
+    ) +
+  geom_histogram(
+    aes(
+      capacity, weight = capacity, 
+      fill="Nb of facilities weighted by capacity"
+      ), 
+    n=100, alpha=.4, stat="density"
+    ) +
+  theme(
+    legend.position = c(0.7,0.8),
+  ) +
+  labs(
+    x="Waste Water Treatment Plant Capacity \n(Population Equivalent)",
+    y="Distribution density",
+    fill="Distribution of",
+    title = paste("WWTP capacities distribution,", as.character(Year_analysis)),
+    subtitle = "raw or weighted by capacity"
+  ) +
+  scale_x_log10(
+    labels = scales::label_number(drop0trailing = TRUE)
+    )
+```
+
+## Cumulative distribution 
+
+```{r}
+temp <- N_P_adour_garonne %>% 
+  ungroup() %>%
+  filter(Year==Year_analysis) %>% 
+  select(code_WWTP, name_WWTP, capacity) %>%
+  filter(is.na(capacity) == F) %>%
+  arrange(desc(capacity)) %>%
+  mutate( 
+    cumulative_capacity = cumsum(capacity)/10^6,
+    rank_STEU = rank(-capacity, ties.method = "first"),
+    percent_cumulative_capacity = round(cumulative_capacity/sum(capacity/10^6)*100, digits = 1),
+    percent_rank = round(rank_STEU/n()*100, digits = 1)
+    ) 
+
+f_save_csv_files(
+  temp %>% mutate(basin = "Adour-Garonne"), 
+  "output_data/zipf_law/",
+  "zipf_law_05_adour_garonne.csv"
+)
+
+coef <- max(temp$rank_STEU)/100
+coef2 <- max(temp$cumulative_capacity)/100
+```
+
+::: panel-tabset
+### Nb of WWTPs vs Capacity (linear scale)
+
+```{r}
+ggplot(temp) +
+  geom_step(
+    aes(
+      x = percent_rank, y = percent_cumulative_capacity
+      )
+    ) + 
+  labs(
+    title = paste("Cumulative distribution,", Year_analysis),
+    subtitle="nb of WWTP vs total capacity",
+    x="% of WWTP", y="% of total capacity",
+    caption = Source
+  ) +
+  scale_x_continuous(
+    sec.axis = 
+      sec_axis(
+        trans=~.*coef, name="nb of WWTP",
+        labels = scales::label_number(drop0trailing = TRUE)
+        )
+    ) + 
+  scale_y_continuous(
+    sec.axis = 
+      sec_axis(
+        trans=~.*coef2, 
+        name="cumulative capacity \n(millions PE)"
+        )
+    ) + 
+    theme(legend.position = "none")
+```
+
+### Nb of WWTPs vs Capacity (log scale)
+
+```{r}
+ggplot(temp) +
+  geom_step(
+    aes(
+      x = percent_rank, y = percent_cumulative_capacity
+      )
+    ) + 
+  labs(
+    title = paste("Cumulative distribution,", Year_analysis),
+    subtitle="nb of WWTP vs total capacity",
+    x="% of WWTP", y="% of total capacity",
+    caption = Source
+  ) +
+  scale_x_log10(
+    labels = scales::label_number(drop0trailing = TRUE),
+    sec.axis = 
+      sec_axis(
+        trans=~.*coef, 
+        name="nb of WWTP",
+        labels = scales::label_number(drop0trailing = TRUE)
+        )
+    ) + 
+  scale_y_continuous(
+    sec.axis = 
+      sec_axis(
+        trans=~.*coef2, 
+        name="cumulative capacity \n(millions Population Equivalent)"
+        )
+    ) + 
+    theme(legend.position = "none")
+```
+
+### Zipf law
+
+```{r}
+ggplot(temp) +
+  geom_point(
+    aes(
+      x = rank_STEU, y = capacity
+      )
+    ) + 
+  labs(
+    title = paste("WWTP capacity vs rank,", Year_analysis),
+    subtitle = "looking for a Zipf law",
+    x="Waste Water Treatment Plant \n(ranked by capacity)",
+    y=" Waste Water Treatment Plant capacity\n(Population Equivalent)"
+    ) +
+  scale_x_log10(
+    labels = scales::label_number(drop0trailing = TRUE)
+    ) + 
+  scale_y_log10(
+    labels = scales::label_number(drop0trailing = TRUE)
+    )
+```
+
+
+
+
+
+
+
+
+
+
+
+:::
+
+:::
+
+# Pollution flows  
+
+::: panel-tabset
+## Data Quality : reporting rates 
+
+Navigate through tabs below to see details for each pollutant. For each pollutant, we present reporting for incoming and outgoing pollution, in terms of number of WWTP reporting the data or in terms of installed capacity.
+
+NTK, NH4, Pt, DBO5, DCO and MES are extremely well reported for both in and out flows. NGL in is also very well reported, but this is less the case for NGL out with 15% of WWTP not reporting it in 2010, and less after. However in terms of capacity it represents less than 4%.
+
+NO2 and NO3 are poorly reported
+
+```{r}
+f_graph_reporting_nutrients <- function(pollution_in, pollution_out, pollution_DO, pollution_BP){
+  temp <- N_P_adour_garonne %>%
+    select(
+      Year, capacity, 
+      !!as.symbol(pollution_in), !!as.symbol(pollution_out),
+      !!as.symbol(pollution_DO), !!as.symbol(pollution_BP)
+      ) %>%
+    mutate(
+      nutrient_in = is.na(!!as.symbol(pollution_in))==F,
+      nutrient_out = is.na(!!as.symbol(pollution_out))==F,
+      nutrient_DO = is.na(!!as.symbol(pollution_DO))==F,
+      nutrient_BP = is.na(!!as.symbol(pollution_DO))==F
+      ) %>%
+    gather(
+      key=in_out_flow, 
+      value = `reported pollution`, 
+      nutrient_in, nutrient_out, nutrient_DO, nutrient_BP
+      ) %>%
+    group_by(
+      Year, in_out_flow, `reported pollution`
+      ) %>%
+    summarise(
+      `number of WWTP`=n(), 
+      `capacity (million PE)` = sum(capacity, na.rm=T)/10^6
+      ) %>%
+    gather(
+      key=n_or_capacity, 
+      value = value, 
+      `number of WWTP`, `capacity (million PE)`
+      ) %>%
+    #renaming labels
+    mutate(
+      in_out_flow = case_when(
+        in_out_flow == "nutrient_in" ~ pollution_in,
+        in_out_flow == "nutrient_out" ~ pollution_out,
+        in_out_flow == "nutrient_DO" ~ pollution_DO,
+        in_out_flow == "nutrient_BP" ~ pollution_BP
+      )
+    )
+
+  g <- ggplot(temp) +
+    geom_area(aes(Year, value, fill=`reported pollution`), alpha=.8) +
+    facet_grid(
+      n_or_capacity~in_out_flow, 
+      scales="free_y", switch = "y") +
+    labs(
+      y="", x="",
+      title = "Reporting of nutrient",
+      subtitle = "In terms of total capacity (top) and nb of WWTP (bottom)",
+      caption = Source,
+      fill="reported"
+      ) 
+
+  return(g)
+}
+```
+
+::: panel-tabset
+### NGL
+
+```{r}
+f_graph_reporting_nutrients("NGL_in", "NGL_out", "NGL_head_by_pass", "NGL_collection_discharge")
+```
+
+### NTK
+
+```{r}
+f_graph_reporting_nutrients("NTK_in", "NTK_out", "NTK_head_by_pass", "NTK_collection_discharge")
+```
+
+### NH4
+
+```{r}
+f_graph_reporting_nutrients("NH4_in", "NH4_out", "NH4_head_by_pass", "NH4_collection_discharge")
+```
+
+### NO2
+
+```{r}
+f_graph_reporting_nutrients("NO2_in", "NO2_out", "NO2_head_by_pass", "NO2_collection_discharge")
+```
+
+### NO3
+
+```{r}
+f_graph_reporting_nutrients("NO3_in", "NO3_out", "NO3_head_by_pass", "NO3_collection_discharge")
+```
+
+### Pt
+
+```{r}
+f_graph_reporting_nutrients("Pt_in", "Pt_out", "Pt_head_by_pass", "Pt_collection_discharge")
+```
+
+### DBO5
+
+```{r}
+f_graph_reporting_nutrients("DBO5_in", "DBO5_out", "DBO5_head_by_pass", "DBO5_collection_discharge")
+```
+
+### DCO
+
+```{r}
+f_graph_reporting_nutrients("DCO_in", "DCO_out", "DCO_head_by_pass", "DCO_collection_discharge")
+```
+
+### MES
+
+```{r}
+f_graph_reporting_nutrients("MES_in", "MES_out", "MES_head_by_pass", "MES_collection_discharge")
+```
+
+:::
+
+## Basin scale 
+
+```{r }
+f_graph_nutrient <- 
+  function (
+    dataset, 
+    nutrient_in, nutrient_out, nutrient_head_by_pass, nutrient_collection_discharge,
+    label, legend_x, legend_y
+    ) {
+    p <- ggplot(dataset) + 
+      #nutrient inflow
+      geom_line(
+        aes(
+          Year, 
+          !!as.symbol(nutrient_in), 
+          color=nutrient_in
+          )
+        ) + 
+      #nutrient outflow
+      geom_line(
+        aes(
+          Year,
+          !!as.symbol(nutrient_out), 
+          color = nutrient_out
+          )
+        ) +
+      #nutrient discharge
+      geom_line(
+        aes(
+          Year,
+          !!as.symbol(nutrient_collection_discharge), 
+          color = nutrient_collection_discharge
+          )
+        ) +
+      #nutrient by pass
+      geom_line(
+        aes(
+          Year,
+          !!as.symbol(nutrient_head_by_pass), 
+          color = nutrient_head_by_pass
+          )
+        ) +
+      ylim(0, NA) +
+      theme(
+        legend.position = c(legend_x, legend_y), 
+        legend.title = element_blank()
+        ) +
+      labs(
+        x="", y=paste("kt of", label) , 
+        title = paste("Reported", label, "flows in Adour-Garonne WWTPs") ,
+        subtitle = "reported, not necessarily actual", 
+        caption = Source
+        )
+  return(p)
+}
+```
+
+::: panel-tabset
+### NGL
+
+```{r }
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "NGL_in", "NGL_out", "NGL_head_by_pass", "NGL_collection_discharge",
+  "NGL", 0.7, 0.7)
+```
+
+### NTK
+
+```{r }
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "NTK_in", "NTK_out", "NTK_head_by_pass", "NTK_collection_discharge",
+  "NTK", 0.7, 0.5) 
+```
+
+### NH4
+
+```{r }
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "NH4_in", "NH4_out", "NH4_head_by_pass", "NH4_collection_discharge",
+  "NH4", 0.7, 0.5) 
+```
+
+### NO2
+
+```{r }
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "NO2_in", "NO2_out", "NO2_head_by_pass", "NO2_collection_discharge",
+  "NO2", 0.4, 0.7) 
+```
+
+### NO3
+
+```{r }
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "NO3_in", "NO3_out", "NO3_head_by_pass", "NO3_collection_discharge",
+  "NO3", 0.7, 0.5) 
+```
+
+
+### Pt
+
+```{r }
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "Pt_in", "Pt_out", "Pt_head_by_pass", "Pt_collection_discharge",
+  "Pt", 0.4, 0.6) 
+```
+
+### DBO5
+
+```{r }
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "DBO5_in", "DBO5_out", "DBO5_head_by_pass", "DBO5_collection_discharge",
+  "DBO5", 0.4, 0.5)  
+```
+
+### DCO
+
+```{r }
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "DCO_in", "DCO_out", "DCO_head_by_pass", "DCO_collection_discharge",
+  "DCO", 0.4, 0.5)  
+```
+
+### MES
+
+```{r }
+f_graph_nutrient(
+  basin_N_P_adour_garonne, 
+  "MES_in", "MES_out", "MES_head_by_pass", "MES_collection_discharge",
+  "MES", 0.3, 0.8)
+```
+
+### All N
+
+Dashed line is NGL to check for constitency.
+
+```{r}
+# N in data preparation
+temp <- basin_N_P_adour_garonne %>% select(Year, NTK_in, NO2_in, NO3_in) %>%
+  gather(key = N_type, value = kt, NTK_in, NO2_in, NO3_in)
+# N out preaparation
+temp2 <- basin_N_P_adour_garonne %>% 
+  #renaming for the legend
+  select(Year, NTK=NTK_out, NO2=NO2_out, NO3=NO3_out) %>%
+  gather(key = N_type, value = kt, NTK, NO2, NO3)
+
+#graphs
+plot_grid(
+  ggplot(temp) +
+    geom_area(
+      aes(
+        Year, kt, 
+        fill = N_type
+        )
+      ) +
+    geom_line(
+      data = basin_N_P_adour_garonne, 
+      aes(
+        Year, NH4_in
+        )
+      ) +
+    geom_line(
+      data = basin_N_P_adour_garonne, 
+      aes(
+        Year, NGL_in
+        ),
+      linetype="dashed"
+      ) +
+    theme(legend.position = "none") +
+    annotate("text", x=2007, y=10, label="NH4") +
+    labs(
+      x="", y="kt of N", 
+      title = "Reported N flows in Adour-Garonne WWTPs",
+      subtitle = "Inflows",
+      caption=""
+    ) +
+    ylim(0, 35),
+  ggplot(temp2) +
+    geom_area(
+      aes(
+        Year, kt, 
+        fill = N_type
+        )
+      ) +
+    geom_line(
+      data = basin_N_P_adour_garonne, 
+      aes(
+        Year, NH4_out
+        )
+      ) +
+    geom_line(
+      data = basin_N_P_adour_garonne, 
+      aes(
+        Year, NGL_out
+        ),
+      linetype="dashed"
+      ) +
+    theme(
+      legend.position = c(0.6, 0.6), 
+      legend.title = element_blank()
+      ) +
+    annotate(
+      "text", label="NH4", 
+      x=2007, y=1.5
+      ) +
+    labs(
+      x="", y="", 
+      title = "",
+      subtitle = "Outflows",
+      caption=Source
+    ) + 
+    ylim(0, 35),
+  align = "hv"
+)
+```
+
+### % All N forms
+
+```{r}
+# N in data preparation
+temp <- basin_N_P_adour_garonne %>% select(Year, NTK_in, NO2_in, NO3_in) %>%
+  gather(key = N_type, value = kt, NTK_in, NO2_in, NO3_in)
+# N out preaparation
+temp2 <- basin_N_P_adour_garonne %>% 
+  #renaming for the legend
+  select(Year, NTK=NTK_out, NO2=NO2_out, NO3=NO3_out) %>%
+  gather(key = N_type, value = kt, NTK, NO2, NO3)
+
+#graphs
+plot_grid(
+  #inflow
+  ggplot(temp) +
+    geom_area(
+      aes(
+        Year, kt, 
+        fill = N_type
+        ),
+      position = "fill"
+      ) +
+    geom_line(
+      data = basin_N_P_adour_garonne, 
+      aes(
+        Year, NH4_in/(NTK_in+NO3_in+NO2_in)
+        )
+      ) +
+    theme(legend.position = "none") +
+    annotate("text", x=2007, y=0.45, label="NH4") +
+    labs(
+      x="", y="kt of N", 
+      title = "Reported share N flows in Adour-Garonne WWTPs",
+      subtitle = "Inflows",
+      caption=""
+    ),
+  #outflow
+  ggplot(temp2) +
+    geom_area(
+      aes(
+        Year, kt, 
+        fill = N_type
+        ),
+      position="fill"
+      ) +
+    geom_line(
+      data = basin_N_P_adour_garonne, 
+      aes(
+        Year, NH4_out/(NTK_out+NO3_out+NO2_out)
+        )
+      ) +
+    theme(
+      legend.position = "bottom", 
+      legend.title = element_blank()
+      ) +
+    annotate(
+      "text", label="NH4", 
+      x=2007, y=0.4
+      ) +
+    labs(
+      x="", y="", 
+      title = "",
+      subtitle = "Outflows",
+      caption=Source
+    ),
+  align = "hv", axis="tblr"
+)
+```
+
+### % NH4 / NTK
+
+```{r}
+ggplot(basin_N_P_adour_garonne) +
+  geom_line(aes(Year, NH4_in/NTK_in*100, color="inflow")) +
+  geom_line(aes(Year, NH4_out/NTK_out*100, color="outflow")) +
+  ylim(0, 100) +
+  theme(legend.position = c(0.3, 0.3)) +
+  labs(
+    y="%", x="", color="",
+    title = "Share of NH4 in NTK",
+    subtitle = "reported, no necessarily actual ; here after data cleaning",
+    caption=Source
+    )
+```
+
+:::
+
+## Real flow extrapolation  
+
+::: panel-tabset
+### Coefficient calculation
+
+We compute in terms of installed capacity the reported and unreported flows for NGL, Pt, DBO5, DCO and MES. We do this for each year and for each capacity category.
+
+```{r}
+#create file of reported 
+temp <- N_P_adour_garonne %>%
+  select(
+    Year, PE_bin, capacity, 
+    Pt_in, Pt_out, NGL_in, NGL_out, DBO5_in, DBO5_out, DCO_in, DCO_out, MES_in, MES_out
+    ) %>%
+  #spots unreported values for each nutrient flow
+  mutate(
+    across(
+      c(Pt_in, Pt_out, NGL_in, NGL_out, DBO5_in, DBO5_out, DCO_in, DCO_out, MES_in, MES_out),
+      ~ is.na(.x)==F
+      )
+    ) %>%
+  #gather to ba able to then group by flow and count capacity
+  gather(
+    key=nutrient_flow, 
+    value = reported_pollution, 
+    Pt_in, Pt_out, NGL_in, NGL_out, DBO5_in, DBO5_out, DCO_in, DCO_out, MES_in, MES_out
+    )  %>%
+  #count reported capacity and unreported capacity for each (Year, capacity category, nutrient flow)
+  group_by(
+    Year, PE_bin, nutrient_flow, reported_pollution
+    ) %>%
+  summarise(
+    capacity = sum(capacity, na.rm=T)/10^6
+    ) %>%
+  #creates reported/unreported names for each nutrient flow and spreads into columns
+  mutate(
+    nutrient_flow = case_when(
+      reported_pollution == T ~ paste0(nutrient_flow, "_reported"),
+      reported_pollution == F ~ paste0(nutrient_flow, "_unreported")
+    )
+  ) %>%
+  select(-reported_pollution) %>%
+  spread(nutrient_flow, capacity)
+
+# NA values replaced by 0 for future coeff computation
+temp[is.na(temp)] <- 0
+```
+
+From this we compute proportionate coefficient to extrapolate real flows.
+
+```{r}
+temp <- temp %>%
+  mutate(
+    #Pt
+    Pt_in_coeff = (Pt_in_reported + Pt_in_unreported)/Pt_in_reported,
+    Pt_out_coeff = (Pt_out_reported + Pt_out_unreported)/Pt_out_reported,
+    #NGL
+    NGL_in_coeff = (NGL_in_reported + NGL_in_unreported)/NGL_in_reported,
+    NGL_out_coeff = (NGL_out_reported + NGL_out_unreported)/NGL_out_reported,
+    #DBO5
+    DBO5_in_coeff = (DBO5_in_reported + DBO5_in_unreported)/DBO5_in_reported,
+    DBO5_out_coeff = (DBO5_out_reported + DBO5_out_unreported)/DBO5_out_reported,
+    #DCO
+    DCO_in_coeff = (DCO_in_reported + DCO_in_unreported)/DCO_in_reported,
+    DCO_out_coeff = (DCO_out_reported + DCO_out_unreported)/DCO_out_reported,
+    #MES
+    MES_in_coeff = (MES_in_reported + MES_in_unreported)/MES_in_reported,
+    MES_out_coeff = (MES_out_reported + MES_out_unreported)/MES_out_reported,
+  ) %>%
+  select(
+    -c(
+      Pt_in_reported, Pt_in_unreported,
+      Pt_out_reported, Pt_out_unreported,
+      NGL_in_reported, NGL_in_unreported,
+      NGL_out_reported, NGL_out_unreported,
+      DBO5_in_reported, DBO5_in_unreported,
+      DBO5_out_reported, DBO5_out_unreported,
+      DCO_in_reported, DCO_in_unreported, 
+      DCO_out_reported, DCO_out_unreported, 
+      MES_in_reported, MES_in_unreported, 
+      MES_out_reported, MES_out_unreported
+      )
+    )
+
+#replace Inf values by 1 (when divided by 0)
+temp[temp == Inf] <- 1
+#replace NAN values by 1 (case of the unerported capacities)
+temp[is.na(temp)] <- 1
+```
+
+With these coefficients we compute the adjusted flows
+
+```{r}
+#file with reported flows and adjustment coefficient
+temp2 <- left_join(
+  basin_PE_N_P_adour_garonne %>%
+    #selects only flows and not yields or ratios
+    select(
+      Year, PE_bin, 
+      Pt_in, Pt_out, NGL_in, NGL_out, DBO5_in, DBO5_out, DCO_in, DCO_out, MES_in, MES_out
+    ),
+  temp, by=c("Year", "PE_bin")
+)
+
+#computes adjusted flows
+temp2 <- temp2 %>%
+  mutate(
+    #Pt
+    Pt_in_adj = round(Pt_in_coeff*Pt_in, 5),
+    Pt_out_adj = round(Pt_out_coeff*Pt_out, 5),
+    #NGL
+    NGL_in_adj = round(NGL_in_coeff*NGL_in, 5),
+    NGL_out_adj = round(NGL_out_coeff*NGL_out, 5),
+    #DBO5
+    DBO5_in_adj = round(DBO5_in_coeff*DBO5_in, 5),
+    DBO5_out_adj = round(DBO5_out_coeff*DBO5_out, 5),
+    #DCO
+    DCO_in_adj = round(DCO_in_coeff*DCO_in, 5),
+    DCO_out_adj = round(DCO_out_coeff*DCO_out, 5),
+    #MES
+    MES_in_adj = round(MES_in_coeff*MES_in, 5),
+    MES_out_adj = round(MES_out_coeff*MES_out, 5)
+  ) %>%
+  #we remove coefficients and unajusted flows
+  select(
+    -c(
+      Pt_in, Pt_in_coeff, Pt_out, Pt_out_coeff,
+      NGL_in, NGL_in_coeff, NGL_out, NGL_out_coeff,
+      DBO5_in, DBO5_in_coeff, DBO5_out, DBO5_out_coeff,
+      DCO_in, DCO_in_coeff, DCO_out, DCO_out_coeff, 
+      MES_in, MES_in_coeff, MES_out, MES_out_coeff
+    )
+  )
+```
+
+We add these adjusted flows to the main files reporting flows at the basin scale
+
+```{r}
+#adding adjusted flows to the basin x capacity files
+basin_PE_N_P_adour_garonne <- left_join(
+  basin_PE_N_P_adour_garonne, temp2, by=c("Year", "PE_bin")
+)
+
+#aggregating adjusted flows at the basin scale without the capacity categories
+temp <- temp2 %>%
+  select(-PE_bin) %>%
+  group_by(Year) %>%
+  summarise_all(~signif(sum(.x), 3))
+
+#adding adjusted flows to the basin files
+basin_N_P_adour_garonne <- left_join(
+  basin_N_P_adour_garonne, temp, by="Year"
+)
+```
+
+We plot the comparison reported / adjusted in the following graphs. For the Adour-Garonne basin, there is virtually no difference, except for NGL discharge.
+
+```{r}
+f_graph_adjusted <- function(basin_file, basin_PE_file, nutrient_adjusted, nutrient_reported, nutrient_label){
+  g <- plot_grid(
+    ggplot(basin_PE_file) +
+      geom_line(
+        data = basin_file,
+        aes(Year, !!as.symbol(nutrient_adjusted)), 
+        color="black", size=1
+        ) + 
+      geom_area(
+        aes(Year, !!as.symbol(nutrient_reported), fill=PE_bin), 
+        alpha=.7
+        ) + 
+      theme(legend.position = "none") +
+      labs(
+        x="", y="kt per year",
+        caption = "\n",
+        title = paste("Adjusted", nutrient_label, "flows")
+    ),
+    ggplot(basin_PE_file) +
+      geom_line(
+        aes(Year, !!as.symbol(nutrient_adjusted), color=PE_bin), 
+        size=1
+        ) + 
+      geom_area(
+        aes(Year, !!as.symbol(nutrient_reported), fill=PE_bin), 
+        alpha=.7
+        ) + 
+      theme(legend.position = "none") +
+      facet_wrap(vars(PE_bin), scales="free") +
+      labs(
+        x="", y="",
+        caption = Source,
+        title = "",
+        subtitle = "line: adjusted flow ; area: reported flow"
+      ),
+    rel_widths = c(0.3, 0.7)
+  )
+  return(g)
+}
+```
+
+### Pt 
+
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_adjusted(
+  basin_N_P_adour_garonne, 
+  basin_PE_N_P_adour_garonne,
+  "Pt_in_adj", "Pt_in", "incoming Pt"
+  )
+```
+
+#### out
+
+```{r}
+f_graph_adjusted(
+  basin_N_P_adour_garonne, 
+  basin_PE_N_P_adour_garonne,
+  "Pt_out_adj", "Pt_out", "discharged Pt"
+  )
+```
+
+:::
+
+### NGL 
+
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_adjusted(
+  basin_N_P_adour_garonne, 
+  basin_PE_N_P_adour_garonne,
+  "NGL_in_adj", "NGL_in", "incoming NGL"
+  )
+```
+
+#### out
+
+```{r}
+f_graph_adjusted(
+  basin_N_P_adour_garonne, 
+  basin_PE_N_P_adour_garonne,
+  "NGL_out_adj", "NGL_out", "discharged NGL"
+  )
+```
+
+:::
+
+### DBO5 
+
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_adjusted(
+  basin_N_P_adour_garonne, 
+  basin_PE_N_P_adour_garonne,
+  "DBO5_in_adj", "DBO5_in", "incoming DBO5"
+  )
+```
+
+#### out
+
+```{r}
+f_graph_adjusted(
+  basin_N_P_adour_garonne, 
+  basin_PE_N_P_adour_garonne,
+  "DBO5_out_adj", "DBO5_out", "discharged DBO5"
+  )
+```
+
+:::
+
+### DCO 
+
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_adjusted(
+  basin_N_P_adour_garonne, 
+  basin_PE_N_P_adour_garonne,
+  "DCO_in_adj", "DCO_in", "incoming DCO"
+  )
+```
+
+#### out
+
+```{r}
+f_graph_adjusted(
+  basin_N_P_adour_garonne, 
+  basin_PE_N_P_adour_garonne,
+  "DCO_out_adj", "DCO_out", "discharged DCO"
+  )
+```
+
+:::
+
+### MES 
+
+::: panel-tabset
+#### in
+
+```{r}
+f_graph_adjusted(
+  basin_N_P_adour_garonne, 
+  basin_PE_N_P_adour_garonne,
+  "MES_in_adj", "MES_in", "incoming MES"
+  )
+```
+
+#### out
+
+```{r}
+f_graph_adjusted(
+  basin_N_P_adour_garonne, 
+  basin_PE_N_P_adour_garonne,
+  "MES_out_adj", "MES_out", "discharged MES"
+  )
+```
+
+:::
+
+:::
+
+:::
+
+# Discharge without treatment 
+
+Just a few stations report the direct discharges of pollution. See in the previous section *Pollution flows* -> *Data Quality: reporting rates*. In the 2015-2020, only about ~10% of stations reported direct discharges, but they represent about ~50% of the total installed capacity.
+
+There are 3 indicators for direct discharges.
+
+  -   **before 2015** estimation of **A1 + A2** points discharges, (original variable **PORMX**, renamed **._discharge_estimate** in our code);
+  -   the direct discharges from sewers, corresponding to **A1** point (original variable **PORDO**, renamed **._collection_discharge** in our code).
+  -   the direct discharge just before the WWTP, corresponding to the **A2** point (original variable **PORBP**, renamed **._head_by_pass** in our code).
+  -   apparently the French "A5 point" is not reported (it seems to be already included in the outflow pollution). 
+  
+In the following tab we represent these direct discharges as % of inflow in WWTP, for the WWTP where both flows are reported.
+
+::: panel-tabset
+## Unadjusted 
+  
+Here we see a consistent continuity between the pre-2015 estimations and ours for 2015-2020. However for proper estimation, we need to weight the flows by the number of days (per month) when a direct discharge is effectively made. This is done in the next tabs *Adjusted by nb of discharge days*.
+
+```{r}
+#selects discharged flows and compares them to incoming flows
+f_select_nutrient_discharge <- function(nutrient){
+  #creates nutrient variable names
+  x_collection_discharge <- paste0(nutrient, "_collection_discharge")
+  x_head_by_pass <- paste0(nutrient, "_head_by_pass")
+  x_discharge_estimate <- paste0(nutrient, "_discharge_estimate")
+  x_in <- paste0(nutrient, "_in")
+  
+  #only A1 points, (PORDO, renamed _collection_discharge)
+  temp <- N_P_adour_garonne %>%
+    #only if both A1 point and incoming flow reported
+    filter(is.na(!!as.symbol(x_collection_discharge))==F & is.na(!!as.symbol(x_in))==F) %>%
+    group_by(Year) %>%
+    summarise(
+      collection_discharge = sum(!!as.symbol(x_collection_discharge), na.rm=T),
+      incoming = sum(!!as.symbol(x_in), na.rm=T),
+      perc_collection_discharge = collection_discharge/incoming*100
+    )
+  #A2 point, (PORBP, renamed _head_by_pass)
+  temp1 <- N_P_adour_garonne %>%
+    #only if both A2 point and incoming flow reported
+    filter(is.na(!!as.symbol(x_head_by_pass))==F & is.na(!!as.symbol(x_in))==F) %>%
+    group_by(Year) %>%
+    summarise(
+      head_by_pass = sum(!!as.symbol(x_head_by_pass), na.rm=T),
+      incoming = sum(!!as.symbol(x_in), na.rm=T),
+      perc_head_by_pass = head_by_pass/incoming*100
+    )
+  #combine A1 and A2 points
+  temp <- left_join(
+    temp %>% select(Year, perc_collection_discharge),
+    temp1 %>% select(Year, perc_head_by_pass),
+    by="Year"
+    ) %>%
+    gather(
+      point, value, perc_head_by_pass, perc_collection_discharge
+    ) %>%
+    mutate(
+      point = case_when(
+        point=="perc_head_by_pass"~"A2 point",
+        point=="perc_collection_discharge"~"A1 point",
+      )
+    )
+  
+  #estimate total before 2015, PORMX (renamed ._discharge_estimate)
+  temp1 <- N_P_adour_garonne %>%
+    #only if both estimation and incoming flow reported
+    filter(is.na(!!as.symbol(x_discharge_estimate))==F & is.na(!!as.symbol(x_in))==F) %>%
+    group_by(Year) %>%
+    summarise(
+      discharge_estimate = sum(!!as.symbol(x_discharge_estimate), na.rm=T),
+      incoming = sum(!!as.symbol(x_in), na.rm=T),
+      perc_discharge_estimate = discharge_estimate/incoming*100
+    )
+  
+  return(list(temp1, temp))
+}
+
+#function for graph
+f_graph_direct_disharge <- function(temp, nutrient){
+  g <- ggplot(temp[[1]]) +
+    geom_line(
+      aes(Year, perc_discharge_estimate, color="A1+A2, before 2015"),
+      ) +
+    scale_color_manual(values = c("black")) +
+    geom_area(
+      data = temp[[2]], alpha=.8,
+      aes(Year, value, fill=point)
+      ) +
+    theme(legend.title = element_blank()) +
+    labs(
+      x="", y="%",
+      title=paste0("Direct discharge of ", nutrient, " (unajusted !)"),
+      subtitle = "% of WWTP inflow (A3 point)",
+      caption = Source
+      )
+  return(g)
+}
+```
+
+::: panel-tabset
+### Pt
+
+```{r}
+temp <- f_select_nutrient_discharge("Pt")
+f_graph_direct_disharge(temp, "Pt")
+```
+
+### NGL
+
+```{r}
+temp <- f_select_nutrient_discharge("NGL")
+f_graph_direct_disharge(temp, "NGL")
+```
+
+### DBO5
+
+```{r}
+temp <- f_select_nutrient_discharge("DBO5")
+f_graph_direct_disharge(temp, "DBO5")
+```
+
+### DCO
+
+```{r}
+temp <- f_select_nutrient_discharge("DCO")
+f_graph_direct_disharge(temp, "DCO")
+```
+
+### MES
+
+```{r}
+temp <- f_select_nutrient_discharge("MES")
+f_graph_direct_disharge(temp, "MES")
+```
+
+
+:::
+
+## Adjusted by nb of discharge days 
+
+The number of days of direct discharge (used to ajust flows) are only reported for 2015-2020 for direct discharges from sewers (A2 point) and 2018-2020 for direct discharge just before the WWTP (A2 point). The result is that for 2018-2020, **direct discharges in A1 and A2 points represent 5-6% of the WWTP incoming pollution**.
+
+```{r}
+#selects discharged flows and compares them to incoming flows
+f_select_nutrient_discharge_adj <- function(nutrient){
+  #creates nutrient variable names
+  x_collection_discharge <- paste0(nutrient, "_collection_discharge")
+  x_head_by_pass <- paste0(nutrient, "_head_by_pass")
+  x_discharge_estimate <- paste0(nutrient, "_discharge_estimate")
+  x_in <- paste0(nutrient, "_in")
+  
+  #only A1 points, (PORDO, renamed _collection_discharge)
+  temp <- N_P_adour_garonne %>%
+    #only if A1 point, nb of days and incoming flow are all reported
+    filter(is.na(!!as.symbol(x_collection_discharge))==F & is.na(!!as.symbol(x_in))==F & is.na(NBJDV_collection_discharge)==F) %>%
+    mutate(collection_discharge = !!as.symbol(x_collection_discharge)*NBJDV_collection_discharge/30) %>%
+    group_by(Year) %>%
+    summarise(
+      collection_discharge = sum(collection_discharge, na.rm=T),
+      incoming = sum(!!as.symbol(x_in), na.rm=T),
+      perc_collection_discharge = collection_discharge/incoming*100
+    )
+  #A2 point, (PORBP, renamed _head_by_pass)
+  temp1 <- N_P_adour_garonne %>%
+    #only if A2 point, nb of days and incoming flow are all reported
+    filter(is.na(!!as.symbol(x_head_by_pass))==F & is.na(!!as.symbol(x_in))==F & is.na(NBJDV_A2)==F) %>%
+    mutate(head_by_pass = !!as.symbol(x_head_by_pass)*NBJDV_A2/30) %>%
+    group_by(Year) %>%
+    summarise(
+      head_by_pass = sum(head_by_pass, na.rm=T),
+      incoming = sum(!!as.symbol(x_in), na.rm=T),
+      perc_head_by_pass = head_by_pass/incoming*100
+    )
+  #combine A1 and A2 points
+  temp <- left_join(
+    temp %>% select(Year, perc_collection_discharge),
+    temp1 %>% select(Year, perc_head_by_pass),
+    by="Year"
+    ) %>%
+    gather(
+      point, value, perc_head_by_pass, perc_collection_discharge
+    ) %>%
+    mutate(
+      point = case_when(
+        point=="perc_head_by_pass"~"A2 point",
+        point=="perc_collection_discharge"~"A1 point",
+      )
+    )
+  
+  return(temp)
+}
+
+#function for graph
+f_graph_direct_disharge_adj <- function(temp, nutrient){
+  temp$point <- 
+    factor(
+      temp$point, 
+      levels = 
+        c("A2 point", "A1 point")
+        )
+  
+  g <- ggplot(temp) +
+    geom_area(
+      alpha=.8,
+      aes(Year, value, fill=point)
+      ) +
+    theme(legend.title = element_blank()) +
+    labs(
+      x="", y="%",
+      title=paste0("Direct discharge of ", nutrient),
+      subtitle = "% of WWTP inflow (A3 point)",
+      caption = Source
+      )
+  return(g)
+}
+```
+
+::: panel-tabset
+### Pt
+
+```{r}
+temp <- f_select_nutrient_discharge_adj("Pt")
+f_graph_direct_disharge_adj(temp, "Pt")
+```
+
+### NGL
+
+```{r}
+temp <- f_select_nutrient_discharge_adj("NGL")
+f_graph_direct_disharge_adj(temp, "NGL")
+```
+
+### DBO5
+
+```{r}
+temp <- f_select_nutrient_discharge_adj("DBO5")
+f_graph_direct_disharge_adj(temp, "DBO5")
+```
+
+### DCO
+
+```{r}
+temp <- f_select_nutrient_discharge_adj("DCO")
+f_graph_direct_disharge_adj(temp, "DCO")
+```
+
+### MES
+
+```{r}
+temp <- f_select_nutrient_discharge_adj("MES")
+f_graph_direct_disharge_adj(temp, "MES")
+```
+
+
+:::
+
+:::
+
+# Ratios 
+
+::: panel-tabset
+## Basin scale 
+
+::: panel-tabset
+### N:P
+
+```{r}
+#temporal P/N ratio
+ggplot(basin_N_P_adour_garonne) + 
+  geom_line(aes(Year, N_P_ratio_in, color="N:P in")) + 
+  geom_line(aes(Year, N_P_ratio_out, color = "N:P out")) + 
+  ylim(0, NA) +
+  theme(
+    legend.position = c(0.7, 0.6)
+  ) +
+  labs(
+    x="", y="N:P ratio",
+    title = "N:P ratio in Adour-Garonne basin",
+    subtitle = "increase over time reflect phosphate detergent ban",
+    caption=Source, color=""
+  )
+```
+
+### DCO:DBO5
+
+```{r}
+ggplot(basin_N_P_adour_garonne) + 
+  geom_line(aes(Year, DCO_in/DBO5_in, color="DCO:DBO5 in")) + 
+  geom_line(aes(Year, DCO_out/DBO5_out, color = "DCO:DBO5 out")) + 
+  ylim(0, NA) +
+  theme(
+    legend.position = c(0.7, 0.6)
+  ) +
+  labs(
+    x="", y="DCO:DBO5 ratio",
+    title = "DCO:DBO5 ratio in Adour-Garonne basin",
+    subtitle = "decrease in outflow shows biodegradation",
+    caption=Source, color=""
+  )
+```
+
+### DBO5:N vs DBO5:P
+
+```{r}
+ggplot(basin_N_P_adour_garonne) + 
+  geom_point(
+    aes(
+      DBO5_in/NGL_in, DBO5_in/Pt_in, 
+      color=Year_category
+      )
+    ) +
+  geom_point(
+    aes(
+      DBO5_out/NGL_out, DBO5_out/Pt_out, 
+      color=Year_category
+        )
+    ) +
+  ylim(0, NA) +
+  annotate(
+    geom="text", label ="inflow",
+    x=4, y=25
+  ) +
+  annotate(
+    geom="text", label ="outflow",
+    x=1.3, y=8
+  ) +
+  labs(
+    x="DBO5:Pt ratio", y="DBO5:NGL ratio",
+    title = "DBO5:NGL vs DBO5:Pt ratio in Adour-Garonne basin WWTPs",
+    subtitle = "decrease in outflow shows biodegradation",
+    caption=Source, color=""
+  )
+```
+
+
+:::
+
+:::
+
+# Basin yield 
+
+::: panel-tabset
+## Basin
+
+```{r}
+ggplot(basin_N_P_adour_garonne) + 
+  geom_line(aes(Year, Pt_yield, color="P")) + 
+  geom_line(aes(Year, NGL_yield, color = "N")) + 
+  geom_line(aes(Year, DBO5_yield, color = "DBO5")) +
+  geom_line(aes(Year, DCO_yield, color = "DCO")) +
+  geom_line(aes(Year, MES_yield, color = "MES")) +
+  ylim(0,100) +
+  theme(legend.position = c(0.7, 0.3)) +
+  labs(
+    title = "Global abatement rate of Adour-Garonne WWTPs", 
+    x="", y="Yield (%)", color="",
+    caption = Source
+    )
+```
+
+## Basin x Capacity 
+
+```{r}
+f_graph_yield_PE <- function(dataset, nutrient_yield, nutrient_label){
+  g <- ggplot(dataset %>% filter(PE_bin !="unreported PE")) + 
+    geom_line(aes(Year, !!as.symbol(nutrient_yield), color=PE_bin)) + 
+    ylim(0,100) +
+    theme(legend.position = c(0.7, 0.3)) +
+    labs(
+      title = paste("Global", nutrient_label, "yield of Adour-Garonne basin"), 
+      subtitle = "by capacity (population equivalent)",
+      x="", y="Yield (%)", color="",
+      caption = Source
+      )
+  return(g)
+}
+```
+
+::: panel-tabset
+### Pt
+
+```{r}
+f_graph_yield_PE(
+  basin_PE_N_P_adour_garonne %>% filter(PE_bin!="0 - 200 PE"), 
+  "Pt_yield", "Pt")
+```
+
+### NGL
+
+```{r}
+f_graph_yield_PE(
+  basin_PE_N_P_adour_garonne %>% filter(PE_bin!="0 - 200 PE"), 
+  "NGL_yield", "NGL")
+```
+
+### DBO5
+
+```{r}
+f_graph_yield_PE(
+  basin_PE_N_P_adour_garonne %>% filter(PE_bin!="0 - 200 PE"), 
+  "DBO5_yield", "DBO5")
+```
+
+### DCO
+
+```{r}
+f_graph_yield_PE(
+  basin_PE_N_P_adour_garonne %>% filter(PE_bin!="0 - 200 PE"), 
+  "DCO_yield", "DCO")
+```
+
+### MES
+
+```{r}
+f_graph_yield_PE(
+  basin_PE_N_P_adour_garonne %>% filter(PE_bin!="0 - 200 PE"), 
+  "MES_yield", "MES")
+```
+
+
+:::
+
+:::
+
+# Save data
+
+We save the corrected data.
+
+```{r saving_data}
+#all WWTP file
+path_output <- "output_data/all_WWTP/"
+temp <- N_P_adour_garonne %>%
+  select(
+    code_WWTP, name_WWTP, Year, capacity, name_commune, INSEE_COM, lat_WWTP, long_WWTP, PE_bin,
+    DBO5_in, DCO_in, MES_in, NGL_in, NTK_in, NH4_in, NO3_in, NO2_in, Pt_in,
+    DBO5_out, DCO_out, MES_out, NGL_out, NTK_out, NH4_out, NO3_out, NO2_out, Pt_out,
+    DBO5_yield, DCO_yield, MES_yield, NGL_yield, Pt_yield,
+  )
+f_save_csv_files(
+  temp,
+  path_output,
+  "all_WWTP_05_adour_garonne.csv"
+)
+
+#basin agregated file
+path_output <- "output_data/basins/"
+temp <- basin_N_P_adour_garonne %>%
+  select(
+    Year, capacity, nb_WWTP,
+    #flows reported and adjusted
+    Pt_in, Pt_in_adj, NGL_in, NGL_in_adj, 
+    DBO5_in, DBO5_in_adj, DCO_in, DCO_in_adj, MES_in, MES_in_adj,
+    Pt_out, Pt_out_adj, NGL_out, NGL_out_adj,
+    DBO5_out, DBO5_out_adj, DCO_out, DCO_out_adj, MES_out, MES_out_adj,
+    #yields
+    NGL_yield, Pt_yield, DBO5_yield, DCO_yield, MES_yield, 
+    #nutrient ratios
+    N_P_ratio_in, N_P_ratio_out,
+    DBO5_N_ratio_in, DBO5_N_ratio_out, DBO5_P_ratio_in, DBO5_P_ratio_out,
+    DCO_N_ratio_in, DCO_N_ratio_out, DCO_P_ratio_in, DCO_P_ratio_out,
+    DCO_DBO5_ratio_in, DCO_DBO5_ratio_out,
+    #PE ratios
+    Pt_PE_ratio_in, Pt_PE_ratio_out, NGL_PE_ratio_in, NGL_PE_ratio_out, 
+    DBO5_PE_ratio_in, DBO5_PE_ratio_out, DCO_PE_ratio_in, DCO_PE_ratio_out, MES_PE_ratio_in, MES_PE_ratio_out
+  )
+f_save_csv_files(
+  temp,
+  path_output,
+  "basin_05_adour_garonne.csv"
+)
+
+#basin x PE agregated file
+path_output <- "output_data/basins_PE/"
+temp <- basin_PE_N_P_adour_garonne %>%
+  select(
+    Year, capacity, nb_WWTP, PE_bin, 
+    #flows reported and adjusted
+    Pt_in, Pt_in_adj, NGL_in, NGL_in_adj, 
+    DBO5_in, DBO5_in_adj, DCO_in, DCO_in_adj, MES_in, MES_in_adj,
+    Pt_out, Pt_out_adj, NGL_out, NGL_out_adj,
+    DBO5_out, DBO5_out_adj, DCO_out, DCO_out_adj, MES_out, MES_out_adj,
+    #yields
+    NGL_yield, Pt_yield, DBO5_yield, DCO_yield, MES_yield, 
+    #nutrient ratios
+    N_P_ratio_in, N_P_ratio_out,
+    DBO5_N_ratio_in, DBO5_N_ratio_out, DBO5_P_ratio_in, DBO5_P_ratio_out,
+    DCO_N_ratio_in, DCO_N_ratio_out, DCO_P_ratio_in, DCO_P_ratio_out,
+    DCO_DBO5_ratio_in, DCO_DBO5_ratio_out,
+    #PE ratios
+    Pt_PE_ratio_in, Pt_PE_ratio_out, NGL_PE_ratio_in, NGL_PE_ratio_out, 
+    DBO5_PE_ratio_in, DBO5_PE_ratio_out, DCO_PE_ratio_in, DCO_PE_ratio_out, MES_PE_ratio_in, MES_PE_ratio_out
+  )
+f_save_csv_files(
+  temp,
+  path_output,
+  "basin_PE_05_adour_garonne.csv"
+)
+```
+
+
+
+```{r remove_all_objects_in_environment}
+rm(list = ls())
+```
+
+
