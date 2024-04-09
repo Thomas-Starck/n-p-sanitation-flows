@@ -129,7 +129,7 @@ N_P_ratio_sludge_review <-
 N_compost_volatilization <- 0.3
 
 #proportion excretions to sewers from people with Individual Autonomous System (due to excretions in public spaces connected to sewers)
-perc_non_IAS <- 0.33
+perc_non_IAS <- 0.2
 ```
 
 ```{r}
@@ -1937,126 +1937,5 @@ ggplot(temp) +
 
 ```{r remove_all_objects_in_environment}
 rm(list = ls())
-```
-
-
-
-```{python}
-import numpy as np
-import pandas as pd
-
-
-rng = np.random.default_rng()
-
-num_vals = int(1e6)
-
-# distributions
-
-P_in_WWTP = rng.normal(loc=30.17, scale=1.509, size=num_vals)
-P_out_WWTP = rng.normal(loc=6.6, scale=0.33, size=num_vals)
-
-frac_sewer_discharge = rng.uniform(low=0.05, high=0.2, size=num_vals)
-
-P_industries = rng.normal(loc=1.120, scale=0.056, size=num_vals)
-
-ias_pop = rng.uniform(low=0.15, high=0.2, size=num_vals)
-
-P_per_cap = rng.uniform(low=0.44, high=0.58, size=num_vals)  # in kgP/year
-P_excreted = 64.9*P_per_cap  # in ktP/year
-
-frac_from_ias_to_sewers = rng.uniform(low=0.05, high=0.3)
-
-P_excr_IAS = P_excreted*ias_pop*(1-frac_from_ias_to_sewers)
-
-P_excr_sewers = P_excreted - P_excr_IAS
-
-P_in_sewers = P_in_WWTP / (1 - frac_sewer_discharge)
-
-# check potentially missing inputs
-
-P_residual_sewers = P_in_sewers - P_excr_sewers - P_industries
-
-missing_input = P_residual_sewers < 0
-
-P_in_sewers[missing_input] = P_excr_sewers[missing_input] + P_industries[missing_input]
-P_residual_sewers[missing_input] = 0
-
-P_lost_sewers = P_in_sewers*frac_sewer_discharge
-
-print("fraction mising input", missing_input.sum() / num_vals)
-
-frac_lost = P_lost_sewers / P_in_sewers
-
-P_residual_IAS = P_residual_sewers * ias_pop / (1 - ias_pop)
-
-frac_loss_IAS = rng.uniform(low=0.8, high=0.9, size=num_vals)
-
-P_loss_IAS = frac_loss_IAS * (P_residual_IAS + P_excr_IAS)
-
-# sludge
-
-frac_IAS_sludge = rng.uniform(low=0.1, high=0.2, size=num_vals)
-
-P_sludge_IAS = P_residual_IAS + P_excr_IAS - P_loss_IAS
-P_IAS_to_sewers = ias_pop * (1 - frac_loss_IAS) * (P_in_sewers - P_industries - P_excreted*frac_from_ias_to_sewers) / (1 - ias_pop)
-
-P_sludge_sewers = P_in_WWTP - P_out_WWTP
-
-frac_sludge_spread =  rng.normal(loc=0.770, scale=0.038, size=num_vals)
-
-
-# P to diffuse, surface, incineration and soil
-
-P_tot = (P_excreted + P_residual_sewers + P_residual_IAS + P_industries)
-
-P_spread = frac_sludge_spread*P_sludge_sewers
-
-ratio_diffuse = P_loss_IAS / P_tot
-
-ratio_spread = P_spread / P_tot
-ratio_residual = (P_residual_IAS + P_residual_sewers) / P_tot
-
-ratio_ias_to_sewers = P_IAS_to_sewers / P_IAS_to_sewers
-
-P_surface = P_out_WWTP + (P_in_sewers - P_in_WWTP)
-
-ratio_surfacewater = P_surface / P_tot
-
-P_incinerated = (P_sludge_sewers - P_spread)
-
-ratio_incinerated = P_incinerated / P_tot
-
-print("Fraction P spread", ratio_spread.mean(), 2*ratio_spread.std())
-print("P res", np.percentile(P_residual_sewers, [5, 25, 50, 75, 95]))
-print("Fraction P res", np.percentile(ratio_residual, [5, 25, 50, 75, 95]))
-print("FIAS_ratios", np.percentile(ratio_ias_to_sewers, [5, 25, 50, 75, 95]))
-
-
-# results in dataframe
-
-res = {
-   "P_in_WWTP": P_in_WWTP,
-   "P_out_WWTP": P_out_WWTP,
-   "P_sludge": P_sludge_sewers,
-   "P_spread": P_spread,
-   "P_in_sewers": P_in_sewers,
-   "P_lost_sewers": P_lost_sewers,
-   "P_industries": P_industries,
-   "P_excreted": P_excreted,
-   "P_residual_sewers": P_residual_sewers,
-   "P_residual_IAS": P_residual_IAS,
-   "P_surface": P_surface,
-   "P_incinerated": P_incinerated,
-   "P_loss_IAS": P_loss_IAS,
-   "ratio_spread": ratio_spread,
-   "ratio_diffuse": ratio_diffuse,
-   "ratio_surfacewater": ratio_surfacewater,
-   "ratio_incinerated": ratio_incinerated
-}
-
-df = pd.DataFrame(res)
-
-print(df.describe())
-
 ```
 
