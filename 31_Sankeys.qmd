@@ -1135,12 +1135,10 @@ round(quantile(removal_efficiency, c(.025, .975)))
 # IAS and sewers losses
 P_IAS_and_sewers <- (P_IAS_to_WWTP + P_lost_sewers)
 round(quantile(P_IAS_and_sewers, c(.025, .975)), 1)
-hist(P_IAS_and_sewers)
 
 # total residuals
 P_residuals <- (P_residual_IAS + P_residual_sewers)
 round(quantile(P_residuals, c(.025, .975)), 1)
-hist(P_residuals)
 
 #OUT
 
