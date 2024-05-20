@@ -41,7 +41,8 @@ library(htmlwidgets) #for sankey
 library(readxl) #to read excel file
 library(cowplot) #for plot_grid, multiple plots
 
-#path for data 
+ #seed for reproducibility of random generation
+set.seed(123)
 
 #setting graphs theme
 theme_set(
@@ -129,7 +130,7 @@ N_P_ratio_sludge_review <-
 N_compost_volatilization <- 0.3
 
 #proportion excretions to sewers from people with Individual Autonomous System (due to excretions in public spaces connected to sewers)
-perc_non_IAS <- 0.2
+excre_not_at_house <- 0.2
 ```
 
 ```{r}
@@ -186,31 +187,13 @@ f_P_file <- function(file_name, basin_selected){
       )
   
   #NETWORK REPARTITION
-  #P excretions to IAS
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "excretion", "IAS", "excretion", 
-      human_excretions$P_excretion*sewage_connection$share_IAS*(1-perc_non_IAS)
-      )
   #P excretions to sewage network
   sankey[nrow(sankey) + 1,] = 
     list(
       "excretion", "sewage network", "excretion", 
       human_excretions$P_excretion*(
-        (1-sewage_connection$share_IAS) + sewage_connection$share_IAS*(perc_non_IAS)
+        (1-sewage_connection$share_IAS) + sewage_connection$share_IAS*(excre_not_at_house)
         )
-      )
-  
-  #P IAS to water and to WWTP
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "IAS", "groundwater", "water", 
-      IAS_balance$water*sankey$value[sankey$target=="IAS"]
-      )
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "IAS", "WWTP", "WWTP", 
-      IAS_balance$sludge*sankey$value[sankey$target=="IAS"]
       )
   
   #P industry to sewage network
@@ -220,11 +203,11 @@ f_P_file <- function(file_name, basin_selected){
       industry_discharge$Pt_in
       )
   
-  #P from network to WWTP (taking into account IAS inputs)
+  #P from network to WWTP (flow in WWTP)
   sankey[nrow(sankey) + 1,] = 
     list(
       "sewage network", "WWTP", "WWTP", 
-      in_out_flows$Pt_in_adj-sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"]
+      in_out_flows$Pt_in_adj
       )
   #P out WWTP in water
   sankey[nrow(sankey) + 1,] = 
@@ -232,34 +215,12 @@ f_P_file <- function(file_name, basin_selected){
       "WWTP", "water", "water", 
       in_out_flows$Pt_out_adj
       )
-  #P in sludge
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "WWTP", "sludge", "sludge", 
-      in_out_flows$Pt_in_adj-in_out_flows$Pt_out_adj
-      )
-  
   #P discharge without treatment
   sankey[nrow(sankey) + 1,] = 
     list(
       "sewage network", "water", "water", 
       in_out_flows$Pt_in_adj*direct_discharge$percent_loss
       )
-  
-  #P in sludge returning to farming system
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "sludge", "composted, spread", "sludge", 
-      sankey$value[sankey$target=="sludge"]*(sludge_destination$spread+sludge_destination$composted)
-      )
-  
-  #P not returning to farming system
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "sludge", "landfill, incineration..", "lost", 
-      sankey$value[sankey$target=="sludge"]-sankey$value[sankey$target=="composted, spread"]
-      )
-  
   #P residual 
   sankey[nrow(sankey) + 1,] = 
     list(
@@ -271,10 +232,12 @@ f_P_file <- function(file_name, basin_selected){
       )
   
   
-  
-  
-  #now that we have residuals in sewers, we recompute IAS flows, considering residuals in IAS
-  
+  #P excretions to IAS
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "excretion", "IAS", "excretion", 
+      human_excretions$P_excretion*sewage_connection$share_IAS*(1-excre_not_at_house)
+      )
   #residuals P to IAS
   sankey[nrow(sankey) + 1,] = 
     list(
@@ -283,21 +246,44 @@ f_P_file <- function(file_name, basin_selected){
         sewage_connection$share_IAS/(1-sewage_connection$share_IAS)
       )
   
-  #recompute P IAS to water and to WWTP
-  sankey$value[sankey$source=="IAS" & sankey$target=="groundwater"] <- 
-    IAS_balance$water*(
-      sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
+  #P IAS to water and to WWTP
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "IAS", "groundwater", "water", 
+      IAS_balance$water*(
+        sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
         sankey$value[sankey$source=="residual" & sankey$target=="IAS"]
-    )
-  sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"] <- 
-    IAS_balance$sludge*(
-      sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
+        )
+      )
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "IAS", "WWTP", "WWTP", 
+      IAS_balance$sludge*(
+        sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
         sankey$value[sankey$source=="residual" & sankey$target=="IAS"]
-    )
+        )
+      )
   
-  #recompute P from network to WWTP (taking into account IAS inputs)
-  sankey$value[sankey$source=="sewage network" & sankey$target=="WWTP"] <- 
-    in_out_flows$Pt_in_adj-sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"]
+  
+  #P in sludge (add also the flow IAS to WWTP for approximation rounding)
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "WWTP", "sludge", "sludge", 
+      in_out_flows$Pt_in_adj-in_out_flows$Pt_out_adj +
+        sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"]
+      )
+  #P in sludge returning to farming system
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "sludge", "composted, spread", "sludge", 
+      sankey$value[sankey$target=="sludge"]*(sludge_destination$spread+sludge_destination$composted)
+      )
+  #P not returning to farming system
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "sludge", "landfill, incineration..", "lost", 
+      sankey$value[sankey$target=="sludge"]-sankey$value[sankey$target=="composted, spread"]
+      )
 
   
   #rounding the results
@@ -541,38 +527,14 @@ f_N_file <- function(file_name, basin_selected){
       )
   
   #NETWORK REPARTITION
-  #N excretions to IAS
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "excretion", "IAS", "excretion", 
-      human_excretions$N_excretion*sewage_connection$share_IAS*(1-perc_non_IAS)
-      )
   #N excretions to sewage network
   sankey[nrow(sankey) + 1,] = 
     list(
       "excretion", "sewage network", "excretion", 
       human_excretions$N_excretion*(
-        (1-sewage_connection$share_IAS) + sewage_connection$share_IAS*(perc_non_IAS)
+        (1-sewage_connection$share_IAS) + sewage_connection$share_IAS*(excre_not_at_house)
         )
       )
-  
-  #N IAS to water, air and to WWTP
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "IAS", "groundwater", "water", 
-      IAS_balance$water*sankey$value[sankey$target=="IAS"]
-      )
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "IAS", "WWTP", "WWTP", 
-      IAS_balance$sludge*sankey$value[sankey$target=="IAS"]
-      )
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "IAS", "air", "air", 
-      IAS_balance$air*sankey$value[sankey$target=="IAS"]
-      )
-  
   #N industry to sewage network
   sankey[nrow(sankey) + 1,] = 
     list(
@@ -584,16 +546,14 @@ f_N_file <- function(file_name, basin_selected){
   sankey[nrow(sankey) + 1,] = 
     list(
       "sewage network", "WWTP", "WWTP", 
-      in_out_flows$NGL_in_adj-sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"]
+      in_out_flows$NGL_in_adj
       )
-  
   #N out of WWTP to water
   sankey[nrow(sankey) + 1,] = 
     list(
       "WWTP", "water", "water", 
       in_out_flows$NGL_out_adj
       )
-  
   #N discharge without treatment
   sankey[nrow(sankey) + 1,] = 
     list(
@@ -601,24 +561,74 @@ f_N_file <- function(file_name, basin_selected){
       in_out_flows$NGL_in_adj*direct_discharge$percent_loss
       )
   
+  #N residual to sewage
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "residual", "sewage network", "large industries", 
+      sankey$value[sankey$source=="sewage network" & sankey$target=="water"] +
+        sankey$value[sankey$source=="sewage network" & sankey$target=="WWTP"] -
+        sankey$value[sankey$source=="large industries"] -
+        sankey$value[sankey$source=="excretion" & sankey$target=="sewage network"] 
+      )
+  
+  #N excretions to IAS
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "excretion", "IAS", "excretion", 
+      human_excretions$N_excretion*sewage_connection$share_IAS*(1-excre_not_at_house)
+      )
+  #N residual to IAS
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "residual", "IAS", "sewage network", 
+      sankey$value[sankey$source=="residual" & sankey$target=="sewage network"]*
+        sewage_connection$share_IAS/(1-sewage_connection$share_IAS)
+      )
+  
+  #N IAS to water, air and to WWTP
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "IAS", "groundwater", "water", 
+      IAS_balance$water*(
+        sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
+        sankey$value[sankey$source=="residual" & sankey$target=="IAS"]
+        )
+      )
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "IAS", "WWTP", "WWTP", 
+      IAS_balance$sludge*(
+        sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
+        sankey$value[sankey$source=="residual" & sankey$target=="IAS"]
+        )
+      )
+  sankey[nrow(sankey) + 1,] = 
+    list(
+      "IAS", "air", "air", 
+      IAS_balance$air*(
+        sankey$value[sankey$source=="excretion" & sankey$target=="IAS"] +
+        sankey$value[sankey$source=="residual" & sankey$target=="IAS"]
+        )
+      )
+
   #N in sludge
   sankey[nrow(sankey) + 1,] =
     list(
       "WWTP", "sludge", "sludge",
       P_sludge*N_P_ratio_sludge_review
       )
-  
   #N de-nitrified
   sankey[nrow(sankey) + 1,] =
     list(
       "WWTP", "air", "air",
       #N into WWTP
-      (sankey$value[sankey$source=="sewage network" & sankey$target=="WWTP"] +
-         sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"])
+      sankey$value[sankey$source=="sewage network" & sankey$target=="WWTP"]
       #minus N into into water
       -sankey$value[sankey$source=="WWTP" & sankey$target=="water"]
-      #minus N insludge
-      -sankey$value[sankey$source=="WWTP" & sankey$target=="sludge"]
+      #minus N in sludge
+      -sankey$value[sankey$source=="WWTP" & sankey$target=="sludge"] +
+      #add N IAS to WWTP to keep consistent mass balance (approximation)+
+      sankey$value[sankey$source=="IAS" & sankey$target=="WWTP"]
       )
   
   #N in sludge directly spread
@@ -665,25 +675,12 @@ f_N_file <- function(file_name, basin_selected){
       sankey$value[sankey$target=="spread"]
     )
   
-  #N residual 
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "residual", "sewage network", "large industries", 
-      sankey$value[sankey$source=="sewage network" & sankey$target=="water"] +
-        sankey$value[sankey$source=="sewage network" & sankey$target=="WWTP"] -
-        sankey$value[sankey$source=="large industries"] -
-        sankey$value[sankey$source=="excretion" & sankey$target=="sewage network"] 
-      )
   
-  #now that we have residuals in sewers, we recompute IAS flows, considering residuals in IAS
   
-  #residuals N to IAS
-  sankey[nrow(sankey) + 1,] = 
-    list(
-      "residual", "IAS", "sewage network", 
-      sankey$value[sankey$source=="residual" & sankey$target=="sewage network"]*
-        sewage_connection$share_IAS/(1-sewage_connection$share_IAS)
-      )
+  
+  
+  
+  
   
   #recompute N IAS to water and to WWTP
   sankey$value[sankey$source=="IAS" & sankey$target=="groundwater"] <- 
@@ -936,6 +933,445 @@ f_sankey(sankey_N)
 f_table(sankey_N)
 ```
 :::
+
+
+
+# Uncertainties French Flows
+
+```{r function_for_uncertainties}
+#function to extract sankey value from source and target nodes
+f_extract_flow <- function(source_label, target_label, sankey_file){
+  
+  value_extracted <- sankey_file %>% 
+    filter(
+      source == source_label, 
+      target == target_label
+      ) %>%
+    pull(value)
+  
+  return(value_extracted)
+}
+
+#function to add 5-95 percentile range to main sankey file
+f_add_min_max <- function(source_label, target_label, distribution, sankey_file){
+  
+  #add 2.5% percentile
+  sankey_file$min[sankey_file$source==source_label & sankey_file$target==target_label] <- 
+    round(quantile(distribution, c(.025, .975)), 1)[1]
+  
+  #add 97.5% percentile
+  sankey_file$max[sankey_file$source==source_label & sankey_file$target==target_label] <- 
+    round(quantile(distribution, c(.025, .975)), 1)[2]
+  
+  return(sankey_file)
+}
+
+
+#number of iterations for monte-carlo simualtion: 1 million
+num_vals <- as.integer(10^6)
+
+#for normal distributions (all at 10% uncertainty) we consider that 95% of values are in the +/- 10% interval
+#so the 2 sigmas interval (95% of values) is +/- 10%, i.e. sigma = 10%/2 of the mean
+per_SD_normal <-  0.1/2
+
+#function to generate normal distribution from a sankey value, defined by its source and target nodes
+f_generate_normal_dstribution <- function(source_label, target_label, sankey_file, print){
+  
+  sankey_value <- f_extract_flow(source_label, target_label, sankey_file)
+  distr <- rnorm(n = num_vals, mean = sankey_value, sd = sankey_value * per_SD_normal)
+  
+  # if want to plot the distribution
+  if (print==TRUE) {
+    hist(distr)
+  }
+  
+  return(distr)
+}
+```
+
+
+## P
+
+```{r}
+#reload Sankey P for whole France
+sankey_P <- read_csv("output_data/sankey_flows/phosphorus/sankey_P_flows_France.csv")
+sankey_P$min <- NA #create min column for low range of percentile ditribution
+sankey_P$max <- NA #create max column for high range of percentile ditribution
+
+
+
+# P IN WWTP (sewage network to WWTP)
+# normal distribution 10% uncertainty
+source <- "sewage network" ; target <- "WWTP" #source and target of the flow
+P_in_WWTP <- f_generate_normal_dstribution(source, target, sankey_P, print = F) #create flow distribution
+sankey_P <- f_add_min_max(source, target, P_in_WWTP, sankey_P) #add min and max percentiles values
+
+
+
+# P OUT WWTP (WWTP to water), 
+# normal distribution 10% uncertainty
+source <- "WWTP" ; target <- "water" #source and target of the flow
+P_out_WWTP <- f_generate_normal_dstribution(source, target, sankey_P, print = F) #create flow distribution
+sankey_P <- f_add_min_max(source, target, P_out_WWTP, sankey_P) #add min and max percentiles values
+
+
+
+# P INDUSTRIES (large industries to sewage network)
+# normal distribution 10% uncertainty
+source <- "large industries" ; target <- "sewage network" #source and target of the flow
+P_industries <- f_generate_normal_dstribution(source, target, sankey_P, print = F) #create flow distribution
+sankey_P <- f_add_min_max(source, target, P_industries, sankey_P) #add min and max percentiles values
+
+
+
+# P EXCRETIONS TO SEWERS AND IAS
+
+# excretions. Uncertainty is a uniform distribution based on our value of excretion by per capita (0.44 kgP/year), compared to the range of our literature review (0.44 to 0.58)
+P_excreted_value <- f_extract_flow("excretion", "sewage network", sankey_P) + f_extract_flow("excretion", "IAS", sankey_P)
+P_excreted <- runif(n = num_vals, min = P_excreted_value*0.44/0.44, max = P_excreted_value*0.58/0.44)
+
+# fraction of the population using individual autonomous systems, uniform distribution 15 to 20% (best estimate 18%)
+ias_pop <- runif(n = num_vals, min = 0.15, max = 0.2)
+
+# fraction of the excretion from people using IAS that is excreted in public spaces connected to sewers, uniform distribution 5 to 35%
+frac_from_ias_to_sewers <- runif(n = num_vals, min = 0.05, max = 0.35)
+
+# P EXCRETIONS TO IAS
+P_excr_IAS <- P_excreted*ias_pop*(1-frac_from_ias_to_sewers)
+sankey_P <- f_add_min_max("excretion", "IAS", P_excr_IAS, sankey_P) #add min and max percentiles values
+
+# P EXCRETIONS TO SEWERS 
+P_excr_sewers <-  P_excreted - P_excr_IAS
+sankey_P <- f_add_min_max("excretion", "sewage network", P_excr_sewers, sankey_P) #add min and max percentiles values
+
+
+
+# RESIDUALS TO SEWERS
+
+# fraction lost in the sewers before reaching WWTPs, uniform distribution 5 to 20 %
+frac_sewer_discharge <- runif(n = num_vals, min = 0.05, max = 0.2) #create flow distribution
+
+# incoming P in the sewers
+P_in_sewers <-  P_in_WWTP / (1 - frac_sewer_discharge)
+
+# first compute residuals coming to sewers
+P_residual_sewers = P_in_sewers - P_excr_sewers - P_industries #compute residuals
+
+#but sometimes residuals to sewers are <0, not possible. Handle this problem
+missing_input <- P_residual_sewers < 0 # checks if negative, i.e. P in sewers < P exr + P industries: this means there cannot be a residual
+P_in_sewers[missing_input] <- P_excr_sewers[missing_input] + P_industries[missing_input]  # if so, update P in sewers, equals to excr + industries
+P_residual_sewers[missing_input] = 0  # and set the residual to zero
+sankey_P <- f_add_min_max("residual", "sewage network", P_residual_sewers, sankey_P) #add min and max percentiles values
+
+
+
+# RESIDUALS TO IAS
+P_residual_IAS <-  P_residual_sewers * ias_pop / (1 - ias_pop)  # residual assigned to IAS
+sankey_P <- f_add_min_max("residual", "IAS", P_residual_IAS, sankey_P) #add min and max percentiles values
+
+
+
+# LOSSES IN SEWERS
+P_lost_sewers <-  P_in_sewers*frac_sewer_discharge
+sankey_P <- f_add_min_max("sewage network", "water", P_lost_sewers, sankey_P) #add min and max percentiles values
+
+
+
+# IAS TO GROUNDWATER
+
+# share of flow coming to IAS ending in gorundwater (uniform 80-90%)
+frac_loss_IAS = runif(n=num_vals, min=0.8, max=0.9)
+
+# IAS to groundwater
+P_loss_IAS <-  frac_loss_IAS * (P_residual_IAS + P_excr_IAS)
+sankey_P <- f_add_min_max("IAS", "groundwater", P_loss_IAS, sankey_P) #add min and max percentiles values
+
+
+
+# IAS TO WWTP 
+P_IAS_to_WWTP <-  P_residual_IAS + P_excr_IAS - P_loss_IAS
+sankey_P <- f_add_min_max("IAS", "WWTP", P_IAS_to_WWTP, sankey_P) #add min and max percentiles values
+
+
+
+# P SLUDGE (from WWTP to sludge)
+P_sludge <-  P_in_WWTP - P_out_WWTP + P_IAS_to_WWTP
+sankey_P <- f_add_min_max("WWTP", "sludge", P_sludge, sankey_P) #add min and max percentiles values
+
+
+
+# P COMPOSTED OR SPREAD
+
+# share of sludge that is composted or spread, normal distribution 10% uncertainty
+frac_sluge_recycled_value <- f_extract_flow("sludge", "composted, spread", sankey_P) /f_extract_flow("WWTP", "sludge", sankey_P)
+frac_sluge_recycled <- rnorm(n=num_vals, mean=frac_sluge_recycled_value, sd=frac_sluge_recycled_value*per_SD_normal)
+
+# sludge composted or spread
+P_recycled <-  frac_sluge_recycled*P_sludge
+sankey_P <- f_add_min_max("sludge", "composted, spread", P_recycled, sankey_P) #add min and max percentiles values
+
+
+
+# P LANDFILLED OR BURNT
+P_landfilled_burnt <-  (P_sludge - P_recycled)
+sankey_P <- f_add_min_max("sludge", "landfill, incineration..", P_landfilled_burnt, sankey_P) #add min and max percentiles values
+```
+
+```{r}
+# now save the Sankey with the min and max values
+write_csv(sankey_P, "output_data/sankey_flows/phosphorus/sankey_P_flows_France.csv")
+
+
+# Global Assessment
+
+# total P
+P_tot <-  (P_excreted + P_residual_sewers + P_residual_IAS + P_industries)
+round(quantile(P_tot, c(.025, .975)), 1)
+
+# removal efficiency
+removal_efficiency <- (1-(P_out_WWTP)/P_in_WWTP)*100
+round(quantile(removal_efficiency, c(.025, .975)))
+
+# IAS and sewers losses
+P_IAS_and_sewers <- (P_IAS_to_WWTP + P_lost_sewers)
+round(quantile(P_IAS_and_sewers, c(.025, .975)), 1)
+hist(P_IAS_and_sewers)
+
+# total residuals
+P_residuals <- (P_residual_IAS + P_residual_sewers)
+round(quantile(P_residuals, c(.025, .975)), 1)
+hist(P_residuals)
+
+#OUT
+
+# % diffuse losses + surface water
+ratio_losses <-  (P_loss_IAS + P_out_WWTP + P_lost_sewers) / P_tot *100
+round(quantile(ratio_losses, c(.025, .975)))
+
+# % recycled
+ratio_spread <-  P_recycled / P_tot *100
+round(quantile(ratio_spread, c(.025, .975)))
+
+# % landfilled or burnt
+ratio_landfilled_burnt <- P_landfilled_burnt/P_tot*100
+round(quantile(ratio_landfilled_burnt, c(.025, .975)))
+
+
+# IN
+
+# share residuals
+ratio_residual <-  (P_residual_IAS + P_residual_sewers) / P_tot *100
+round(quantile(ratio_residual, c(.025, .975)))
+
+# share excretion
+ratio_excretions <-  P_excreted / P_tot *100
+round(quantile(ratio_excretions, c(.025, .975)))
+
+# share industries
+ratio_industries <-  P_industries / P_tot *100
+round(quantile(ratio_industries, c(.025, .975)))
+```
+
+## N
+
+```{r}
+#reload Sankey N for whole France
+sankey_N <- read_csv("output_data/sankey_flows/nitrogen/sankey_N_flows_France.csv")
+sankey_N$min <- NA #create min column for low range of percentile ditribution
+sankey_N$max <- NA #create max column for high range of percentile ditribution
+
+
+
+# N IN WWTP (sewage network to WWTP)
+# normal distribution 10% uncertainty
+source <- "sewage network" ; target <- "WWTP" #source and target of the flow
+N_in_WWTP <- f_generate_normal_dstribution(source, target, sankey_N, print = F) #create flow distribution
+sankey_N <- f_add_min_max(source, target, N_in_WWTP, sankey_N) #add min and max percentiles values
+
+
+
+# N OUT WWTP (WWTP to water), 
+# normal distribution 10% uncertainty
+source <- "WWTP" ; target <- "water" #source and target of the flow
+N_out_WWTP <- f_generate_normal_dstribution(source, target, sankey_N, print = F) #create flow distribution
+sankey_N <- f_add_min_max(source, target, N_out_WWTP, sankey_N) #add min and max percentiles values
+
+
+
+# N INDUSTRIES (large industries to sewage network)
+# normal distribution 10% uncertainty
+source <- "large industries" ; target <- "sewage network" #source and target of the flow
+N_industries <- f_generate_normal_dstribution(source, target, sankey_N, print = F) #create flow distribution
+sankey_N <- f_add_min_max(source, target, N_industries, sankey_N) #add min and max percentiles values
+
+
+
+# N EXCRETIONS TO SEWERS AND IAS
+
+# excretions, normal distribution 10% uncertainty
+N_excreted_value <- f_extract_flow("excretion", "sewage network", sankey_N) + f_extract_flow("excretion", "IAS", sankey_N)
+N_excreted <- rnorm(n = num_vals, mean = N_excreted_value, sd = N_excreted_value * per_SD_normal)
+
+# fraction of the population using individual autonomous systems, uniform distribution 15 to 20% (best estimate 18%)
+ias_pop <- runif(n = num_vals, min = 0.15, max = 0.2)
+
+# fraction of the excretion from people using IAS that is excreted in public spaces connected to sewers, uniform distribution 5 to 35%
+frac_from_ias_to_sewers <- runif(n = num_vals, min = 0.05, max = 0.35)
+
+# N EXCRETIONS TO IAS
+N_excr_IAS <- N_excreted*ias_pop*(1-frac_from_ias_to_sewers)
+sankey_N <- f_add_min_max("excretion", "IAS", N_excr_IAS, sankey_N) #add min and max percentiles values
+
+# N EXCRETIONS TO SEWERS 
+N_excr_sewers <-  N_excreted - N_excr_IAS
+sankey_N <- f_add_min_max("excretion", "sewage network", N_excr_sewers, sankey_N) #add min and max percentiles values
+
+
+
+# RESIDUALS TO SEWERS
+
+# fraction lost in the sewers before reaching WWTPs, uniform distribution 5 to 20 %
+frac_sewer_discharge <- runif(n = num_vals, min = 0.05, max = 0.2) #create flow distribution
+
+# incoming N in the sewers
+N_in_sewers <-  N_in_WWTP / (1 - frac_sewer_discharge)
+
+# first compute residuals coming to sewers
+N_residual_sewers = N_in_sewers - N_excr_sewers - N_industries #compute residuals
+
+#but sometimes residuals to sewers are <0, not possible. Handle this problem
+missing_input <- N_residual_sewers < 0 # checks if negative, i.e. P in sewers < P exr + P industries: this means there cannot be a residual
+N_in_sewers[missing_input] <- N_excr_sewers[missing_input] + N_industries[missing_input]  # if so, update P in sewers, equals to excr + industries
+N_residual_sewers[missing_input] = 0  # and set the residual to zero
+sankey_N <- f_add_min_max("residual", "sewage network", N_residual_sewers, sankey_N) #add min and max percentiles values
+
+
+
+# RESIDUALS TO IAS
+N_residual_IAS <-  N_residual_sewers * ias_pop / (1 - ias_pop)  # residual assigned to IAS
+sankey_N <- f_add_min_max("residual", "IAS", N_residual_IAS, sankey_N) #add min and max percentiles values
+
+
+
+# LOSSES IN SEWERS
+N_lost_sewers <-  N_in_sewers*frac_sewer_discharge
+sankey_N <- f_add_min_max("sewage network", "water", N_lost_sewers, sankey_N) #add min and max percentiles values
+
+
+
+# IAS TO GROUNDWATER, WWTP AND AIR
+
+# share of flow coming to IAS ending in groundwater 
+frac_IAS_groundwater = runif(n=num_vals, min=0.7, max=0.95) # groundwater (uniform 80-90%)
+frac_IAS_air = runif(n=num_vals, min=0.01, max=0.25) # groundwater (uniform 0-25%)
+frac_IAS_WWTP = runif(n=num_vals, min=0.045, max = 0.055) # sludge, i.e. to WWTP (10% uncertainty on median value of 5%)
+
+# IAS to groundwater
+N_IAS_groundwater <-  frac_IAS_groundwater * (N_residual_IAS + N_excr_IAS)
+sankey_N <- f_add_min_max("IAS", "groundwater", N_IAS_groundwater, sankey_N) #add min and max percentiles values
+
+# IAS TO WWTP 
+N_IAS_to_WWTP <-  frac_IAS_WWTP * (N_residual_IAS + N_excr_IAS)
+sankey_N <- f_add_min_max("IAS", "WWTP", N_IAS_to_WWTP, sankey_N) #add min and max percentiles values
+
+# IAS TO AIR 
+N_IAS_to_air <-  frac_IAS_air * (N_residual_IAS + N_excr_IAS)
+sankey_N <- f_add_min_max("IAS", "air", N_IAS_to_air, sankey_N) #add min and max percentiles values
+
+
+
+# N SLUDGE (from WWTP to sludge)
+N_P_ratio <- runif(n=num_vals, min = 1, max = 3) # N:P sludge ration between 1 and 3
+N_sludge <-  N_P_ratio*P_sludge
+sankey_N <- f_add_min_max("WWTP", "sludge", N_sludge, sankey_N) #add min and max percentiles values
+
+
+
+# N WWTP TO AIR
+N_WWTP_to_air <-  N_in_WWTP - N_out_WWTP - N_sludge + N_IAS_to_WWTP #add N_IAS_to_WWTP to have consistent mass balance: false but very small
+sankey_N <- f_add_min_max("WWTP", "air", N_WWTP_to_air, sankey_N) #add min and max percentiles values
+
+
+
+# N COMPOSTED, SPREAD, LANDFILLED
+
+# share of sludge that is composted, directly spread, or landfilled/burnt. normal distribution 10% uncertainty
+frac_sluge_composted_value <- f_extract_flow("sludge", "composted", sankey_N) /f_extract_flow("WWTP", "sludge", sankey_N)
+frac_sluge_spread_value <- f_extract_flow("sludge", "spread", sankey_N) /f_extract_flow("WWTP", "sludge", sankey_N)
+frac_sluge_landfilled_burnt_value <- f_extract_flow("sludge", "landfill, incineration..", sankey_N) /f_extract_flow("WWTP", "sludge", sankey_N)
+
+# 10% uncertainties on these fractions
+frac_sluge_composted <- rnorm(n = num_vals, mean = frac_sluge_composted_value, sd = frac_sluge_composted_value * per_SD_normal)
+frac_sluge_spread <- rnorm(n = num_vals, mean = frac_sluge_spread_value, sd = frac_sluge_spread_value * per_SD_normal)
+frac_sluge_landfilled_burnt <- rnorm(n = num_vals, mean = frac_sluge_landfilled_burnt_value, sd = frac_sluge_landfilled_burnt_value * per_SD_normal)
+
+# N composted, spread, or landfilled/burnt
+N_composted <-  frac_sluge_composted*N_sludge
+N_spread <-  frac_sluge_spread*N_sludge
+N_landfilled_burnt <-  frac_sluge_landfilled_burnt*N_sludge
+
+# add these 3 flows to sankey
+sankey_N <- f_add_min_max("sludge", "composted", N_composted, sankey_N) #add min and max percentiles values
+sankey_N <- f_add_min_max("sludge", "spread", N_spread, sankey_N) #add min and max percentiles values
+sankey_N <- f_add_min_max("spread", "recycled", N_spread, sankey_N) #add min and max percentiles values
+sankey_N <- f_add_min_max("sludge", "landfill, incineration..", N_landfilled_burnt, sankey_N) #add min and max percentiles values
+
+
+
+# N VOLATILIZED DURING COMPOST
+frac_volatilized <- runif(n = num_vals, min = 0.2, max = 0.4)
+N_compost_air <- N_composted*frac_volatilized
+sankey_N <- f_add_min_max("composted", "air", N_compost_air, sankey_N) #add min and max percentiles values
+N_compost_recycled <- N_composted*(1-frac_volatilized)
+sankey_N <- f_add_min_max("composted", "recycled", N_landfilled_burnt, sankey_N) #add min and max percentiles values
+```
+
+```{r}
+# now save the Sankey with the min and max values
+write_csv(sankey_N, "output_data/sankey_flows/nitrogen/sankey_N_flows_France.csv")
+
+
+# Global Assessment
+
+# total N
+N_tot <-  (N_excreted + N_residual_sewers + N_residual_IAS + N_industries)
+round(quantile(N_tot, c(.025, .975)), 1)
+
+# removal efficiency
+removal_efficiency <- (1-(N_out_WWTP)/N_in_WWTP)*100
+round(quantile(removal_efficiency, c(.025, .975)))
+
+
+#OUT
+
+# % diffuse losses + surface water
+ratio_losses <-  (N_IAS_groundwater + N_out_WWTP + N_lost_sewers) / N_tot *100
+round(quantile(ratio_losses, c(.025, .975)))
+
+# % recycled
+ratio_recycled <-  (N_compost_recycled + N_spread) / N_tot *100
+round(quantile(ratio_recycled, c(.025, .975)))
+
+# % air
+ratio_landfilled_burnt <- (N_WWTP_to_air + N_IAS_to_air + N_compost_air)/N_tot*100
+round(quantile(ratio_landfilled_burnt, c(.025, .975)))
+
+
+# IN
+
+# share residuals
+ratio_residual <-  (N_residual_IAS + N_residual_sewers) / N_tot *100
+round(quantile(ratio_residual, c(.025, .975)))
+
+# share excretion
+ratio_excretions <-  N_excreted / N_tot *100
+round(quantile(ratio_excretions, c(.025, .975)))
+
+# share industries
+ratio_industries <-  N_industries / N_tot *100
+round(quantile(ratio_industries, c(.025, .975)))
+```
+
 
 # Results
 

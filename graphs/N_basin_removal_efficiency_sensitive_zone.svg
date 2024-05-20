@@ -584,7 +584,19 @@
 <text x='235.92' y='150.69' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>2000</text>
 <text x='291.08' y='150.69' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>2010</text>
 <text x='346.25' y='150.69' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>2020</text>
-<text transform='translate(139.37,72.47) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='88.03px' lengthAdjust='spacingAndGlyphs'>removal efficiency</text>
+<text transform='translate(139.37,72.47) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='99.03px' lengthAdjust='spacingAndGlyphs'>N removal efficiency</text>
 <text x='130.27' y='15.11' style='font-size: 14.00px; font-weight: bold; font-family: "Arial";' textLength='8.55px' lengthAdjust='spacingAndGlyphs'>b</text>
+<circle cx='41.02' cy='175.10' r='1.95' style='stroke-width: 0.71; stroke: #440154; stroke-opacity: 0.70; fill: #440154; fill-opacity: 0.70;' />
+<line x1='34.10' y1='197.86' x2='47.93' y2='197.86' style='stroke-width: 2.13; stroke: #414487; stroke-opacity: 0.60; stroke-linecap: butt;' />
+<line x1='134.85' y1='175.10' x2='148.67' y2='175.10' style='stroke-width: 2.13; stroke: #2A788E; stroke-opacity: 0.60; stroke-linecap: butt;' />
+<line x1='134.85' y1='197.86' x2='148.67' y2='197.86' style='stroke-width: 2.13; stroke: #7AD151; stroke-opacity: 0.60; stroke-linecap: butt;' />
+<line x1='227.37' y1='175.10' x2='241.20' y2='175.10' style='stroke-width: 2.13; stroke: #22A884; stroke-opacity: 0.60; stroke-linecap: butt;' />
+<line x1='227.37' y1='197.86' x2='241.20' y2='197.86' style='stroke-width: 2.13; stroke: #FDE725; stroke-opacity: 0.60; stroke-linecap: butt;' />
+<text x='55.14' y='178.25' style='font-size: 8.80px; font-family: "Arial";' textLength='68.48px' lengthAdjust='spacingAndGlyphs'>Seine-Normandie</text>
+<text x='55.14' y='201.01' style='font-size: 8.80px; font-family: "Arial";' textLength='58.22px' lengthAdjust='spacingAndGlyphs'>Loire-Bretagne</text>
+<text x='155.88' y='178.25' style='font-size: 8.80px; font-family: "Arial";' textLength='57.20px' lengthAdjust='spacingAndGlyphs'>Artois-Picardie</text>
+<text x='155.88' y='201.01' style='font-size: 8.80px; font-family: "Arial";' textLength='60.67px' lengthAdjust='spacingAndGlyphs'>Adour-Garonne</text>
+<text x='248.40' y='178.25' style='font-size: 8.80px; font-family: "Arial";' textLength='47.44px' lengthAdjust='spacingAndGlyphs'>Rhin-Meuse</text>
+<text x='248.40' y='201.01' style='font-size: 8.80px; font-family: "Arial";' textLength='80.72px' lengthAdjust='spacingAndGlyphs'>Rhône-Méditerranée</text>
 </g>
 </svg>

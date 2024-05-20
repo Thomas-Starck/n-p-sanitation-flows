@@ -698,7 +698,7 @@ draw_map_effectively_sensitive <- function(data, basins_metropole, N_or_P_sensit
       size=0, alpha=.6, color=NA
       ) + 
     scale_fill_manual(
-      values = c("sensitive" = "#440154", "sensitive in progress" = "#fde725"),
+      values = c("sensitive" = "#440154", "sensitive in progress" = "#21918c"),
       limits = c("sensitive", "sensitive in progress") #to display all the colors in legend, even when not present in data (for year by year gif)
       ) +
     geom_sf(
@@ -806,6 +806,38 @@ draw_map_effectively_sensitive(
 :::
 
 :::
+
+# Final maps
+
+```{r N_maps_effectively_sensitive_filtered_years}
+gg1 <- draw_map_effectively_sensitive(
+  effectively_sensitive_zones %>% filter(Year %in% c(2006, 2013, 2017, 2024)), 
+  basins_metropole,
+  N_sensitivity
+  ) +
+  facet_wrap(vars(Year), nrow=1) +
+  labs(title="Evolution of classified 'N sensitive' areas", caption="")
+gg1
+ggsave(#png
+  "graphs/N_sensitive_zones.png",
+  dpi=700, width=6, height=3, bg="white", create.dir = T
+  )
+
+gg2 <- draw_map_effectively_sensitive(
+  effectively_sensitive_zones %>% filter(Year %in% c(2006, 2013, 2017, 2024)), 
+  basins_metropole,
+  P_sensitivity
+  )+
+  facet_wrap(vars(Year), nrow=1) +
+  labs(title="Evolution of classified 'P sensitive' areas", caption="")
+gg2
+ggsave(#png
+  "graphs/P_sensitive_zones.png",
+  dpi=700, width=6, height=3, bg="white", create.dir = T
+  )
+
+```
+
 
 ```{r remove_all_objects_in_environment}
 rm(list = ls())

@@ -354,7 +354,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="fu">aes</span>(Study, <span class="sc">!!</span><span class="fu">as.symbol</span>(select_variable), <span class="at">fill=</span>compost)) <span class="sc">+</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(Study, <span class="sc">!!</span><span class="fu">as.symbol</span>(select_variable), <span class="at">label=</span><span class="sc">!!</span><span class="fu">as.symbol</span>(select_variable)),</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">hjust=</span><span class="dv">0</span>, <span class="at">family =</span> <span class="st">"Times New Roman"</span>, <span class="at">fontface=</span><span class="st">"italic"</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">hjust=</span><span class="dv">0</span>, <span class="at">fontface=</span><span class="st">"italic"</span></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
@@ -430,6 +430,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <p><img src="0_sludge_composition_files/figure-html/N_P_ratio_review-1.svg" class="img-fluid" width="672"></p>
 </div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="co">#svg</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"graphs/sludge_ratio_review.svg"</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">dpi=</span><span class="dv">500</span>, <span class="at">width=</span><span class="dv">6</span>, <span class="at">height=</span><span class="dv">4</span>, <span class="at">bg=</span><span class="st">"white"</span>, <span class="at">create.dir =</span> T</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="co">#pdf</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"graphs/sludge_ratio_review.pdf"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">dpi=</span><span class="dv">500</span>, <span class="at">width=</span><span class="dv">6</span>, <span class="at">height=</span><span class="dv">4</span>, <span class="at">bg=</span><span class="st">"white"</span>, <span class="at">create.dir =</span> T</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="co">#png</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"graphs/sludge_ratio_review.png"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">dpi=</span><span class="dv">500</span>, <span class="at">width=</span><span class="dv">6</span>, <span class="at">height=</span><span class="dv">4</span>, <span class="at">bg=</span><span class="st">"white"</span>, <span class="at">create.dir =</span> T</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </div>
 </div>
@@ -447,56 +462,56 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mean P content no composted</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(compost<span class="sc">==</span><span class="st">"not composted"</span>, Study<span class="sc">!=</span> <span class="st">"Mohanty et al., 2006"</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>mean_P_no_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>P, <span class="at">na.rm=</span>T), <span class="dv">0</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#mean P content composted</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Study<span class="sc">!=</span> <span class="st">"Mohanty et al., 2006"</span> <span class="sc">&amp;</span> compost<span class="sc">==</span><span class="st">"composted"</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>mean_P_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>P, <span class="at">na.rm=</span>T), <span class="dv">0</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#mean N content not composted</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(compost<span class="sc">==</span><span class="st">"not composted"</span>)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>mean_N_no_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>N, <span class="at">na.rm=</span>T), <span class="dv">0</span>)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#mean N content composted</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(compost<span class="sc">==</span><span class="st">"composted"</span>)</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>mean_N_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>N, <span class="at">na.rm=</span>T), <span class="dv">0</span>)</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#mean N:P ratio not composted</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(compost<span class="sc">==</span><span class="st">"not composted"</span>, Study<span class="sc">!=</span> <span class="st">"Mohanty et al., 2006"</span>)</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>mean_ratio_NP_no_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>N_P_ratio, <span class="at">na.rm=</span>T), <span class="dv">1</span>)</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#mean N:P ratio composted</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(compost<span class="sc">==</span><span class="st">"composted"</span>)</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>mean_ratio_NP_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>N_P_ratio, <span class="at">na.rm=</span>T), <span class="dv">1</span>)</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#ratio of means N and P no compost</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>ratio_means_NP_no_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(mean_N_no_compost<span class="sc">/</span>mean_P_no_compost, <span class="dv">1</span>)</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#ratio of means N and P compost</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>ratio_means_NP_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(mean_N_compost<span class="sc">/</span>mean_P_compost, <span class="dv">1</span>)</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#create dataset of computed values</span></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>mean_values <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">compost =</span> <span class="fu">c</span>(<span class="st">"not composted"</span>, <span class="st">"composted"</span>),</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">P =</span> <span class="fu">c</span>(mean_P_no_compost, mean_P_compost),</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">N =</span> <span class="fu">c</span>(mean_N_no_compost, mean_N_compost),</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">N_P_mean_of_ratios =</span> <span class="fu">c</span>(mean_ratio_NP_no_compost, mean_ratio_NP_compost),</span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">N_P_ratio_of_means =</span> <span class="fu">c</span>(ratio_means_NP_no_compost, ratio_means_NP_compost),</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">N_P_ratio =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="fl">0.9</span>)</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>mean_values<span class="sc">$</span>compost <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>  mean_values<span class="sc">$</span>compost,</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">"not composted"</span>, <span class="st">"composted"</span>)</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co">#save computed values</span></span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="fu">f_save_csv_files</span>(</span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>  mean_values, </span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>  <span class="st">"output_data/sludge_composition/"</span>,</span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>  <span class="st">"N_P_sludge_review.csv"</span></span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mean P content no composted</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(compost<span class="sc">==</span><span class="st">"not composted"</span>, Study<span class="sc">!=</span> <span class="st">"Mohanty et al., 2006"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>mean_P_no_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>P, <span class="at">na.rm=</span>T), <span class="dv">0</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#mean P content composted</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Study<span class="sc">!=</span> <span class="st">"Mohanty et al., 2006"</span> <span class="sc">&amp;</span> compost<span class="sc">==</span><span class="st">"composted"</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>mean_P_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>P, <span class="at">na.rm=</span>T), <span class="dv">0</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#mean N content not composted</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(compost<span class="sc">==</span><span class="st">"not composted"</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>mean_N_no_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>N, <span class="at">na.rm=</span>T), <span class="dv">0</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#mean N content composted</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(compost<span class="sc">==</span><span class="st">"composted"</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>mean_N_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>N, <span class="at">na.rm=</span>T), <span class="dv">0</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co">#mean N:P ratio not composted</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(compost<span class="sc">==</span><span class="st">"not composted"</span>, Study<span class="sc">!=</span> <span class="st">"Mohanty et al., 2006"</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>mean_ratio_NP_no_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>N_P_ratio, <span class="at">na.rm=</span>T), <span class="dv">1</span>)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">#mean N:P ratio composted</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> review_sludge <span class="sc">%&gt;%</span> <span class="fu">filter</span>(compost<span class="sc">==</span><span class="st">"composted"</span>)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>mean_ratio_NP_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(temp<span class="sc">$</span>N_P_ratio, <span class="at">na.rm=</span>T), <span class="dv">1</span>)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co">#ratio of means N and P no compost</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>ratio_means_NP_no_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(mean_N_no_compost<span class="sc">/</span>mean_P_no_compost, <span class="dv">1</span>)</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">#ratio of means N and P compost</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>ratio_means_NP_compost <span class="ot">&lt;-</span> <span class="fu">round</span>(mean_N_compost<span class="sc">/</span>mean_P_compost, <span class="dv">1</span>)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co">#create dataset of computed values</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>mean_values <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">compost =</span> <span class="fu">c</span>(<span class="st">"not composted"</span>, <span class="st">"composted"</span>),</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">P =</span> <span class="fu">c</span>(mean_P_no_compost, mean_P_compost),</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">N =</span> <span class="fu">c</span>(mean_N_no_compost, mean_N_compost),</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">N_P_mean_of_ratios =</span> <span class="fu">c</span>(mean_ratio_NP_no_compost, mean_ratio_NP_compost),</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">N_P_ratio_of_means =</span> <span class="fu">c</span>(ratio_means_NP_no_compost, ratio_means_NP_compost),</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">N_P_ratio =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="fl">0.9</span>)</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>mean_values<span class="sc">$</span>compost <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>  mean_values<span class="sc">$</span>compost,</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">"not composted"</span>, <span class="st">"composted"</span>)</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="co">#save computed values</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="fu">f_save_csv_files</span>(</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>  mean_values, </span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>  <span class="st">"output_data/sludge_composition/"</span>,</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>  <span class="st">"N_P_sludge_review.csv"</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
@@ -506,17 +521,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">g_composition</span>(rounded_values <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Study<span class="sc">!=</span> <span class="st">"Mohanty et al., 2006"</span>), <span class="st">"P"</span>) <span class="sc">+</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Review of P content in urban sludge"</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"g of P per kg of Dry Matter"</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">40</span>) <span class="sc">+</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">data =</span> mean_values, <span class="fu">aes</span>(<span class="at">yintercept=</span>P), <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mean_values, <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.2</span>, <span class="at">family =</span> <span class="st">"Times New Roman"</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>,</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x=</span><span class="st">"Traore et al., 1999"</span>, <span class="at">y=</span>P, <span class="at">label=</span><span class="fu">paste</span>(<span class="st">"mean:"</span>, P))</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">g_composition</span>(rounded_values <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Study<span class="sc">!=</span> <span class="st">"Mohanty et al., 2006"</span>), <span class="st">"P"</span>) <span class="sc">+</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Review of P content in urban sludge"</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"g of P per kg of Dry Matter"</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">40</span>) <span class="sc">+</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">data =</span> mean_values, <span class="fu">aes</span>(<span class="at">yintercept=</span>P), <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mean_values, <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.2</span>, <span class="at">family =</span> <span class="st">"Times New Roman"</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x=</span><span class="st">"Traore et al., 1999"</span>, <span class="at">y=</span>P, <span class="at">label=</span><span class="fu">paste</span>(<span class="st">"mean:"</span>, P))</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="0_sludge_composition_files/figure-html/graph_mean_P_composition-1.svg" class="img-fluid" width="672"></p>
@@ -527,17 +542,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">g_composition</span>(rounded_values, <span class="st">"N"</span>) <span class="sc">+</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Review of N content in urban sludge"</span>,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"g of N per kg of Dry Matter"</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">50</span>) <span class="sc">+</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">data =</span> mean_values, <span class="fu">aes</span>(<span class="at">yintercept=</span>N), <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mean_values, <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.2</span>, <span class="at">family =</span> <span class="st">"Times New Roman"</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>,</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x=</span><span class="st">"Mohanty et al., 2006"</span>, <span class="at">y=</span>N, <span class="at">label=</span><span class="fu">paste</span>(<span class="st">"mean:"</span>, N))</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">g_composition</span>(rounded_values, <span class="st">"N"</span>) <span class="sc">+</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Review of N content in urban sludge"</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"g of N per kg of Dry Matter"</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">50</span>) <span class="sc">+</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">data =</span> mean_values, <span class="fu">aes</span>(<span class="at">yintercept=</span>N), <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mean_values, <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.2</span>, <span class="at">family =</span> <span class="st">"Times New Roman"</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x=</span><span class="st">"Mohanty et al., 2006"</span>, <span class="at">y=</span>N, <span class="at">label=</span><span class="fu">paste</span>(<span class="st">"mean:"</span>, N))</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="0_sludge_composition_files/figure-html/graph_mean_N_composition-1.svg" class="img-fluid" width="672"></p>
@@ -548,27 +563,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">g_composition</span>(rounded_values <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Study<span class="sc">!=</span> <span class="st">"Mohanty et al., 2006"</span>), <span class="st">"N_P_ratio"</span>) <span class="sc">+</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Review of N:P ratio in urban sludge"</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"we will use a N:P ratio of 2 for uncomposted sludge"</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#mean of ratios</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">data =</span> mean_values, <span class="fu">aes</span>(<span class="at">yintercept=</span>N_P_mean_of_ratios, <span class="at">linetype=</span><span class="st">"mean of ratios"</span>)) <span class="sc">+</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mean_values, <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.2</span>, <span class="at">family =</span> <span class="st">"Times New Roman"</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>,</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x=</span><span class="fu">c</span>(<span class="st">"Sikora et al., 1982"</span>, <span class="st">"Traore et al., 1999"</span>), <span class="at">y=</span>N_P_mean_of_ratios, <span class="at">label=</span> N_P_mean_of_ratios)</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#ratio of means</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">data =</span> mean_values, <span class="fu">aes</span>(<span class="at">yintercept=</span>N_P_ratio_of_means, <span class="at">linetype=</span><span class="st">"ratio of means"</span>)) <span class="sc">+</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mean_values, <span class="at">hjust=</span><span class="fl">1.2</span>, <span class="at">family =</span> <span class="st">"Times New Roman"</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>,</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x=</span><span class="fu">c</span>(<span class="st">"Sikora et al., 1982"</span>, <span class="st">"Traore et al., 1999"</span>), <span class="at">y=</span>N_P_ratio_of_means, <span class="at">label=</span> N_P_ratio_of_means)</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>) <span class="sc">+</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">linetype=</span><span class="st">""</span>) <span class="sc">+</span> </span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="st">"none"</span>) <span class="co">#not showing composted/not composted legend</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">g_composition</span>(rounded_values <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Study<span class="sc">!=</span> <span class="st">"Mohanty et al., 2006"</span>), <span class="st">"N_P_ratio"</span>) <span class="sc">+</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Review of N:P ratio in urban sludge"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"we will use a N:P ratio of 2 for uncomposted sludge"</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#mean of ratios</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">data =</span> mean_values, <span class="fu">aes</span>(<span class="at">yintercept=</span>N_P_mean_of_ratios, <span class="at">linetype=</span><span class="st">"mean of ratios"</span>)) <span class="sc">+</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mean_values, <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.2</span>, <span class="at">family =</span> <span class="st">"Times New Roman"</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x=</span><span class="fu">c</span>(<span class="st">"Sikora et al., 1982"</span>, <span class="st">"Traore et al., 1999"</span>), <span class="at">y=</span>N_P_mean_of_ratios, <span class="at">label=</span> N_P_mean_of_ratios)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#ratio of means</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">data =</span> mean_values, <span class="fu">aes</span>(<span class="at">yintercept=</span>N_P_ratio_of_means, <span class="at">linetype=</span><span class="st">"ratio of means"</span>)) <span class="sc">+</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mean_values, <span class="at">hjust=</span><span class="fl">1.2</span>, <span class="at">family =</span> <span class="st">"Times New Roman"</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>,</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x=</span><span class="fu">c</span>(<span class="st">"Sikora et al., 1982"</span>, <span class="st">"Traore et al., 1999"</span>), <span class="at">y=</span>N_P_ratio_of_means, <span class="at">label=</span> N_P_ratio_of_means)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>) <span class="sc">+</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">linetype=</span><span class="st">""</span>) <span class="sc">+</span> </span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="st">"none"</span>) <span class="co">#not showing composted/not composted legend</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="0_sludge_composition_files/figure-html/graph_mean_NP_ratio-1.svg" class="img-fluid" width="672"></p>
@@ -583,7 +598,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 

@@ -1,20 +1,20 @@
 source,target,flow_group,value
-excretion,IAS,excretion,8.64
 excretion,sewage network,excretion,27.36
-IAS,groundwater,water,7.13
-IAS,WWTP,WWTP,0.49
-IAS,air,air,2.25
 large industries,sewage network,large industries,0.61
-sewage network,WWTP,WWTP,28.51
+sewage network,WWTP,WWTP,28.5
 WWTP,water,water,11
 sewage network,water,water,2.03
-WWTP,sludge,sludge,4.8
-WWTP,air,air,13.2
-sludge,spread,sludge,0.72
-sludge,composted,sludge,3.55
-sludge,"landfill, incineration..",lost,0.53
-composted,air,air,1.07
-composted,recycled,sludge,2.49
-spread,recycled,sludge,0.72
-residual,sewage network,large industries,2.63
-residual,IAS,sewage network,1.13
+residual,sewage network,large industries,3.06
+excretion,IAS,excretion,8.64
+residual,IAS,sewage network,1.31
+IAS,groundwater,water,7.27
+IAS,WWTP,WWTP,0.5
+IAS,air,air,2.29
+WWTP,sludge,sludge,5.18
+WWTP,air,air,13.32
+sludge,spread,sludge,0.78
+sludge,composted,sludge,3.83
+sludge,"landfill, incineration..",lost,0.57
+composted,air,air,1.15
+composted,recycled,sludge,2.68
+spread,recycled,sludge,0.78

@@ -671,7 +671,7 @@
 <text x='235.92' y='150.69' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>2000</text>
 <text x='291.08' y='150.69' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>2010</text>
 <text x='346.25' y='150.69' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>2020</text>
-<text transform='translate(139.37,72.47) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='88.03px' lengthAdjust='spacingAndGlyphs'>removal efficiency</text>
+<text transform='translate(139.37,72.47) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='98.42px' lengthAdjust='spacingAndGlyphs'>P removal efficiency</text>
 <text x='130.27' y='15.11' style='font-size: 14.00px; font-weight: bold; font-family: "Arial";' textLength='8.55px' lengthAdjust='spacingAndGlyphs'>b</text>
 <circle cx='41.02' cy='175.10' r='1.95' style='stroke-width: 0.71; stroke: #440154; stroke-opacity: 0.70; fill: #440154; fill-opacity: 0.70;' />
 <line x1='34.10' y1='197.86' x2='47.93' y2='197.86' style='stroke-width: 2.13; stroke: #414487; stroke-opacity: 0.60; stroke-linecap: butt;' />

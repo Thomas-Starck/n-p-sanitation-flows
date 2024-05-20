@@ -1,9 +1,9 @@
 source,flow_group,value,basin,pop,target
 excretion,excretion,4.583,Metropolitan France,64.8,Sanitation System
-residual,residual,0.295,Metropolitan France,64.8,Sanitation System
+residual,residual,0.328,Metropolitan France,64.8,Sanitation System
 large industries,large industries,0.116,Metropolitan France,64.8,Sanitation System
 Sanitation System,water,1.551,Metropolitan France,64.8,water
-Sanitation System,groundwater,0.44,Metropolitan France,64.8,groundwater
-Sanitation System,air,2.357,Metropolitan France,64.8,air
-Sanitation System,"landfill, incineration..",0.172,Metropolitan France,64.8,"landfill, incineration.."
-Sanitation System,recycled,0.479,Metropolitan France,64.8,recycled
+Sanitation System,groundwater,0.444,Metropolitan France,64.8,groundwater
+Sanitation System,air,2.369,Metropolitan France,64.8,air
+Sanitation System,"landfill, incineration..",0.177,Metropolitan France,64.8,"landfill, incineration.."
+Sanitation System,recycled,0.493,Metropolitan France,64.8,recycled

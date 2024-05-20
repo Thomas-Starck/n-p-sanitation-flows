@@ -301,7 +301,7 @@ f_graph_yield_basin <- function(dataset, nutrient_yield, yield_label){
 
 ```{r}
 g1 <- draw_map(sensitive_zones, basins_metropole, "P_decree_date") 
-g2 <- f_graph_yield_basin(file_basin, "Pt_yield", "Pt")
+g2 <- f_graph_yield_basin(file_basin, "Pt_yield", "Pt") + labs(y="P removal efficiency")
 p <- get_plot_component(g2, "guide-box", return_all = TRUE)
 
 plot_grid(
@@ -330,14 +330,15 @@ ggsave(#png
 
 ```{r}
 g1 <- draw_map(sensitive_zones, basins_metropole, "N_decree_date") 
-g2 <- f_graph_yield_basin(file_basin, "NGL_yield", "NGL")
+g2 <- f_graph_yield_basin(file_basin, "NGL_yield", "NGL") + labs(y="N removal efficiency")
+p <- get_plot_component(g2, "guide-box", return_all = TRUE)
 
 plot_grid(
   plot_grid(
     g1, g2 + theme(legend.position = "none"),
     rel_widths = c(0.35, 0.65), labels = "auto"
     ),
-  p, rel_heights = c(0.85, 0.15), ncol = 1
+  p[[3]], rel_heights = c(0.85, 0.15), ncol = 1
   )
 
 ggsave(#svg
@@ -544,7 +545,7 @@ f_graph_yield_WWTP <- function(dataset, nutrient_yield, sensitive_color){
 ## Phosphorus
 
 ```{r}
-f_graph_yield_WWTP(temp, "Pt_yield", "P_sens_color")
+f_graph_yield_WWTP(temp, "Pt_yield", "P_sens_color") + labs(y="P removal efficiency")
 ggsave(#svg
   "graphs/P_WWTP_removal_efficiency.svg",
   dpi=350, width=8, height=5, bg="white", create.dir = T
@@ -563,7 +564,7 @@ ggsave(#png
 ## Nitrogen
 
 ```{r}
-f_graph_yield_WWTP(temp, "NGL_yield", "N_sens_color")
+f_graph_yield_WWTP(temp, "NGL_yield", "N_sens_color") + labs(y="N removal efficiency")
 ggsave(#svg
   "graphs/N_WWTP_removal_efficiency.svg",
   dpi=350, width=8, height=5, bg="white", create.dir = T
@@ -813,6 +814,95 @@ ggsave(#png
   dpi=500, width=6, height=4, bg="white", create.dir = T
   )
 ```
+
+
+## Repartition urine / feces
+
+```{r}
+#prepare file for graph, columns
+temp <- review_excretion %>% 
+  select(study, perc_N_urine, perc_P_urine) %>%
+  gather(perc_type, perc, perc_N_urine, perc_P_urine) %>%
+  mutate(
+    nutrient = case_when(
+      perc_type %in% c("perc_N_urine") ~ "Nitrogen",
+      perc_type %in% c("perc_P_urine") ~ "Phosphorus"
+    )
+  ) 
+
+#for labels
+temp2 <- temp %>% 
+  mutate(
+    perc = round(perc)
+  ) 
+
+
+temp$study <- reorder(temp$study, temp$perc)
+#graph for nitrogen
+g1 <- ggplot(temp %>% filter(nutrient=="Nitrogen", is.na(perc)==F)) +
+  #columns for feces
+  geom_col(
+    aes(100, reorder(study, perc)), fill="#591000"
+    ) +
+  #columns of urine
+  geom_col(
+    aes(perc, study), fill="#e3dc00"
+    ) +
+  #labels
+  geom_text(
+    data=temp2 %>% filter(nutrient=="Nitrogen", is.na(perc)==F),
+    aes(100, study, label = paste(perc, "/", 100-perc, "%")),
+    hjust=-0.1, fontface="italic"
+    ) +
+  facet_wrap(vars(nutrient), nrow=2) +
+  theme(plot.title = ggtext::element_markdown()) + #for colored title
+  scale_x_continuous(
+    breaks = seq(0, 100, by=10), 
+    limits = c(0, 130)) +
+  labs(
+    x="", y="",
+    title = "N and P repartition in <span style='color:#e3dc00;'>urine</span> and in <span style='color:#591000;'>feces</span>",
+    subtitle = "nutrient in urine: ~85% for N and ~60% for P"
+  )
+#graph for nitrogen
+g2 <- ggplot(temp %>% filter(nutrient=="Phosphorus", is.na(perc)==F)) +
+  #columns for feces
+  geom_col(
+    aes(100, reorder(study, perc)), fill="#591000"
+    ) +
+  #columns of urine
+  geom_col(
+    aes(perc, study), fill="#e3dc00"
+    ) +
+  #labels
+  geom_text(
+    data=temp2 %>% filter(nutrient=="Phosphorus", is.na(perc)==F),
+    aes(100, study, label = paste(perc, "/", 100-perc, "%")),
+    hjust=-0.1, fontface="italic"
+    ) +
+  facet_wrap(vars(nutrient), nrow=2) +
+  scale_x_continuous(
+    breaks = seq(0, 100, by=10), 
+    limits = c(0, 130)) +
+  labs(
+    x="%", y=""
+  )
+plot_grid(g1, g2, nrow=2, align="v")
+
+ggsave(#svg
+  "graphs/excretions_repartition.svg",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+ggsave(#pdf
+  "graphs/excretions_repartition.pdf",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+ggsave(#png
+  "graphs/excretions_repartition.png",
+  dpi=350, width=8, height=5, bg="white", create.dir = T
+  )
+```
+
 
 ## N:P ratio
 
