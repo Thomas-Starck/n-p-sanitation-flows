@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.5.41">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Sanitation-NP-Flows-France - Sanitation Portal</title>
+<title>Sanitation-NP-Flows-France – Sanitation Portal</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,7 +22,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -33,7 +33,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -81,7 +81,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -90,12 +96,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
 }</script>
-
 <script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 
@@ -107,104 +113,104 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">Sanitation-NP-Flows-France</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html" rel="" target="">
- <span class="menu-text">Home</span></a>
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-wwtp-flows-preparation" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-wwtp-flows-preparation" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">WWTP flows preparation</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-wwtp-flows-preparation">    
         <li>
-    <a class="dropdown-item" href="./0_sanitation_portal.html" rel="" target="">
+    <a class="dropdown-item" href="./0_sanitation_portal.html">
  <span class="dropdown-text">Sanitation portal</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./01_artois_picardie.html" rel="" target="">
+    <a class="dropdown-item" href="./01_artois_picardie.html">
  <span class="dropdown-text">01 Artois-Picardie</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./02_rhin_meuse.html" rel="" target="">
+    <a class="dropdown-item" href="./02_rhin_meuse.html">
  <span class="dropdown-text">02 Rhin-Meuse</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./03_seine_normandie_SIAAP.html" rel="" target="">
+    <a class="dropdown-item" href="./03_seine_normandie_SIAAP.html">
  <span class="dropdown-text">03 Seine-Normandie &amp; SIAAP</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./04_loire_bretagne.html" rel="" target="">
+    <a class="dropdown-item" href="./04_loire_bretagne.html">
  <span class="dropdown-text">04 Loire-Bretagne</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./05_adour_garonne.html" rel="" target="">
+    <a class="dropdown-item" href="./05_adour_garonne.html">
  <span class="dropdown-text">05 Adour-Garonne</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./06_rhone_mediterranee.html" rel="" target="">
+    <a class="dropdown-item" href="./06_rhone_mediterranee.html">
  <span class="dropdown-text">06 Rhône-Méditerranée</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./11_WWTP_synthesis.html" rel="" target="">
+    <a class="dropdown-item" href="./11_WWTP_synthesis.html">
  <span class="dropdown-text">Synthesis</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-other-flows-preparation" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-other-flows-preparation" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Other flows preparation</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-other-flows-preparation">    
         <li>
-    <a class="dropdown-item" href="./0_industry_discharge.html" rel="" target="">
+    <a class="dropdown-item" href="./0_industry_discharge.html">
  <span class="dropdown-text">Industry discharge</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./0_nutrient_excretions.html" rel="" target="">
+    <a class="dropdown-item" href="./0_nutrient_excretions.html">
  <span class="dropdown-text">Nutrient excretion</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./0_sludge_composition.html" rel="" target="">
+    <a class="dropdown-item" href="./0_sludge_composition.html">
  <span class="dropdown-text">Sludge composition</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./10_discharged_without_treatment.html" rel="" target="">
+    <a class="dropdown-item" href="./10_discharged_without_treatment.html">
  <span class="dropdown-text">Direct discharge</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-results" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-results" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Results</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-results">    
         <li>
-    <a class="dropdown-item" href="./12_sensitive_areas.html" rel="" target="">
+    <a class="dropdown-item" href="./12_sensitive_areas.html">
  <span class="dropdown-text">Sensitive Areas</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./21_flows_synthesis.html" rel="" target="">
+    <a class="dropdown-item" href="./21_flows_synthesis.html">
  <span class="dropdown-text">First Nutrient Synthesis</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./31_Sankeys.html" rel="" target="">
+    <a class="dropdown-item" href="./31_Sankeys.html">
  <span class="dropdown-text">Sankeys N P sanitation flows</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./32_figures.html" rel="" target="">
+    <a class="dropdown-item" href="./32_figures.html">
  <span class="dropdown-text">Main Figures</span></a>
   </li>  
     </ul>
@@ -212,15 +218,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/Thomas-Starck/n-p-sanitation-flows" rel="" target=""><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/Thomas-Starck/n-p-sanitation-flows"> <i class="bi bi-github" role="img">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
+          </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
-          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -238,6 +244,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#sludge-production" id="toc-sludge-production" class="nav-link" data-scroll-target="#sludge-production">Sludge Production</a></li>
   <li><a href="#sludge-destination" id="toc-sludge-destination" class="nav-link" data-scroll-target="#sludge-destination">Sludge destination</a></li>
   <li><a href="#sensitive-areas" id="toc-sensitive-areas" class="nav-link" data-scroll-target="#sensitive-areas">Sensitive Areas</a></li>
+  <li><a href="#treatment-types" id="toc-treatment-types" class="nav-link" data-scroll-target="#treatment-types">Treatment types</a></li>
   <li><a href="#export-data" id="toc-export-data" class="nav-link" data-scroll-target="#export-data">Export data</a></li>
   </ul>
 </nav>
@@ -260,10 +267,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
+
 </header>
 
+
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">warning=</span>F, <span class="at">message=</span>F, <span class="at">results=</span>F, <span class="at">dev=</span><span class="st">'svg'</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -299,32 +308,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co">#loading relevant packages</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot) <span class="co">#for plot_grid()</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co">#for multiple ggplot graphs</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf) <span class="co">#for spherical geometry operations</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co">#at first with sf there was an issues with GDAL and PROJ librairies that were not found. I found the answer here https://github.com/r-spatial/sf/issues/2302 and here https://github.com/r-spatial/sf/issues/2298. I uninstalled the sf package and manually installed it with install.packages('sf', repos = c('https://r-spatial.r-universe.dev')). This changed the version </span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co">#setting graphs theme</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face=</span><span class="st">"bold"</span>))</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="co">#setting viridis theme for colors</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>scale_colour_continuous <span class="ot">&lt;-</span> scale_colour_viridis_c</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>scale_colour_discrete   <span class="ot">&lt;-</span> scale_colour_viridis_d</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>scale_colour_binned     <span class="ot">&lt;-</span> scale_colour_viridis_b</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="co">#setting viridis theme for fill</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>scale_fill_continuous <span class="ot">&lt;-</span> scale_fill_viridis_c</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>scale_fill_discrete   <span class="ot">&lt;-</span> scale_fill_viridis_d</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>scale_fill_binned     <span class="ot">&lt;-</span> scale_fill_viridis_b</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>Source <span class="ot">&lt;-</span> <span class="st">"Source: Sanitation Portal</span><span class="sc">\n</span><span class="st">Treatment by Thomas Starck"</span></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>Year_analysis <span class="ot">&lt;-</span> <span class="dv">2019</span></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the function file</span></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co">#for multiple plots</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot) <span class="co">#for plot_grid()</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co">#for multiple ggplot graphs</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf) <span class="co">#for spherical geometry operations</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co">#at first with sf there was an issues with GDAL and PROJ librairies that were not found. I found the answer here https://github.com/r-spatial/sf/issues/2302 and here https://github.com/r-spatial/sf/issues/2298. I uninstalled the sf package and manually installed it with install.packages('sf', repos = c('https://r-spatial.r-universe.dev')). This changed the version </span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="co">#setting graphs theme</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face=</span><span class="st">"bold"</span>))</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="co">#setting viridis theme for colors</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>scale_colour_continuous <span class="ot">&lt;-</span> scale_colour_viridis_c</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>scale_colour_discrete   <span class="ot">&lt;-</span> scale_colour_viridis_d</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>scale_colour_binned     <span class="ot">&lt;-</span> scale_colour_viridis_b</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="co">#setting viridis theme for fill</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>scale_fill_continuous <span class="ot">&lt;-</span> scale_fill_viridis_c</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>scale_fill_discrete   <span class="ot">&lt;-</span> scale_fill_viridis_d</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>scale_fill_binned     <span class="ot">&lt;-</span> scale_fill_viridis_b</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>Source <span class="ot">&lt;-</span> <span class="st">"Source: Sanitation Portal</span><span class="sc">\n</span><span class="st">Treatment by Thomas Starck"</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>Year_analysis <span class="ot">&lt;-</span> <span class="dv">2019</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the function file</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="source-and-data-description" class="level1">
@@ -335,7 +345,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <p>We load the files for each year, downloaded from <a href="https://www.assainissement.developpement-durable.gouv.fr/PortailAC/">this page</a> from the sanitation portal website (on the left “téléchargement des données”).</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>f_load_files <span class="ot">&lt;-</span> <span class="cf">function</span>(){</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  f2021 <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"source_data/0_sanitation_portal/db_export_2021.csv"</span>, <span class="at">delim =</span> <span class="st">"|"</span>) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="dv">2021</span>)</span>
@@ -364,7 +374,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <p>We select and clean the data.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>BDERU <span class="ot">&lt;-</span> file_BDERU <span class="sc">%&gt;%</span> <span class="fu">select</span>(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">basin_reported =</span> <span class="st">`</span><span class="at">    "Libellé du bassin"</span><span class="st">`</span>,</span>
@@ -489,7 +499,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>We correct the reported basins. Check <a href="https://www.sandre.eaufrance.fr/jeu-de-donnees/code-administratif-de-circonscription-de-bassin">here</a> for the corresponding number to the corresponding basin (i.e.&nbsp;03 = Seine-Normandie)</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#remove some code WWTP (closed ones and foreign)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>BDERU <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span></span>
@@ -606,7 +616,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Sometimes the reported basin does not match what would be expected based on the individual WWTP code. This concerns ~150 WWTP (out of ~20,000 in Fance, 0.8%). In terms of nominal capacity this is 0.2 million population equivalent ((out of ~100 million in France, 0.2%). The largest WWTP in this case is 30,000 population equivalent.</p>
 <p>We chose to remove all the concerned WWTP from the database. In a further version, we could manually reconcile the data.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#to see when reported basin is different than code in 2020, mostly small ones</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> </span>
@@ -637,11 +647,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>g1 <span class="sc">+</span> g2 <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-2-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-2-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#get unique ID of mismatching WWTP</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> temp <span class="sc">%&gt;%</span> <span class="fu">select</span>(code_WWTP)</span>
@@ -659,7 +673,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
 <p>We use the creation dates of each station create a database for the period 1960-2020. Note that we use the year 2014 to determine the characteristics of the WWTP, so the further we go back in time, the less reliable is the database. Indeed for instance when a WWTP change capacities, it usually changes SANDRE codes. However it allows to see the temporal evolution of the number of stations.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>f_file_WWTP_all_years <span class="ot">&lt;-</span> <span class="cf">function</span>(year_min, year_max, dataset){</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> dataset <span class="sc">%&gt;%</span> </span>
@@ -701,7 +715,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p>There seem to have some incoherence with a large spike in the reporting rate in 2006 for some basins.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Year, basin, capacity, PE_bin) <span class="sc">%&gt;%</span></span>
@@ -723,14 +737,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-5-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-5-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <p>There are big discontinuities in the total capacity evolution. It is probably due to the fact that some big WWTP “appear” when they are etended. For instance the big spike for Seine-Normandie in 2006 is probably the Seine-Aval WWTP, even though it exists since 1940.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(temp <span class="sc">%&gt;%</span> <span class="fu">filter</span>(basin<span class="sc">!=</span><span class="st">"Overseas and others"</span>)) <span class="sc">+</span> </span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="fu">aes</span>(Year, capacity<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>, <span class="at">fill=</span>PE_bin)) <span class="sc">+</span></span>
@@ -744,21 +762,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-6-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-6-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <p>For these reasons we focus on the years starting 2007, when the whole is smoother.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>BDERU <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Year<span class="sc">&gt;</span><span class="dv">2006</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>We leave empty values for sludge data before 2014 (the first year officially reported on the sanitation portal).</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>BDERU<span class="sc">$</span>sludge_production[BDERU<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2014</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>BDERU<span class="sc">$</span>sludge_spread[BDERU<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2014</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
@@ -771,7 +793,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#harmonize denomination (i.e;"Oui" before 2016 and "oui" after)</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>BDERU <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span></span>
@@ -803,7 +825,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Year) <span class="sc">%&gt;%</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">capacity =</span> <span class="fu">sum</span>(capacity)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>, <span class="at">nb_WWTP =</span> <span class="fu">n</span>()) </span>
@@ -826,7 +848,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-10-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-10-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -837,7 +863,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Yet in terms of total capacity, Plants &lt; 2 000 PE make only 10% of the total, ant the ones &gt; 10 000 PE represent 70%.</p>
 <p>This reflects the highly skewed distribution of the facilities capacities, presented in the 2 following tabs (“Histogramm” and “Cumulative distribution”), which use a finer scale than the 5 catgories presented here.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(capacity)<span class="sc">==</span>F) <span class="sc">%&gt;%</span></span>
@@ -855,7 +881,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(temp) <span class="sc">+</span> </span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="fu">aes</span>(Year, value, <span class="at">fill=</span>PE_bin), <span class="at">alpha=</span>.<span class="dv">8</span>) <span class="sc">+</span> </span>
@@ -869,13 +895,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-12-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-12-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(temp) <span class="sc">+</span> </span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="fu">aes</span>(Year, value, <span class="at">fill=</span>PE_bin), <span class="at">position =</span> <span class="st">"fill"</span>, <span class="at">alpha=</span>.<span class="dv">8</span>) <span class="sc">+</span> </span>
@@ -889,7 +919,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-13-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-13-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -899,7 +933,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-6-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-3-tab">
 <p>Here we present the distribution at a finer resolution than the previous 5 administrative categories. As in the “Large categories” tab, we present both the distribution of the number of facilities and the distribution of the total capacity.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mieux si on arrive à faire un double axe ?</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Year<span class="sc">==</span>Year_analysis)</span>
@@ -920,7 +954,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_number</span>(<span class="at">drop0trailing =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-14-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-14-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -935,7 +973,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>To help visualize this skewed distribution, we also present the same graph in a log-log scale (tab “Nb of WWTP vs Capacity (log scale).</p>
 <p>Finally a focus is made on Zipf’s law, which is well known for the size distribution of cities and might be applied to waste water treatment plants capacities.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Year<span class="sc">==</span>Year_analysis) <span class="sc">%&gt;%</span> </span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(code_WWTP, name_WWTP, capacity) <span class="sc">%&gt;%</span></span>
@@ -962,7 +1000,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(temp) <span class="sc">+</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_step</span>(</span>
@@ -995,13 +1033,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>  ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-16-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-16-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(temp) <span class="sc">+</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_step</span>(<span class="fu">aes</span>(<span class="at">x =</span> percent_rank, <span class="at">y =</span> percent_cumulative_capacity)) <span class="sc">+</span> </span>
@@ -1027,7 +1069,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>  ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-17-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-17-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1037,7 +1083,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>It can also be applied to toher instances, such as <a href="https://en.wikipedia.org/wiki/Zipf%27s_law">word frequencies in a large text</a>. One limitation of its application to cities is that it is dependant on the administrative limits, which are arbitrary and not necessary representative of the continuity of a metropolitan area. One may expect that it would be more accurate for distribution of Waste Water Treatment Plant, which is linked to the distribution of cities but is less prone to “administrative” limitations and more “physical”.</p>
 <p>In our case, it might be possible to see a Zipf law for the first 10 000 waste water treatment plants, which represent about 50% of the total number of facilities (and 98% of the national capacity). However, it must be kept in mind that the <a href="https://fr.wikipedia.org/wiki/Loi_de_Zipf#Une_loi_%C3%A0_utiliser_avec_prudence">Zipf law should be used with caution</a>.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(temp) <span class="sc">+</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> rank_STEU, <span class="at">y =</span> capacity)) <span class="sc">+</span> </span>
@@ -1050,7 +1096,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_number</span>(<span class="at">drop0trailing =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-18-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-18-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1059,7 +1109,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div id="tabset-6-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> </span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(basin <span class="sc">!=</span><span class="st">"Overseas and others"</span>) <span class="sc">%&gt;%</span></span>
@@ -1077,7 +1127,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_grid</span>(</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(temp) <span class="sc">+</span> </span>
@@ -1104,13 +1154,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-20-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-20-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_grid</span>(</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(temp) <span class="sc">+</span> </span>
@@ -1137,7 +1191,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-21-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-21-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1157,7 +1215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>As shown by the graphs below, out of the more than 20 000 waste water treatment plants, more than half report 0 sludge production. However, in terms of capacity, they represent less than 10% of the total capacity of the country, which is about 100 million population equivalent. This reflects the highly skewed distribution of plant size and the fact that the “0” sludge production is mostly due to very small facilities</p>
 <p>In the following, we will thus consider that total sludge production is rather accurate.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> </span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
@@ -1190,7 +1248,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">2014</span>, <span class="dv">2020</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/percent_WWTP_reporting_no_sludge-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/percent_WWTP_reporting_no_sludge-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1206,7 +1268,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> <span class="fu">filter</span>(basin <span class="sc">!=</span> <span class="st">"Overseas and others"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">&gt;=</span> <span class="dv">2014</span>)</span>
@@ -1255,13 +1317,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb26-45"><a href="#cb26-45" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-22-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-22-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#linear scale</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> <span class="fu">filter</span>(basin <span class="sc">!=</span> <span class="st">"Overseas and others"</span>) <span class="sc">%&gt;%</span></span>
@@ -1312,7 +1378,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-23-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-23-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1322,7 +1392,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
 <p>Black points represent the outliers with the previously defined threshold. The complete list is below the graph, as well as the manual correction we apply.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>outliers <span class="ot">&lt;-</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  BDERU <span class="sc">%&gt;%</span> </span>
@@ -1389,11 +1459,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb28-63"><a href="#cb28-63" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/visual_check_sludge_outliers-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/visual_check_sludge_outliers-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#to see outliers</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>outliers <span class="ot">&lt;-</span> outliers <span class="sc">%&gt;%</span> <span class="fu">select</span>(Year, code_WWTP)</span>
@@ -1452,7 +1526,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>We change these outliers values, probably reported as kgDM instead of tDM, by dividing them by 1 000.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Artois-Picardie</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>BDERU<span class="sc">$</span>sludge_production[BDERU<span class="sc">$</span>code_WWTP <span class="sc">==</span> <span class="st">"011234300000"</span> <span class="sc">&amp;</span> BDERU<span class="sc">$</span>Year <span class="sc">==</span> <span class="dv">2018</span>] <span class="ot">&lt;-</span> </span>
@@ -1526,7 +1600,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-9-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-3-tab">
 <p>After the biggest outliers correction, the main source of variability at the metropolitan scale remains the drop in Seine-Normandie in 2016. The general order of magnitude for sludge production is about 1-1.1 Mt of Dry Matter per year.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year<span class="sc">&gt;=</span><span class="dv">2014</span>) <span class="sc">%&gt;%</span></span>
@@ -1569,7 +1643,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb31-39"><a href="#cb31-39" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/sludge_production-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/sludge_production-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1593,7 +1671,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>There are some serious reporting issues. Before 2017, sludge destination is virtually not reported. In 2017, the sum of all the destinations represents only half of the total reported production. Only starting 2018 the total is more coherent, with still a mismatch on the order of 10%. This is why the global repartition of produced sludge should be seen as an indicative order of magnitude, valid only at the large scale.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co">#sludge production at the national scale 2014-2020</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Year) <span class="sc">%&gt;%</span> </span>
@@ -1655,14 +1733,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb32-58"><a href="#cb32-58" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-25-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-25-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-11-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-2-tab">
 <p>We identify the biggest outliers. We filter the WWTP when the absolute difference between the sum of destinations and the reported produced sludge is higher than 10 000 t per year (so higher than 1% of the total 1 Mt produced per year).</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>outliers <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year<span class="sc">&gt;</span><span class="dv">2016</span>) <span class="sc">%&gt;%</span></span>
@@ -1715,7 +1797,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>060913055001 Marseille in 2017, 2018 and 2020</li>
 </ul>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#VAL DE CESSE (INTERCOMMUNALE)</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>BDERU<span class="sc">$</span>sludge_compost[BDERU<span class="sc">$</span>Year<span class="sc">==</span><span class="dv">2018</span> <span class="sc">&amp;</span> BDERU<span class="sc">$</span>code_WWTP<span class="sc">==</span><span class="st">"060911353002"</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
@@ -1749,7 +1831,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-11-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-3-tab">
 <p>After this correction we obtain the following graph. The orders of magnitude are consistent starting 2018.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#NATIONAL SCALE DATA</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co">#sludge production at the national scale 2014-2020</span></span>
@@ -1866,9 +1948,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb35-113"><a href="#cb35-113" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>, <span class="at">widths =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">4</span>, <span class="dv">3</span><span class="sc">/</span><span class="dv">4</span>)) <span class="sc">&amp;</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-28-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-28-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
-<details>
+</div>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(temp, temp2, temp3, temp4, g1, g2, g)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -1881,7 +1967,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-10-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-10-1-tab">
 <p>This gives the following relative proportions for the sludge destination.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#NATIONAL SCALE</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>percent_national <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> <span class="fu">filter</span>(basin <span class="sc">!=</span> <span class="st">"Overseas and others"</span>) <span class="sc">%&gt;%</span></span>
@@ -2029,9 +2115,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb37-144"><a href="#cb37-144" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-29-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-29-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
-<details>
+</div>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(percent_basins) <span class="sc">+</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(Year, percent<span class="sc">*</span><span class="dv">100</span>, <span class="at">fill=</span>destination)) <span class="sc">+</span></span>
@@ -2044,14 +2134,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(basin))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-29-2.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-29-2.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-10-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-2-tab">
 <p>we use the mean of 2019-2021 to determine our final rate</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>percent_national <span class="ot">&lt;-</span> percent_national <span class="sc">%&gt;%</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year<span class="sc">&gt;</span><span class="dv">2018</span>) <span class="sc">%&gt;%</span></span>
@@ -2100,14 +2194,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb39-45"><a href="#cb39-45" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-30-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-30-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-10-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-3-tab">
 <p>We save these final values</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> percent_national <span class="sc">%&gt;%</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">basin =</span> <span class="st">"Metropolitan France"</span>) <span class="sc">%&gt;%</span></span>
@@ -2127,7 +2225,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<table class="table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
 <caption>Destination of sludge (%), in metropolitan France and by basin</caption>
 <thead>
 <tr class="header">
@@ -2209,7 +2307,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 </div>
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>path_output <span class="ot">&lt;-</span> <span class="st">"output_data/sludge_destination/"</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f_save_csv_files</span>(</span>
@@ -2231,7 +2329,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In the data base, there is information on whether the WWTP is in a N or P sensitive area or not. For more info on N and P sensitive areas, see the page <em>First Synthesis</em> -&gt; <em>Sensitive area</em>.</p>
 <p>There are some isolated WWTP with a seemingly erroneous “non sensitive” reporting. This usually concerns very small facilities (&lt; 200 population equivalent).</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co">#loading data to draw French water agencies basins</span></span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>basins <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_read</span>(<span class="st">"source_data/maps/water_agencies/simplified_CircAdminBassin2021/CircAdminBassin2021.shp"</span>)</span>
@@ -2315,7 +2413,115 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb42-80"><a href="#cb42-80" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-32-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-32-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="treatment-types" class="level1">
+<h1>Treatment types</h1>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co">#prepare data</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#replace Not Available by unknown</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment =</span> <span class="fu">case_when</span>(<span class="fu">is.na</span>(treatment) <span class="sc">~</span> <span class="st">"None or Unknown"</span>, T <span class="sc">~</span>treatment)</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#translate main treatments to English</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment =</span> <span class="fu">case_when</span>(</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>      treatment <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"biofiltre"</span>, <span class="st">"Biofiltre"</span>) <span class="sc">~</span> <span class="st">"Biofilter"</span>,</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>      treatment <span class="sc">==</span> <span class="st">"Boue activée forte charge"</span> <span class="sc">~</span> <span class="st">"Activated sludge</span><span class="sc">\n</span><span class="st">(high-load)"</span>,</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>      treatment <span class="sc">==</span> <span class="st">"Boue activée moyenne charge"</span> <span class="sc">~</span> <span class="st">"Activated sludge</span><span class="sc">\n</span><span class="st">(low-load)"</span>,</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>      treatment <span class="sc">==</span> <span class="st">"Boue activée faible charge"</span> <span class="sc">~</span> <span class="st">"Activated sludge</span><span class="sc">\n</span><span class="st">(moderate-load)"</span>,</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>      treatment <span class="sc">==</span> <span class="st">"Boue activée aération prolongée (très faible charge)"</span> <span class="sc">~</span> <span class="st">"Activated sludge</span><span class="sc">\n</span><span class="st">(very low-load)"</span>,</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>      treatment <span class="sc">==</span> <span class="st">"Bioréacteur à membrane"</span> <span class="sc">~</span> <span class="st">"Membrane bioreactor"</span>,</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>      treatment <span class="sc">==</span> <span class="st">"Filtres Plantés"</span> <span class="sc">~</span> <span class="st">"Planted filters"</span>,</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>      treatment <span class="sc">==</span> <span class="st">"Lagunage naturel"</span> <span class="sc">~</span> <span class="st">"Natural lagooning"</span>,</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>      T <span class="sc">~</span> <span class="st">"Other"</span></span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#summarize total capacity and number of WWTP by category</span></span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(</span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>    Year, treatment, PE_bin</span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">capacity =</span> <span class="fu">sum</span>(capacity, <span class="at">na.rm =</span> <span class="dv">7</span>)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>,</span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_WWTP =</span> <span class="fu">n</span>()</span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a>  <span class="co">#also compute total capacity only by treatment, </span></span>
+<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(</span>
+<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a>    Year, treatment</span>
+<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb43-33"><a href="#cb43-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb43-34"><a href="#cb43-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_capacity =</span> <span class="fu">sum</span>(capacity, <span class="at">na.rm =</span> <span class="dv">7</span>)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span></span>
+<span id="cb43-35"><a href="#cb43-35" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb43-36"><a href="#cb43-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-37"><a href="#cb43-37" aria-hidden="true" tabindex="-1"></a><span class="co">#uncomment to see 2018-2020 seem less reliable for the Biofilter / Other attribution</span></span>
+<span id="cb43-38"><a href="#cb43-38" aria-hidden="true" tabindex="-1"></a><span class="co">#so I take the median Year, 2017</span></span>
+<span id="cb43-39"><a href="#cb43-39" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(temp %&gt;% filter(Year&gt;2014 &amp; Year&lt;2021)) +</span></span>
+<span id="cb43-40"><a href="#cb43-40" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_col(aes(Year, capacity, fill = PE_bin), alpha=.7) +</span></span>
+<span id="cb43-41"><a href="#cb43-41" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(panel.grid.major.y = element_blank()) +</span></span>
+<span id="cb43-42"><a href="#cb43-42" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(y= "million population equivalent concerned", fill = "WWTP capacity") +</span></span>
+<span id="cb43-43"><a href="#cb43-43" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(vars(treatment))</span></span>
+<span id="cb43-44"><a href="#cb43-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-45"><a href="#cb43-45" aria-hidden="true" tabindex="-1"></a><span class="co">#focus just on 2017</span></span>
+<span id="cb43-46"><a href="#cb43-46" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> temp <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Year<span class="sc">==</span><span class="dv">2017</span>)</span>
+<span id="cb43-47"><a href="#cb43-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-48"><a href="#cb43-48" aria-hidden="true" tabindex="-1"></a><span class="co">#order treatment as I want them to be presented on graph</span></span>
+<span id="cb43-49"><a href="#cb43-49" aria-hidden="true" tabindex="-1"></a>temp<span class="sc">$</span>treatment <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
+<span id="cb43-50"><a href="#cb43-50" aria-hidden="true" tabindex="-1"></a>  temp<span class="sc">$</span>treatment,</span>
+<span id="cb43-51"><a href="#cb43-51" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">c</span>(</span>
+<span id="cb43-52"><a href="#cb43-52" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Other"</span>,</span>
+<span id="cb43-53"><a href="#cb43-53" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Membrane bioreactor"</span>,</span>
+<span id="cb43-54"><a href="#cb43-54" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Planted filters"</span>,</span>
+<span id="cb43-55"><a href="#cb43-55" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Natural lagooning"</span>,</span>
+<span id="cb43-56"><a href="#cb43-56" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Biofilter"</span>,</span>
+<span id="cb43-57"><a href="#cb43-57" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Activated sludge</span><span class="sc">\n</span><span class="st">(high-load)"</span>,</span>
+<span id="cb43-58"><a href="#cb43-58" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Activated sludge</span><span class="sc">\n</span><span class="st">(low-load)"</span>,</span>
+<span id="cb43-59"><a href="#cb43-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Activated sludge</span><span class="sc">\n</span><span class="st">(moderate-load)"</span>,</span>
+<span id="cb43-60"><a href="#cb43-60" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Activated sludge</span><span class="sc">\n</span><span class="st">(very low-load)"</span></span>
+<span id="cb43-61"><a href="#cb43-61" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb43-62"><a href="#cb43-62" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb43-63"><a href="#cb43-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-64"><a href="#cb43-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-65"><a href="#cb43-65" aria-hidden="true" tabindex="-1"></a><span class="co"># graph of treatments based on WWTP capacity</span></span>
+<span id="cb43-66"><a href="#cb43-66" aria-hidden="true" tabindex="-1"></a>gg1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(temp) <span class="sc">+</span></span>
+<span id="cb43-67"><a href="#cb43-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(capacity, treatment, <span class="at">fill =</span> PE_bin), <span class="at">alpha=</span>.<span class="dv">7</span>) <span class="sc">+</span></span>
+<span id="cb43-68"><a href="#cb43-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.major.y =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb43-69"><a href="#cb43-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb43-70"><a href="#cb43-70" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"millions PE concerned"</span>, <span class="at">y=</span> <span class="st">""</span>, </span>
+<span id="cb43-71"><a href="#cb43-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"capacity range"</span>, </span>
+<span id="cb43-72"><a href="#cb43-72" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"French WWTPs capacity: ~ 100 million PE"</span></span>
+<span id="cb43-73"><a href="#cb43-73" aria-hidden="true" tabindex="-1"></a>    ) </span>
+<span id="cb43-74"><a href="#cb43-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-75"><a href="#cb43-75" aria-hidden="true" tabindex="-1"></a><span class="co"># graph of treatments based on WWTP number</span></span>
+<span id="cb43-76"><a href="#cb43-76" aria-hidden="true" tabindex="-1"></a>gg2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(temp) <span class="sc">+</span></span>
+<span id="cb43-77"><a href="#cb43-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(n_WWTP, treatment, <span class="at">fill =</span> PE_bin), <span class="at">alpha=</span>.<span class="dv">7</span>) <span class="sc">+</span></span>
+<span id="cb43-78"><a href="#cb43-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.major.y =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb43-79"><a href="#cb43-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_number</span>(<span class="at">drop0trailing =</span> <span class="cn">TRUE</span>)) <span class="sc">+</span></span>
+<span id="cb43-80"><a href="#cb43-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb43-81"><a href="#cb43-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"number of WWTPS concerned"</span>, <span class="at">y=</span> <span class="st">""</span>, </span>
+<span id="cb43-82"><a href="#cb43-82" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"capacity range"</span>, </span>
+<span id="cb43-83"><a href="#cb43-83" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"number of French WWTPs: ~ 21,000"</span></span>
+<span id="cb43-84"><a href="#cb43-84" aria-hidden="true" tabindex="-1"></a>    ) </span>
+<span id="cb43-85"><a href="#cb43-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-86"><a href="#cb43-86" aria-hidden="true" tabindex="-1"></a><span class="co"># combine 2 graphs</span></span>
+<span id="cb43-87"><a href="#cb43-87" aria-hidden="true" tabindex="-1"></a>gg1 <span class="sc">+</span>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span> <span class="fu">scale_x_reverse</span>() <span class="sc">+</span></span>
+<span id="cb43-88"><a href="#cb43-88" aria-hidden="true" tabindex="-1"></a>  gg2 <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">hjust=</span><span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb43-89"><a href="#cb43-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">+</span> <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">"WWTPs treatments in France"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="0_sanitation_portal_files/figure-html/unnamed-chunk-33-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -2323,67 +2529,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Export data</h1>
 <p>Save the data at summarized at the basins and metropolitan scales</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co">#info summarized at the basin scales</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>BDERU_basin <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> </span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(basin <span class="sc">!=</span> <span class="st">"Overseas and others"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year, basin) <span class="sc">%&gt;%</span></span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(</span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>        sludge_production, sludge_spread, sludge_compost, sludge_landfill, sludge_incinerated, sludge_to_other_WWTP, sludge_industrial_valorisation,</span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>        capacity</span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>      ), <span class="sc">~</span> <span class="fu">sum</span>(.x, <span class="at">na.rm =</span> T)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span> <span class="co">#convert in Mt</span></span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">nb_WWTP=</span> <span class="fu">n</span>()</span>
-<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a><span class="co">#summarised at the national metropolitan scale</span></span>
-<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> </span>
-<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(basin <span class="sc">!=</span> <span class="st">"Overseas and others"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year) <span class="sc">%&gt;%</span></span>
-<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
-<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(</span>
-<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>        sludge_production, sludge_spread, sludge_compost, sludge_landfill, sludge_incinerated, sludge_to_other_WWTP, sludge_industrial_valorisation,</span>
-<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>        capacity</span>
-<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>      ), <span class="sc">~</span> <span class="fu">sum</span>(.x, <span class="at">na.rm =</span> T)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span> <span class="co">#convert in Mt</span></span>
-<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">nb_WWTP=</span> <span class="fu">n</span>()</span>
-<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">basin=</span><span class="st">"Metropolitan France"</span></span>
-<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a><span class="co">#merge basins and national summarized infos</span></span>
-<span id="cb43-33"><a href="#cb43-33" aria-hidden="true" tabindex="-1"></a>BDERU_basin <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(BDERU_basin, temp)</span>
-<span id="cb43-34"><a href="#cb43-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-35"><a href="#cb43-35" aria-hidden="true" tabindex="-1"></a><span class="co">#remove sludge data before 2015</span></span>
-<span id="cb43-36"><a href="#cb43-36" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_production[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb43-37"><a href="#cb43-37" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_spread[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb43-38"><a href="#cb43-38" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_compost[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb43-39"><a href="#cb43-39" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_landfill[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb43-40"><a href="#cb43-40" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_incinerated[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb43-41"><a href="#cb43-41" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_to_other_WWTP[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb43-42"><a href="#cb43-42" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_industrial_valorisation[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb43-43"><a href="#cb43-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-44"><a href="#cb43-44" aria-hidden="true" tabindex="-1"></a><span class="co">#save data</span></span>
-<span id="cb43-45"><a href="#cb43-45" aria-hidden="true" tabindex="-1"></a><span class="fu">f_save_csv_files</span>(</span>
-<span id="cb43-46"><a href="#cb43-46" aria-hidden="true" tabindex="-1"></a>  BDERU_basin,</span>
-<span id="cb43-47"><a href="#cb43-47" aria-hidden="true" tabindex="-1"></a>  <span class="st">"output_data/basins/"</span>,</span>
-<span id="cb43-48"><a href="#cb43-48" aria-hidden="true" tabindex="-1"></a>  <span class="st">"basin_sanitation_portal.csv"</span></span>
-<span id="cb43-49"><a href="#cb43-49" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<p>Same but also including capacities categories.</p>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co">#info summarized at the basin x capacity category scales</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co">#info summarized at the basin scales</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>BDERU_basin <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> </span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(basin <span class="sc">!=</span> <span class="st">"Overseas and others"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year, basin, PE_bin) <span class="sc">%&gt;%</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year, basin) <span class="sc">%&gt;%</span></span>
 <span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
 <span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(</span>
@@ -2392,12 +2543,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>      ), <span class="sc">~</span> <span class="fu">sum</span>(.x, <span class="at">na.rm =</span> T)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span> <span class="co">#convert in Mt</span></span>
 <span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
 <span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">nb_WWTP=</span> <span class="fu">n</span>()</span>
-<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a><span class="co">#summarised at the national metropolitan x capacity category scale</span></span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a><span class="co">#summarised at the national metropolitan scale</span></span>
 <span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> </span>
 <span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(basin <span class="sc">!=</span> <span class="st">"Overseas and others"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year, PE_bin) <span class="sc">%&gt;%</span></span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year) <span class="sc">%&gt;%</span></span>
 <span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
 <span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(</span>
@@ -2412,51 +2563,106 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb44-30"><a href="#cb44-30" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb44-31"><a href="#cb44-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb44-32"><a href="#cb44-32" aria-hidden="true" tabindex="-1"></a><span class="co">#merge basins and national summarized infos</span></span>
-<span id="cb44-33"><a href="#cb44-33" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(BDERU_PE_basin, temp)</span>
+<span id="cb44-33"><a href="#cb44-33" aria-hidden="true" tabindex="-1"></a>BDERU_basin <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(BDERU_basin, temp)</span>
 <span id="cb44-34"><a href="#cb44-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb44-35"><a href="#cb44-35" aria-hidden="true" tabindex="-1"></a><span class="co">#remove sludge data before 2015</span></span>
-<span id="cb44-36"><a href="#cb44-36" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_production[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb44-37"><a href="#cb44-37" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_spread[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb44-38"><a href="#cb44-38" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_compost[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb44-39"><a href="#cb44-39" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_landfill[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb44-40"><a href="#cb44-40" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_incinerated[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb44-41"><a href="#cb44-41" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_to_other_WWTP[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb44-42"><a href="#cb44-42" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_industrial_valorisation[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb44-36"><a href="#cb44-36" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_production[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb44-37"><a href="#cb44-37" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_spread[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb44-38"><a href="#cb44-38" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_compost[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb44-39"><a href="#cb44-39" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_landfill[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb44-40"><a href="#cb44-40" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_incinerated[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb44-41"><a href="#cb44-41" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_to_other_WWTP[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb44-42"><a href="#cb44-42" aria-hidden="true" tabindex="-1"></a>BDERU_basin<span class="sc">$</span>sludge_industrial_valorisation[BDERU_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb44-43"><a href="#cb44-43" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb44-44"><a href="#cb44-44" aria-hidden="true" tabindex="-1"></a><span class="co">#save data</span></span>
 <span id="cb44-45"><a href="#cb44-45" aria-hidden="true" tabindex="-1"></a><span class="fu">f_save_csv_files</span>(</span>
-<span id="cb44-46"><a href="#cb44-46" aria-hidden="true" tabindex="-1"></a>  BDERU_PE_basin, </span>
-<span id="cb44-47"><a href="#cb44-47" aria-hidden="true" tabindex="-1"></a>  <span class="st">"output_data/basins_PE/"</span>,</span>
-<span id="cb44-48"><a href="#cb44-48" aria-hidden="true" tabindex="-1"></a>  <span class="st">"basin_PE_sanitation_portal.csv"</span></span>
+<span id="cb44-46"><a href="#cb44-46" aria-hidden="true" tabindex="-1"></a>  BDERU_basin,</span>
+<span id="cb44-47"><a href="#cb44-47" aria-hidden="true" tabindex="-1"></a>  <span class="st">"output_data/basins/"</span>,</span>
+<span id="cb44-48"><a href="#cb44-48" aria-hidden="true" tabindex="-1"></a>  <span class="st">"basin_sanitation_portal.csv"</span></span>
 <span id="cb44-49"><a href="#cb44-49" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Same but also including capacities categories.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co">#info summarized at the basin x capacity category scales</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> </span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(basin <span class="sc">!=</span> <span class="st">"Overseas and others"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year, basin, PE_bin) <span class="sc">%&gt;%</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>        sludge_production, sludge_spread, sludge_compost, sludge_landfill, sludge_incinerated, sludge_to_other_WWTP, sludge_industrial_valorisation,</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>        capacity</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>      ), <span class="sc">~</span> <span class="fu">sum</span>(.x, <span class="at">na.rm =</span> T)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span> <span class="co">#convert in Mt</span></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">nb_WWTP=</span> <span class="fu">n</span>()</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a><span class="co">#summarised at the national metropolitan x capacity category scale</span></span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span> </span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(basin <span class="sc">!=</span> <span class="st">"Overseas and others"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year, PE_bin) <span class="sc">%&gt;%</span></span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(</span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>        sludge_production, sludge_spread, sludge_compost, sludge_landfill, sludge_incinerated, sludge_to_other_WWTP, sludge_industrial_valorisation,</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>        capacity</span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>      ), <span class="sc">~</span> <span class="fu">sum</span>(.x, <span class="at">na.rm =</span> T)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">6</span> <span class="co">#convert in Mt</span></span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">nb_WWTP=</span> <span class="fu">n</span>()</span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">basin=</span><span class="st">"Metropolitan France"</span></span>
+<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb45-31"><a href="#cb45-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-32"><a href="#cb45-32" aria-hidden="true" tabindex="-1"></a><span class="co">#merge basins and national summarized infos</span></span>
+<span id="cb45-33"><a href="#cb45-33" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(BDERU_PE_basin, temp)</span>
+<span id="cb45-34"><a href="#cb45-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-35"><a href="#cb45-35" aria-hidden="true" tabindex="-1"></a><span class="co">#remove sludge data before 2015</span></span>
+<span id="cb45-36"><a href="#cb45-36" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_production[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb45-37"><a href="#cb45-37" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_spread[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb45-38"><a href="#cb45-38" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_compost[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb45-39"><a href="#cb45-39" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_landfill[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb45-40"><a href="#cb45-40" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_incinerated[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb45-41"><a href="#cb45-41" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_to_other_WWTP[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb45-42"><a href="#cb45-42" aria-hidden="true" tabindex="-1"></a>BDERU_PE_basin<span class="sc">$</span>sludge_industrial_valorisation[BDERU_PE_basin<span class="sc">$</span>Year<span class="sc">&lt;</span><span class="dv">2015</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb45-43"><a href="#cb45-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-44"><a href="#cb45-44" aria-hidden="true" tabindex="-1"></a><span class="co">#save data</span></span>
+<span id="cb45-45"><a href="#cb45-45" aria-hidden="true" tabindex="-1"></a><span class="fu">f_save_csv_files</span>(</span>
+<span id="cb45-46"><a href="#cb45-46" aria-hidden="true" tabindex="-1"></a>  BDERU_PE_basin, </span>
+<span id="cb45-47"><a href="#cb45-47" aria-hidden="true" tabindex="-1"></a>  <span class="st">"output_data/basins_PE/"</span>,</span>
+<span id="cb45-48"><a href="#cb45-48" aria-hidden="true" tabindex="-1"></a>  <span class="st">"basin_PE_sanitation_portal.csv"</span></span>
+<span id="cb45-49"><a href="#cb45-49" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Save individual WWTP data on capacity, sludge production and many more</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    Year, code_WWTP, name_WWTP, basin, capacity, PE_bin, </span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    sludge_production, sludge_spread, sludge_compost, sludge_landfill, sludge_incinerated, sludge_industrial_valorisation, sludge_to_other_WWTP,</span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    N_sens, P_sens, sensitivity,</span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    flow_m3_d, percent_direct_discharge_dry_weather, </span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    treatment, sludge_treatment, bio_treatment, N_treatment, P_treatment, </span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    lat_STEU, long_STEU, lat_discharge, long_discharge, </span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>    INSEE_dep, INSEE_com, </span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a><span class="fu">f_save_csv_files</span>(</span>
-<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>  temp, </span>
-<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"output_data/all_WWTP/"</span>,</span>
-<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"all_WWTP_sanitation_portal.csv"</span></span>
-<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> BDERU <span class="sc">%&gt;%</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    Year, code_WWTP, name_WWTP, basin, capacity, PE_bin, </span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    sludge_production, sludge_spread, sludge_compost, sludge_landfill, sludge_incinerated, sludge_industrial_valorisation, sludge_to_other_WWTP,</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    N_sens, P_sens, sensitivity,</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    flow_m3_d, percent_direct_discharge_dry_weather, </span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    treatment, sludge_treatment, bio_treatment, N_treatment, P_treatment, </span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>    lat_STEU, long_STEU, lat_discharge, long_discharge, </span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>    INSEE_dep, INSEE_com, </span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a><span class="fu">f_save_csv_files</span>(</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>  temp, </span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"output_data/all_WWTP/"</span>,</span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"all_WWTP_sanitation_portal.csv"</span></span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 
@@ -2505,6 +2711,33 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       } else {
         el.classList.add('notransition');
       }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
     }
   }
   const toggleColorMode = (alternate) => {
@@ -2573,13 +2806,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  let localAlternateSentinel = 'default';
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {
     // Read the current dark / light value 
     let toAlternate = !hasAlternateSentinel();
     toggleColorMode(toAlternate);
     setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
   };
   // Ensure there is a toggle, if there isn't float one in the top right
   if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -2614,18 +2849,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -2657,11 +2881,50 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
-  function tippyHover(el, contentFn) {
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -2671,8 +2934,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -2684,7 +2956,130 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -2728,6 +3123,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -2753,6 +3149,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -2813,6 +3235,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+
 
 
 

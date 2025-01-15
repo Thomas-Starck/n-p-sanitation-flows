@@ -1,4 +1,4 @@
-HOW TO RUN THE CODE AND GET THE RESULTS
+# How to run the code and get the results
 
 This is the code to reproduce and generate the results for the nutrient flow analysis of the French sanitation system. It is rendered as a user-friendly website interface (https://thomas-starck.github.io/n-p-sanitation-flows/) using a github repository (https://github.com/Thomas-Starck/n-p-sanitation-flows). It is also stored on a permanent institutional repository on zenodo, with a digital object identifier (https://zenodo.org/doi/10.5281/zenodo.7990171).
 
@@ -19,7 +19,7 @@ Graphs used for the academic article are rendered in the graphs folder (generate
 Open the website (online or in the docs folder) to see more results and descriptions.
 
 
-WHAT IS THE OUPUT_DATA CONTENT ?
+# What is the output_data content ?
 
 - all_WWTP folder : 1 file for each water agency basin. Displays for each year all the wastewater treatment plants with the following information : incoming and outgoing pollution, yield, and wastewater treatment plant description. The sanitation portal csv provides more extensive description of the wastewater treatment plats + destinations of produced sludge.
 
@@ -40,7 +40,7 @@ WHAT IS THE OUPUT_DATA CONTENT ?
 -zipf_law folder : data to look for a zipf law relation, at the basin and national scale (rank of wastewater treatment plant vs capacity).
 
 
-WHAT IS THE SOURCE_DATA CONTENT ?
+# What is the source_data content ?
 
 -data in source_data folders (for instance 0_industry_discharge) are fully described in their respective website pages (0_industry_discharge.html).
 

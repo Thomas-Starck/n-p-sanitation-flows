@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.5.41">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Sanitation-NP-Flows-France - Industrial sewage network discharge</title>
+<title>Sanitation-NP-Flows-France – Industrial sewage network discharge</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,7 +22,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -33,7 +33,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -81,7 +81,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -90,6 +96,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
@@ -104,104 +111,104 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">Sanitation-NP-Flows-France</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html" rel="" target="">
- <span class="menu-text">Home</span></a>
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-wwtp-flows-preparation" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-wwtp-flows-preparation" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">WWTP flows preparation</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-wwtp-flows-preparation">    
         <li>
-    <a class="dropdown-item" href="./0_sanitation_portal.html" rel="" target="">
+    <a class="dropdown-item" href="./0_sanitation_portal.html">
  <span class="dropdown-text">Sanitation portal</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./01_artois_picardie.html" rel="" target="">
+    <a class="dropdown-item" href="./01_artois_picardie.html">
  <span class="dropdown-text">01 Artois-Picardie</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./02_rhin_meuse.html" rel="" target="">
+    <a class="dropdown-item" href="./02_rhin_meuse.html">
  <span class="dropdown-text">02 Rhin-Meuse</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./03_seine_normandie_SIAAP.html" rel="" target="">
+    <a class="dropdown-item" href="./03_seine_normandie_SIAAP.html">
  <span class="dropdown-text">03 Seine-Normandie &amp; SIAAP</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./04_loire_bretagne.html" rel="" target="">
+    <a class="dropdown-item" href="./04_loire_bretagne.html">
  <span class="dropdown-text">04 Loire-Bretagne</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./05_adour_garonne.html" rel="" target="">
+    <a class="dropdown-item" href="./05_adour_garonne.html">
  <span class="dropdown-text">05 Adour-Garonne</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./06_rhone_mediterranee.html" rel="" target="">
+    <a class="dropdown-item" href="./06_rhone_mediterranee.html">
  <span class="dropdown-text">06 Rhône-Méditerranée</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./11_WWTP_synthesis.html" rel="" target="">
+    <a class="dropdown-item" href="./11_WWTP_synthesis.html">
  <span class="dropdown-text">Synthesis</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-other-flows-preparation" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-other-flows-preparation" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Other flows preparation</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-other-flows-preparation">    
         <li>
-    <a class="dropdown-item" href="./0_industry_discharge.html" rel="" target="">
+    <a class="dropdown-item" href="./0_industry_discharge.html">
  <span class="dropdown-text">Industry discharge</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./0_nutrient_excretions.html" rel="" target="">
+    <a class="dropdown-item" href="./0_nutrient_excretions.html">
  <span class="dropdown-text">Nutrient excretion</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./0_sludge_composition.html" rel="" target="">
+    <a class="dropdown-item" href="./0_sludge_composition.html">
  <span class="dropdown-text">Sludge composition</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./10_discharged_without_treatment.html" rel="" target="">
+    <a class="dropdown-item" href="./10_discharged_without_treatment.html">
  <span class="dropdown-text">Direct discharge</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-results" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-results" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Results</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-results">    
         <li>
-    <a class="dropdown-item" href="./12_sensitive_areas.html" rel="" target="">
+    <a class="dropdown-item" href="./12_sensitive_areas.html">
  <span class="dropdown-text">Sensitive Areas</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./21_flows_synthesis.html" rel="" target="">
+    <a class="dropdown-item" href="./21_flows_synthesis.html">
  <span class="dropdown-text">First Nutrient Synthesis</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./31_Sankeys.html" rel="" target="">
+    <a class="dropdown-item" href="./31_Sankeys.html">
  <span class="dropdown-text">Sankeys N P sanitation flows</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./32_figures.html" rel="" target="">
+    <a class="dropdown-item" href="./32_figures.html">
  <span class="dropdown-text">Main Figures</span></a>
   </li>  
     </ul>
@@ -209,15 +216,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/Thomas-Starck/n-p-sanitation-flows" rel="" target=""><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/Thomas-Starck/n-p-sanitation-flows"> <i class="bi bi-github" role="img">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
+          </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
-          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -255,11 +262,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
+
 </header>
+
 
 <p>This page describes the data used to determine how much nitrogen and phosphorus is discharged by industries to sewers networks.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">warning=</span>F, <span class="at">message=</span>F, <span class="at">results=</span>F, <span class="at">dev=</span><span class="st">'svg'</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -335,7 +344,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <p>We load the emission file <em>emissions.csv</em>, for each year. They report the industry facility ID and name, pollutant type (145 different), discharge environment (air, water direct, water indirect, ground), and quantity in kg/an. We focus only on NGL, Pt, DBO5, DCO, MES.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#path for géorsiques data  source</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>path_source <span class="ot">&lt;-</span> <span class="st">"source_data/0_industry_discharge/georisque_data/"</span></span>
@@ -368,7 +377,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>We load the files describing the facilities (<em>etablissements.csv</em>). They report the site name, address, coordinates, the European Pollutant Release and Transfer Register code (EPRTR code and wording), and the APE code and wording. EPRTR categories are listed <a href="https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes/synthese/donnees#/recherche=secteur" target="_blank">here</a>, and APE codes are listed <a href="https://www.georisques.gouv.fr/risques/registre-des-emissions-polluantes/etablissement/donnees#/secteur=codeAPE" target="_blank">here</a>.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>year_min <span class="ot">&lt;-</span> <span class="dv">2003</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>year_max <span class="ot">&lt;-</span> <span class="dv">2020</span></span>
@@ -404,7 +413,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>We merge these 2 emissions files through their unique ID. There are 200 APE codes and 50 EPRTR codes related to our pollution of interest (NGL, Pt, DBO5, DCO, MES).</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#merge the industrial sites file with the file on pollutant emissions</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>file_georisques_emissions_id_site <span class="ot">&lt;-</span> <span class="fu">left_join</span>(</span>
@@ -473,7 +482,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <p>Only for the years 2019 and 2020, for each site (ID and name), there are files (rejets.csv) specifically specifying if discharges are in the sewers network or in the natural environment, in m3/y. We will use it to test our main dataset on this particular point.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#read and merge csv of all years</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>file_georisques_discharge <span class="ot">&lt;-</span> <span class="fu">list.files</span>( </span>
@@ -502,7 +511,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <p>We load the data. Contrary to géorisques data, there is only 1 main file, so no need to merge several files together.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#path for GEREP data source</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>path_source <span class="ot">&lt;-</span> <span class="st">"source_data/0_industry_discharge/GEREP_data/"</span></span>
@@ -538,7 +547,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>We summarize the flows at the national scale.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>GEREP <span class="ot">&lt;-</span> GEREP <span class="sc">%&gt;%</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">#We only keep metropolitan France sites (exclude overseas territories)</span></span>
@@ -593,7 +602,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>We summarize the flows at each water agency basin scale.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#temporary file, incoming and discharges nutrient flows and number of facilities, for each water agency basin</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> GEREP <span class="sc">%&gt;%</span></span>
@@ -625,7 +634,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>We also create a complete file with the flows of all the industrial facilities, not summarized at the basin nor national scale.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># add dummy ID for each industrial facility to merge temporary files together</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> GEREP <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">ID =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span>
@@ -664,7 +673,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
 <p>For 2003-2020, we plot at the national scale the number of industrial facilities reporting discharges for the concerned nutrient (left) and the quantity discharged (right). Spikes in the right chart indicate some potential incoherent data, that we investigate.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#function for the graph of géorisques nutrient inflows and discharges</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>f_graph <span class="ot">&lt;-</span> <span class="cf">function</span>(nutrient){</span>
@@ -722,60 +731,80 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <p>Outliers (visual identification): in 2017 for indirect water discharge; in 2010 for direct water discharge; potential outlier in 2007.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph</span>(<span class="st">"NGL"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/outliers_georisques_NGL-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/outliers_georisques_NGL-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <p>Outliers (visual identification): in 2010 direct water discharge ; in 2008 and 2020 ground discharge.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph</span>(<span class="st">"Pt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/outliers_georisques_Pt-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/outliers_georisques_Pt-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
 <p>Outliers (visual identification): in 2010 direct water discharge, and in 2007.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph</span>(<span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/outliers_georisques_DBO5-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/outliers_georisques_DBO5-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-3-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-4-tab">
 <p>Outliers (visual identification): in 2010 direct water discharge ; in 2018, 2019 and 2020 indirect water discharge.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph</span>(<span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/outliers_georisques_DCO-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/outliers_georisques_DCO-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-3-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-5-tab">
 <p>Outliers (visual identification): in 2010 direct water discharge ; in 2018, 2019 and 2020 indirect water discharge.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph</span>(<span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/outliers_georisques_MES-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/outliers_georisques_MES-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -786,7 +815,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>DCO, DBO5 and MES are off by factor 1000 (we divide the values by 1000)</li>
 </ul>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#NGL</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>georisque<span class="sc">$</span>NGL[georisque<span class="sc">$</span>Id <span class="sc">==</span> <span class="st">"0079305101"</span> <span class="sc">&amp;</span> georisque<span class="sc">$</span>Year <span class="sc">==</span> <span class="dv">2010</span>] <span class="ot">&lt;-</span> </span>
@@ -811,7 +840,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>in 2017, Id 0005403171, SMET NORD EST 71 : only year reported for this facility =&gt; we remove it</li>
 </ul>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>georisque<span class="sc">$</span>NGL[georisque<span class="sc">$</span>Id <span class="sc">==</span> <span class="st">"0005403171"</span> <span class="sc">&amp;</span> georisque<span class="sc">$</span>Year <span class="sc">==</span> <span class="dv">2017</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -822,7 +851,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>in 2020, Id 0005106528 SUEZ ORGANIQUE : only year reported for this facility =&gt; we remove it</li>
 </ul>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>georisque<span class="sc">$</span>Pt[georisque<span class="sc">$</span>Id <span class="sc">==</span> <span class="st">"0005103644"</span> <span class="sc">&amp;</span> georisque<span class="sc">$</span>Year <span class="sc">==</span> <span class="dv">2008</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>georisque<span class="sc">$</span>Pt[georisque<span class="sc">$</span>Id <span class="sc">==</span> <span class="st">"0005106528"</span> <span class="sc">&amp;</span> georisque<span class="sc">$</span>Year <span class="sc">==</span> <span class="dv">2020</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -833,7 +862,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>in 2007, Id 0009000031, Base Aérienne 103 CDT René MOUCHOTTE : only year reported for this facility =&gt; we remove it</li>
 </ul>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>georisque<span class="sc">$</span>DBO5[georisque<span class="sc">$</span>Id <span class="sc">==</span> <span class="st">"0009000031"</span> <span class="sc">&amp;</span> georisque<span class="sc">$</span>Year <span class="sc">==</span> <span class="dv">2007</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -843,7 +872,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>in 2018, 2019 and 2020, Id 0006402259 SERAMM, Usine des boues: values about 10 times higher than the previous years. We divide the values of these years by 10.</li>
 </ul>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>georisque<span class="sc">$</span>DCO[georisque<span class="sc">$</span>Id <span class="sc">==</span> <span class="st">"0006402259"</span> <span class="sc">&amp;</span> georisque<span class="sc">$</span>Year <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">2018</span>, <span class="dv">2019</span>, <span class="dv">2020</span>)] <span class="ot">&lt;-</span> </span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  georisque<span class="sc">$</span>DCO[georisque<span class="sc">$</span>Id <span class="sc">==</span> <span class="st">"0006402259"</span> <span class="sc">&amp;</span> georisque<span class="sc">$</span>Year <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">2018</span>, <span class="dv">2019</span>, <span class="dv">2020</span>)]<span class="sc">/</span><span class="dv">10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -855,7 +884,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>in 2018, 2019, 2020, Id 0006402259 SERAMM Usine des boues : about 10 times higher than the previous years. We divide by 10.</li>
 </ul>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>georisque<span class="sc">$</span>MES[georisque<span class="sc">$</span>Id <span class="sc">==</span> <span class="st">"0006700018"</span> <span class="sc">&amp;</span> georisque<span class="sc">$</span>Year <span class="sc">==</span><span class="dv">2019</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -874,56 +903,76 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph</span>(<span class="st">"NGL"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/georisques_corrected_NGL-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/georisques_corrected_NGL-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph</span>(<span class="st">"Pt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/georisques_corrected_Pt-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/georisques_corrected_Pt-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph</span>(<span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/georisques_corrected_DBO5-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/georisques_corrected_DBO5-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-4-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph</span>(<span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/georisques_corrected_DCO-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/georisques_corrected_DCO-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-4-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph</span>(<span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/georisques_corrected_MES-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/georisques_corrected_MES-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -933,7 +982,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-7-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-3-tab">
 <p>For 2019 and 2020 discharged flows in the sanitation network and in the environment are reported (in m3/year) in the <em>emission.csv</em> file. We compare these data with the ones presented in the previous graphs, to check for coherence. Normally the nutrient flows discharged in the network should correspond to the “water (indirect)” flows of the previous graphs.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#merge our main georisque data with file on network discharges</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>data_sewers_discharge_merged <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(</span>
@@ -955,7 +1004,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Some of what is reported as “connected disharged” in the emission file is actually not a discharge into the sanitation network, but a discharge in the environment from waste water treatment plant. We identify these waste water treatment plants by their APE code (“Collecte et traitement des eaux usées”) and EPRTR code (“Installations de traitement des eaux urbaines résiduaires d’une capacité de 100 000 équivalents habitants”).</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#see all the APE labels (about 90)</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(data_sewers_discharge_merged<span class="sc">$</span>libelle_ape)</span>
@@ -977,7 +1026,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In the graphs below, we can see that besides what looks like some little incoherences, the “indirect water discharge” of our previous data (black line) corresponds well to the discharge into networks of facilities that are not WWTP (columns for 2019 and 2020, left).</p>
 <p>So in the following, we will use the “indirect water discharge” as a proxy for what is discharged into the sanitation networks.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>f_graph_comparison <span class="ot">&lt;-</span> <span class="cf">function</span>(nutrient_select){</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">#in the main file keep only indirect water discharge of nutrient, normally corresponding to discharge in sanitation networks.</span></span>
@@ -1022,56 +1071,76 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_comparison</span>(<span class="st">"NGL"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/sewers_discarge_consistency_NGL-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/sewers_discarge_consistency_NGL-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_comparison</span>(<span class="st">"Pt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/sewers_discarge_consistency_Pt-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/sewers_discarge_consistency_Pt-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-5-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_comparison</span>(<span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/sewers_discarge_consistency_DCO-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/sewers_discarge_consistency_DCO-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-5-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_comparison</span>(<span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/sewers_discarge_consistency_DBO5-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/sewers_discarge_consistency_DBO5-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-5-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_comparison</span>(<span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/sewers_discarge_consistency_MES-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/sewers_discarge_consistency_MES-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1081,7 +1150,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-7-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-4-tab">
 <p>We save the sewage network discharge for all the industrial sites.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#remove temporary file used only to check consistency of sewers discharge</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(data_sewers_discharge_merged)</span>
@@ -1104,7 +1173,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>We also save the data aggregated at the national scale. Below are the graphs for each nutrient.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co">#same as before, but flows summarized at the national scale</span></span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>national_network_discharge <span class="ot">&lt;-</span> georisque <span class="sc">%&gt;%</span></span>
@@ -1147,7 +1216,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#function for graph of industries discharge to sewers networks</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>f_graph_final <span class="ot">&lt;-</span> <span class="cf">function</span>(dataset, nutrient_flow, nutrient_nb_facilities){</span>
@@ -1181,60 +1250,80 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
 <p>Order of magnitude for the 2010s : 0.7 ktP/year.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_final</span>(national_network_discharge, <span class="st">"Pt"</span>, <span class="st">"Pt_nb_facilities"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/graph_georisque_final_discharge_sewers_Pt-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/graph_georisque_final_discharge_sewers_Pt-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
 <p>Order of magnitude for the 2010s : 3-4 ktN/year.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_final</span>(national_network_discharge, <span class="st">"NGL"</span>, <span class="st">"NGL_nb_facilities"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/graph_georisque_final_discharge_sewers_NGL-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/graph_georisque_final_discharge_sewers_NGL-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-6-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-3-tab">
 <p>Order of magnitude for the 2010s : 60-70 ktDBO5/year.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_final</span>(national_network_discharge, <span class="st">"DBO5"</span>, <span class="st">"DBO5_nb_facilities"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/graph_georisque_final_discharge_sewers_DBO5-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/graph_georisque_final_discharge_sewers_DBO5-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-6-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-4-tab">
 <p>Order of magnitude for the 2010s : 150 ktDCO/year.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_final</span>(national_network_discharge, <span class="st">"DCO"</span>, <span class="st">"DCO_nb_facilities"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/graph_georisque_final_discharge_sewers_DCO-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/graph_georisque_final_discharge_sewers_DCO-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-6-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-5-tab">
 <p>Order of magnitude for the 2010s : 10-15 ktMES/year.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_final</span>(national_network_discharge, <span class="st">"MES"</span>, <span class="st">"MES_nb_facilities"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/graph_georisque_final_discharge_sewers_MES-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/graph_georisque_final_discharge_sewers_MES-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1257,7 +1346,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-15-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-15-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co">#caption of the comparison graph</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>Source_GEREP_georisque <span class="ot">&lt;-</span> <span class="st">"Source: géorisque and GEREP database</span><span class="sc">\n</span><span class="st">computation by Thomas Starck"</span></span>
@@ -1354,56 +1443,76 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_data_comparison</span>(GEREP_national, national_network_discharge, <span class="st">"Pt"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_Pt_before_correction-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_Pt_before_correction-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_data_comparison</span>(GEREP_national, national_network_discharge, <span class="st">"NGL"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_NGL_before_correction-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_NGL_before_correction-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-8-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_data_comparison</span>(GEREP_national, national_network_discharge, <span class="st">"DBO5"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_DBO5_before_correction-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_DBO5_before_correction-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-8-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_data_comparison</span>(GEREP_national, national_network_discharge, <span class="st">"DCO"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_DCO_before_correction-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_DCO_before_correction-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-8-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_data_comparison</span>(GEREP_national, national_network_discharge, <span class="st">"MES"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_MES_before_correction-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_MES_before_correction-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1420,67 +1529,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-9-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-9-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>,<span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-1-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-1-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-9-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-2-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-2-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-9-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-3-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-3-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-9-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-4-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-4-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-9-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-5-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-5-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-9-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-6-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-6-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-6-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1493,67 +1626,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-10-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-10-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-7-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-7-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-10-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-8-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-8-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-10-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-9-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-9-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-10-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-10-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-10-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-10-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-11-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-11-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-10-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-6-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-12-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-12-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1566,67 +1723,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-11-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-11-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-13-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-13-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-11-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-14-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-14-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-11-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-15-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-15-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-11-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-16-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-16-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-11-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-17-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-17-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-11-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-6-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-18-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-18-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1639,67 +1820,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-12-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-12-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-19-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-19-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-12-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-20-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-20-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-12-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-21-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-21-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-12-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-22-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-22-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-12-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-23-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-23-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-12-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-6-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-24-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-24-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1712,67 +1917,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-13-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-13-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-25-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-25-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-13-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-26-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-26-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-13-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-27-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-27-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-13-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-28-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-28-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-13-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-29-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-29-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-13-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-6-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-30-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-30-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1806,7 +2035,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>in 2019 for BISCHWILLER, correct factor 10 000 in and out</li>
 </ul>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="co">#PHOSPHORUS</span></span>
 <span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a><span class="co">#CHAGNY in, 2017</span></span>
@@ -1931,7 +2160,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-24-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-24-2-tab">
 <p>We recompute the aggregated (national and basin scale) flows after our corrections on the GEREP database.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="co">#We recompute the flows at the national scale</span></span>
 <span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -2008,56 +2237,76 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-16-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-16-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_data_comparison</span>(GEREP_national, national_network_discharge, <span class="st">"Pt"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_Pt_after_correction-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_Pt_after_correction-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-16-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-16-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_data_comparison</span>(GEREP_national, national_network_discharge, <span class="st">"NGL"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_NGL_after_correction-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_NGL_after_correction-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-16-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-16-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_data_comparison</span>(GEREP_national, national_network_discharge, <span class="st">"DBO5"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_DBO5_after_correction-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_DBO5_after_correction-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-16-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-16-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_data_comparison</span>(GEREP_national, national_network_discharge, <span class="st">"DCO"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_DCO_after_correction-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_DCO_after_correction-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-16-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-16-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_data_comparison</span>(GEREP_national, national_network_discharge, <span class="st">"MES"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_MES_after_correction-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/comparison_GEREP_georisques_MES_after_correction-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -2074,67 +2323,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-17-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-17-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>,<span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-31-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-31-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-17-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-17-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-32-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-32-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-17-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-17-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-33-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-33-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-17-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-17-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-34-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-34-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-17-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-17-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-35-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-35-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-17-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-17-6-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"Pt_in"</span>, <span class="st">"Pt_out"</span>, <span class="st">"Pt_nb_facilities"</span>, <span class="st">"P"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-36-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-36-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -2147,67 +2420,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-18-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-18-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-37-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-37-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-18-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-18-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-38-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-38-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-18-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-18-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-39-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-39-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-18-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-18-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-40-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-40-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-18-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-18-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-41-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-41-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-18-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-18-6-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"NGL_in"</span>, <span class="st">"NGL_out"</span>, <span class="st">"NGL_nb_facilities"</span>, <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-42-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-42-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -2220,67 +2517,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-19-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-19-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-43-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-43-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-19-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-19-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-44-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-44-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-19-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-19-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-45-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-45-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-19-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-19-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-46-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-46-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-19-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-19-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-47-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-47-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-19-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-19-6-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"DBO5_in"</span>, <span class="st">"DBO5_out"</span>, <span class="st">"DBO5_nb_facilities"</span>, <span class="st">"DBO5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-48-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-48-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -2293,67 +2614,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-20-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-20-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-49-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-49-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-20-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-20-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-50-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-50-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-20-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-20-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-51-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-51-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-20-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-20-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-52-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-52-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-20-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-20-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-53-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-53-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-20-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-20-6-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"DCO_in"</span>, <span class="st">"DCO_out"</span>, <span class="st">"DCO_nb_facilities"</span>, <span class="st">"DCO"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-54-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-54-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -2366,67 +2711,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-21-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-21-1-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Adour-Garonne"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-55-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-55-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-21-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-21-2-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Artois-Picardie"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-56-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-56-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-21-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-21-3-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Loire-Bretagne"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-57-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-57-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-21-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-21-4-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhin-Meuse"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-58-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-58-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-21-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-21-5-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Rhône-Méditerranée"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-59-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-59-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
 <div id="tabset-21-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-21-6-tab">
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f_graph_basin</span>(GEREP_basins, <span class="st">"Seine-Normandie"</span>, <span class="st">"MES_in"</span>, <span class="st">"MES_out"</span>, <span class="st">"MES_nb_facilities"</span>, <span class="st">"MES"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-60-1.svg" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="0_industry_discharge_files/figure-html/unnamed-chunk-60-1.svg" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -2447,7 +2816,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In the <em>géorisques data</em> paragraph, we already saved the cleaned géorisques database.</p>
 <p>We also save the GEREP data, which is more complete than the géorisques database. Note: with a little more work, it would also be possible to save industrial pollution at the departmental and regional scale.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a><span class="co">#output path</span></span>
 <span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>output_data <span class="ot">&lt;-</span> <span class="st">"output_data/industry_sewers_network_discharge/"</span></span>
@@ -2474,7 +2843,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>We add a metadata file to describe our saved files.</p>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="fu">writeLines</span>(</span>
 <span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -2501,7 +2870,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -2552,6 +2921,33 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       } else {
         el.classList.add('notransition');
       }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
     }
   }
   const toggleColorMode = (alternate) => {
@@ -2620,13 +3016,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  let localAlternateSentinel = 'default';
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {
     // Read the current dark / light value 
     let toAlternate = !hasAlternateSentinel();
     toggleColorMode(toAlternate);
     setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
   };
   // Ensure there is a toggle, if there isn't float one in the top right
   if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -2661,18 +3059,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -2704,11 +3091,50 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
-  function tippyHover(el, contentFn) {
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -2718,8 +3144,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -2731,7 +3166,130 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -2775,6 +3333,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -2800,6 +3359,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -2860,6 +3445,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+
 
 
 

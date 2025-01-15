@@ -37,6 +37,7 @@ library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org
 
 
 #loading relevant packages
+library(patchwork) #for multiple plots
 library(cowplot) #for plot_grid()
 library(patchwork) #for multiple ggplot graphs
 library(sf) #for spherical geometry operations
@@ -1821,6 +1822,167 @@ p2 <- draw_map_sensitive(
 
 p1 + p2
 ```
+
+
+# Treatment types
+
+```{r}
+#prepare data
+temp <- BDERU %>%
+  #replace Not Available by unknown
+  mutate(
+    treatment = case_when(is.na(treatment) ~ "None or Unknown", T ~treatment)
+    ) %>% 
+  #translate main treatments to English
+  mutate(
+    treatment = case_when(
+      treatment %in% c("biofiltre", "Biofiltre") ~ "Biofilter",
+      treatment == "Boue activée forte charge" ~ "Activated sludge\n(high-load)",
+      treatment == "Boue activée moyenne charge" ~ "Activated sludge\n(low-load)",
+      treatment == "Boue activée faible charge" ~ "Activated sludge\n(moderate-load)",
+      treatment == "Boue activée aération prolongée (très faible charge)" ~ "Activated sludge\n(very low-load)",
+      treatment == "Bioréacteur à membrane" ~ "Membrane bioreactor",
+      treatment == "Filtres Plantés" ~ "Planted filters",
+      treatment == "Lagunage naturel" ~ "Natural lagooning",
+      T ~ "Other"
+      )
+    ) %>%
+  #summarize total capacity and number of WWTP by category
+  group_by(
+    Year, treatment, PE_bin
+    ) %>%
+  summarise(
+    capacity = sum(capacity, na.rm = T)/10^6,
+    n_WWTP = n()
+    ) %>%
+  #also compute total capacity only by treatment, 
+  group_by(
+    Year, treatment
+    ) %>%
+  mutate(
+    total_capacity = sum(capacity, na.rm = T)/10^6
+    )
+
+#uncomment to see 2018-2020 seem less reliable for the Biofilter / Other attribution
+#so I take the median Year, 2017
+# ggplot(temp %>% filter(Year>2014 & Year<2021)) +
+#   geom_col(aes(Year, capacity, fill = PE_bin), alpha=.7) +
+#   theme(panel.grid.major.y = element_blank()) +
+#   labs(y= "million population equivalent concerned", fill = "WWTP capacity") +
+#   facet_wrap(vars(treatment))
+
+#focus just on 2017
+temp <- temp %>% filter(Year==2017)
+
+#order treatment as I want them to be presented on graph
+temp$treatment <- factor(
+  temp$treatment,
+  levels = c(
+    "Other",
+    "Membrane bioreactor",
+    "Planted filters",
+    "Natural lagooning",
+    "Biofilter",
+    "Activated sludge\n(high-load)",
+    "Activated sludge\n(low-load)",
+    "Activated sludge\n(moderate-load)",
+    "Activated sludge\n(very low-load)"
+  )
+)
+
+
+# graph of treatments based on WWTP capacity
+gg1 <- ggplot(temp) +
+  geom_col(aes(capacity, treatment, fill = PE_bin), alpha=.7) +
+  theme(panel.grid.major.y = element_blank()) +
+  labs(
+    x="millions PE concerned", y= "", 
+    fill = "capacity range", 
+    subtitle = "French WWTPs capacity: ~ 100 million PE"
+    ) 
+
+# graph of treatments based on WWTP number
+gg2 <- ggplot(temp) +
+  geom_col(aes(n_WWTP, treatment, fill = PE_bin), alpha=.7) +
+  theme(panel.grid.major.y = element_blank()) +
+  scale_x_continuous(labels = scales::label_number(drop0trailing = TRUE)) +
+  labs(
+    x="number of WWTPS concerned", y= "", 
+    fill = "capacity range", 
+    subtitle = "number of French WWTPs: ~ 21,000"
+    ) 
+
+# combine 2 graphs
+gg1 +  theme(axis.text.y = element_blank()) + scale_x_reverse() +
+  gg2 + theme(axis.text.y = element_text(hjust=0.5)) +
+  plot_layout(guides = "collect") + plot_annotation(title = "WWTPs treatments in France")
+```
+
+sanitization
+
+```{r}
+#prepare data
+temp <- BDERU %>%
+  #replace Not Available by unknown
+  mutate(
+    sanitization_treatment = case_when(is.na(sanitization_treatment) ~ "None or Unknown", T ~sanitization_treatment)
+    ) %>%
+  #summarize total capacity and number of WWTP by category
+  group_by(
+    Year, sanitization_treatment, PE_bin
+    ) %>%
+  summarise(
+    capacity = sum(capacity, na.rm = T)/10^6,
+    n_WWTP = n()
+    ) %>%
+  #also compute total capacity only by treatment, 
+  group_by(
+    Year, sanitization_treatment
+    ) %>%
+  mutate(
+    total_capacity = sum(capacity, na.rm = T)/10^6
+    )
+
+#focus just on 2017
+temp <- temp %>% filter(Year==2017)
+
+# graph of treatments based on WWTP capacity
+gg1 <- ggplot(temp) +
+  geom_col(aes(capacity, sanitization_treatment, fill = PE_bin), alpha=.7) +
+  theme(panel.grid.major.y = element_blank()) +
+  labs(
+    x="millions PE concerned", y= "", 
+    fill = "capacity range", 
+    subtitle = "French WWTPs capacity: ~ 100 million PE"
+    ) 
+
+# graph of treatments based on WWTP number
+gg2 <- ggplot(temp) +
+  geom_col(aes(n_WWTP, sanitization_treatment, fill = PE_bin), alpha=.7) +
+  theme(panel.grid.major.y = element_blank()) +
+  scale_x_continuous(labels = scales::label_number(drop0trailing = TRUE)) +
+  labs(
+    x="number of WWTPS concerned", y= "", 
+    fill = "capacity range", 
+    subtitle = "number of French WWTPs: ~ 21,000"
+    ) 
+
+# combine 2 graphs
+gg1 +  theme(axis.text.y = element_blank()) + scale_x_reverse() +
+  gg2 + theme(axis.text.y = element_text(hjust=0.5)) +
+  plot_layout(guides = "collect") + plot_annotation(title = "WWTPs treatments in France")
+
+
+# 1.6% WWTP have sanitization, representing 7.2% of capacity :
+temp2 <- temp %>% group_by(
+    Year, sanitization_treatment
+    ) %>%
+  summarise(
+    capacity = sum(capacity, na.rm = T),
+    n_WWTP = sum(n_WWTP)
+    ) 
+```
+
 
 # Export data
 

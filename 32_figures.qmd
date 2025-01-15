@@ -602,8 +602,6 @@ f_graph_ratio_basin <- function(dataset, ratio_in){
     theme(legend.position = "bottom")
   return(g)
 }
-
-
 ```
 
 ```{r}
@@ -619,7 +617,10 @@ g1 <- f_graph_ratio_basin(file_basin, "Pt_PE_ratio_in") +
           trans=~.*(365/1000), 
           name=expression(paste("kgP.PE"^"-1", ".year"^"-1"))
           )
-      ) 
+      ) +
+  theme(
+    axis.title.y.right = element_text(angle = 90)
+    )
 g2 <- f_graph_ratio_basin(file_basin, "N_P_ratio_in") +
   labs(
     x="", y="N:P ratio",
@@ -646,7 +647,7 @@ ggsave(#svg
   dpi=1000, width=5, height=2.8, bg="white", create.dir = T
   )
 ggsave(#pdf
-  "graphs/P_ratios.png",
+  "graphs/P_ratios.pdf",
   dpi=1000, width=5, height=2.8, bg="white", create.dir = T
   )
 ```
