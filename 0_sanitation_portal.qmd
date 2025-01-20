@@ -1749,7 +1749,7 @@ basins_metropole <- basins %>%
     NumCircAdm %in% c("01", "02", "03", "04", "05", "06", "12")
   ) %>%
   select(
-    basin_name = NomCircAdm, 
+    basin_name = NomCircAdm,
     basin_num = NumCircAdm
   ) %>%
   mutate(
@@ -1763,11 +1763,11 @@ basins_metropole <- basins %>%
       basin_name == "CORSE" ~ "Rhone-Méditerranée"
     )
   )
-draw_map_sensitive <- 
+draw_map_sensitive <-
   function(map_sf, dataset){
-  p <- ggplot(map_sf) + 
+  p <- ggplot(map_sf) +
     geom_point(data = dataset, aes(long_STEU, lat_STEU, color=sensitivity), size=0.3) +
-    geom_sf(fill = NA, color = "black", size = 0.3, alpha=.8) + 
+    geom_sf(fill = NA, color = "black", size = 0.3, alpha=.8) +
     coord_sf(datum = NA, expand = FALSE) + #remove coordinates
     theme(panel.background = element_blank()) +
     labs(
@@ -1779,11 +1779,11 @@ draw_map_sensitive <-
 
 #P sensitive WWTPs graph
 p1 <- draw_map_sensitive(
-  basins_metropole, 
-  BDERU %>% 
+  basins_metropole,
+  BDERU %>%
     filter(Year==2020, basin !="Overseas and others") %>%
     mutate(
-      sensitivity = 
+      sensitivity =
         case_when(
           sensitivity %in% c("Only P sensible", "N and P sensible") ~ "Yes",
           T ~ "No"
@@ -1796,17 +1796,17 @@ p1 <- draw_map_sensitive(
     caption = "\n",
     color = "Sensitive"
   ) +
-  theme(legend.position = "right")  + 
+  theme(legend.position = "right")  +
   #biggest points on the legend
   guides(color = guide_legend(override.aes = list(size=5)))
 
 #N sensitive WWTPs graph
 p2 <- draw_map_sensitive(
-  basins_metropole, 
-  BDERU %>% 
+  basins_metropole,
+  BDERU %>%
     filter(Year==2020, basin !="Overseas and others") %>%
     mutate(
-      sensitivity = 
+      sensitivity =
         case_when(
           sensitivity %in% c("N and P sensible") ~ "Yes",
           T ~ "No"
@@ -1832,7 +1832,7 @@ temp <- BDERU %>%
   #replace Not Available by unknown
   mutate(
     treatment = case_when(is.na(treatment) ~ "None or Unknown", T ~treatment)
-    ) %>% 
+    ) %>%
   #translate main treatments to English
   mutate(
     treatment = case_when(
@@ -1855,7 +1855,7 @@ temp <- BDERU %>%
     capacity = sum(capacity, na.rm = T)/10^6,
     n_WWTP = n()
     ) %>%
-  #also compute total capacity only by treatment, 
+  #also compute total capacity only by treatment,
   group_by(
     Year, treatment
     ) %>%
@@ -1896,10 +1896,10 @@ gg1 <- ggplot(temp) +
   geom_col(aes(capacity, treatment, fill = PE_bin), alpha=.7) +
   theme(panel.grid.major.y = element_blank()) +
   labs(
-    x="millions PE concerned", y= "", 
-    fill = "capacity range", 
+    x="millions PE concerned", y= "",
+    fill = "capacity range",
     subtitle = "French WWTPs capacity: ~ 100 million PE"
-    ) 
+    )
 
 # graph of treatments based on WWTP number
 gg2 <- ggplot(temp) +
@@ -1907,10 +1907,10 @@ gg2 <- ggplot(temp) +
   theme(panel.grid.major.y = element_blank()) +
   scale_x_continuous(labels = scales::label_number(drop0trailing = TRUE)) +
   labs(
-    x="number of WWTPS concerned", y= "", 
-    fill = "capacity range", 
+    x="number of WWTPS concerned", y= "",
+    fill = "capacity range",
     subtitle = "number of French WWTPs: ~ 21,000"
-    ) 
+    )
 
 # combine 2 graphs
 gg1 +  theme(axis.text.y = element_blank()) + scale_x_reverse() +
@@ -1935,7 +1935,7 @@ temp <- BDERU %>%
     capacity = sum(capacity, na.rm = T)/10^6,
     n_WWTP = n()
     ) %>%
-  #also compute total capacity only by treatment, 
+  #also compute total capacity only by treatment,
   group_by(
     Year, sanitization_treatment
     ) %>%
@@ -1951,10 +1951,10 @@ gg1 <- ggplot(temp) +
   geom_col(aes(capacity, sanitization_treatment, fill = PE_bin), alpha=.7) +
   theme(panel.grid.major.y = element_blank()) +
   labs(
-    x="millions PE concerned", y= "", 
-    fill = "capacity range", 
+    x="millions PE concerned", y= "",
+    fill = "capacity range",
     subtitle = "French WWTPs capacity: ~ 100 million PE"
-    ) 
+    )
 
 # graph of treatments based on WWTP number
 gg2 <- ggplot(temp) +
@@ -1962,10 +1962,10 @@ gg2 <- ggplot(temp) +
   theme(panel.grid.major.y = element_blank()) +
   scale_x_continuous(labels = scales::label_number(drop0trailing = TRUE)) +
   labs(
-    x="number of WWTPS concerned", y= "", 
-    fill = "capacity range", 
+    x="number of WWTPS concerned", y= "",
+    fill = "capacity range",
     subtitle = "number of French WWTPs: ~ 21,000"
-    ) 
+    )
 
 # combine 2 graphs
 gg1 +  theme(axis.text.y = element_blank()) + scale_x_reverse() +
@@ -1980,7 +1980,7 @@ temp2 <- temp %>% group_by(
   summarise(
     capacity = sum(capacity, na.rm = T),
     n_WWTP = sum(n_WWTP)
-    ) 
+    )
 ```
 
 
@@ -1990,7 +1990,7 @@ Save the data at summarized at the basins and metropolitan scales
 
 ```{r}
 #info summarized at the basin scales
-BDERU_basin <- BDERU %>% 
+BDERU_basin <- BDERU %>%
   filter(basin != "Overseas and others") %>%
   group_by(Year, basin) %>%
   summarise(
@@ -2004,7 +2004,7 @@ BDERU_basin <- BDERU %>%
   )
 
 #summarised at the national metropolitan scale
-temp <- BDERU %>% 
+temp <- BDERU %>%
   filter(basin != "Overseas and others") %>%
   group_by(Year) %>%
   summarise(
@@ -2044,7 +2044,7 @@ Same but also including capacities categories.
 
 ```{r}
 #info summarized at the basin x capacity category scales
-BDERU_PE_basin <- BDERU %>% 
+BDERU_PE_basin <- BDERU %>%
   filter(basin != "Overseas and others") %>%
   group_by(Year, basin, PE_bin) %>%
   summarise(
@@ -2055,10 +2055,10 @@ BDERU_PE_basin <- BDERU %>%
       ), ~ sum(.x, na.rm = T)/10^6 #convert in Mt
     ),
     nb_WWTP= n()
-  ) 
+  )
 
 #summarised at the national metropolitan x capacity category scale
-temp <- BDERU %>% 
+temp <- BDERU %>%
   filter(basin != "Overseas and others") %>%
   group_by(Year, PE_bin) %>%
   summarise(
@@ -2088,7 +2088,7 @@ BDERU_PE_basin$sludge_industrial_valorisation[BDERU_PE_basin$Year<2015] <- NA
 
 #save data
 f_save_csv_files(
-  BDERU_PE_basin, 
+  BDERU_PE_basin,
   "output_data/basins_PE/",
   "basin_PE_sanitation_portal.csv"
 )
@@ -2099,17 +2099,17 @@ Save individual WWTP data on capacity, sludge production and many more
 ```{r}
 temp <- BDERU %>%
   select(
-    Year, code_WWTP, name_WWTP, basin, capacity, PE_bin, 
+    Year, code_WWTP, name_WWTP, basin, capacity, PE_bin,
     sludge_production, sludge_spread, sludge_compost, sludge_landfill, sludge_incinerated, sludge_industrial_valorisation, sludge_to_other_WWTP,
     N_sens, P_sens, sensitivity,
-    flow_m3_d, percent_direct_discharge_dry_weather, 
-    treatment, sludge_treatment, bio_treatment, N_treatment, P_treatment, 
-    lat_STEU, long_STEU, lat_discharge, long_discharge, 
-    INSEE_dep, INSEE_com, 
+    flow_m3_d, percent_direct_discharge_dry_weather,
+    treatment, sludge_treatment, bio_treatment, N_treatment, P_treatment,
+    lat_STEU, long_STEU, lat_discharge, long_discharge,
+    INSEE_dep, INSEE_com,
   )
 
 f_save_csv_files(
-  temp, 
+  temp,
   "output_data/all_WWTP/",
   "all_WWTP_sanitation_portal.csv"
 )
