@@ -37,7 +37,6 @@ library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org
 
 
 #loading relevant packages
-library(patchwork) #for multiple plots
 library(cowplot) #for plot_grid()
 library(patchwork) #for multiple ggplot graphs
 library(sf) #for spherical geometry operations

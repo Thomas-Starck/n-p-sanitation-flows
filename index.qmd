@@ -7,7 +7,7 @@ bibliography: references.bib
 knitr::opts_chunk$set(warning=F, message=F, results=F, dev='svg')
 ```
 
-This website describes the data sources and processing to get the results presented in @starck2024fate (for nitrogen) and @starck2023phosphorus (for phosphorus). The results here go beyond what is presented in the articles. 
+This website describes the data sources and processing to get the results presented in @starck2024fate (for nitrogen) and @starck2023phosphorus (for phosphorus) and chapter 4 of @starck2024towards. The results here go beyond what is presented in the articles. 
 
 This project assesses the nutrient flows in the French sanitation system. Multiple sources are used: wastewater treatment plant data from water agencies, industry discharge, food intakes surveys...
 

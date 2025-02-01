@@ -40,6 +40,8 @@ library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org
 #loading additional relevant packages
 library(cowplot) #for plot_grid(), multiple plots
 library(DT) #for interactive tables
+library(ggtext)
+library(viridis)
 
 #path for data 
 path_output <- "output_data/nutrient_ingestion_excretion/"
